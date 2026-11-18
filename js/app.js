@@ -13,23 +13,46 @@ const rotator = document.getElementById("rotator");
 const img = document.getElementById("cardImg");
 const stage = document.getElementById("stage");
 
+/* Presets fusionnés des deux moteurs embarqués via ribi-holo :
+   - engine "css"  = simeydotme/pokemon-cards-css  (e151: false)
+   - engine "151"  = simeydotme/pokemon-cards-151  (e151: true, couches glitter/glare2) */
+const P = { supertype: "pokémon", subtypes: "basic" };
 const EFFECTS = [
-  { id: "basic", label: "Basique (non-holo)", rarity: "common" },
-  { id: "holo", label: "Holo rare", rarity: "rare holo" },
-  { id: "reverse", label: "Reverse holo", rarity: "reverse holo" },
-  { id: "cosmos", label: "Cosmos / Galaxy", rarity: "rare holo cosmos" },
-  { id: "amazing", label: "Amazing rare", rarity: "amazing rare" },
-  { id: "radiant", label: "Radiant", rarity: "radiant rare" },
-  { id: "rainbow", label: "Rainbow rare", rarity: "rare rainbow" },
-  { id: "rainbow-alt", label: "Rainbow alt (VMAX)", rarity: "rare rainbow alt" },
-  { id: "secret", label: "Secret rare (or)", rarity: "rare secret" },
-  { id: "v", label: "Pokémon V", rarity: "rare holo v" },
-  { id: "vfull", label: "V Full Art", rarity: "rare ultra", supertype: "pokémon" },
-  { id: "vmax", label: "VMAX", rarity: "rare holo vmax", supertype: "pokémon" },
-  { id: "vstar", label: "VSTAR", rarity: "rare holo vstar" },
-  { id: "shinyv", label: "Shiny V", rarity: "rare shiny v" },
-  { id: "shinyvmax", label: "Shiny VMAX", rarity: "rare shiny vmax" },
-  { id: "tg", label: "Trainer Gallery", rarity: "trainer gallery rare holo" },
+  { group: "Épée & Bouclier — pokemon-cards-css" },
+  { id: "basic", label: "Basique (non-holo)", rarity: "common", ...P },
+  { id: "reverse", label: "Reverse holo", rarity: "reverse holo", ...P },
+  { id: "holo", label: "Holo rare", rarity: "rare holo", ...P },
+  { id: "cosmos", label: "Cosmos / Galaxy", rarity: "rare holo cosmos", ...P },
+  { id: "amazing", label: "Amazing rare", rarity: "amazing rare", ...P },
+  { id: "radiant", label: "Radiant", rarity: "radiant rare", ...P },
+  { id: "v", label: "Pokémon V", rarity: "rare holo v", subtypes: "basic v", supertype: "pokémon" },
+  { id: "vfull", label: "V Full Art", rarity: "rare ultra", subtypes: "basic v", supertype: "pokémon" },
+  { id: "vmax", label: "VMAX", rarity: "rare holo vmax", subtypes: "vmax", supertype: "pokémon" },
+  { id: "vstar", label: "VSTAR", rarity: "rare holo vstar", subtypes: "vstar", supertype: "pokémon" },
+  { id: "trainerfull", label: "Trainer Full Art", rarity: "rare ultra", supertype: "trainer", subtypes: "supporter" },
+  { id: "rainbow", label: "Rainbow rare", rarity: "rare rainbow", subtypes: "basic v", supertype: "pokémon" },
+  { id: "rainbow-alt", label: "Rainbow alt (VMAX)", rarity: "rare rainbow alt", subtypes: "vmax", supertype: "pokémon" },
+  { id: "secret", label: "Secret rare (or)", rarity: "rare secret", ...P },
+  { id: "shinyrare", label: "Shiny rare", rarity: "rare shiny", ...P },
+  { id: "shinyv", label: "Shiny V", rarity: "rare shiny v", subtypes: "basic v", supertype: "pokémon" },
+  { id: "shinyvmax", label: "Shiny VMAX", rarity: "rare shiny vmax", subtypes: "vmax", supertype: "pokémon" },
+  { id: "tg-holo", label: "TG • Holo", rarity: "rare holo", gallery: true, number: "tg01", ...P },
+  { id: "tg-v", label: "TG • V", rarity: "rare holo v", gallery: true, number: "tg01", subtypes: "basic v", supertype: "pokémon" },
+  { id: "tg-vmax", label: "TG • VMAX", rarity: "rare holo vmax", gallery: true, number: "tg01", subtypes: "vmax", supertype: "pokémon" },
+  { id: "tg-secret", label: "TG • Secret rare", rarity: "rare secret", gallery: true, number: "tg01", ...P },
+  { group: "Écarlate & Violet — pokemon-cards-151" },
+  { id: "s151-basic", label: "Basique", e151: true, rarity: "common", ...P },
+  { id: "s151-reverse", label: "Reverse holo", e151: true, rarity: "common reverse holo", ...P },
+  { id: "s151-holo", label: "Holo rare", e151: true, rarity: "rare holo", ...P },
+  { id: "s151-radiant", label: "Radiant rare", e151: true, rarity: "radiant rare", ...P },
+  { id: "s151-rainbow-alt", label: "Rainbow alt (VMAX)", e151: true, rarity: "rare rainbow alt", subtypes: "vmax", supertype: "pokémon" },
+  { id: "s151-double", label: "Double rare (ex)", e151: true, rarity: "double rare", subtypes: "basic ex", supertype: "pokémon" },
+  { id: "s151-ultra", label: "Ultra rare (Full Art ex)", e151: true, rarity: "ultra rare", subtypes: "basic ex", supertype: "pokémon" },
+  { id: "s151-illu", label: "Illustration rare", e151: true, rarity: "illustration rare", ...P },
+  { id: "s151-special", label: "Special illustration rare", e151: true, rarity: "special illustration rare", subtypes: "basic ex", supertype: "pokémon" },
+  { id: "s151-hyper", label: "Hyper rare (or)", e151: true, rarity: "hyper rare", subtypes: "basic ex", supertype: "pokémon" },
+  { id: "s151-pokeball", label: "Poké Ball holo", e151: true, rarity: "pokeball holo", ...P },
+  { id: "s151-masterball", label: "Master Ball holo", e151: true, rarity: "masterball holo", ...P },
 ];
 
 const settings = {
@@ -219,16 +242,24 @@ function applyEffect(id) {
   currentEffect = id;
   card.dataset.rarity = fx.rarity;
   card.dataset.supertype = fx.supertype || "pokémon";
-  card.dataset.subtypes = "basic";
-  card.dataset.set = "";
-  card.dataset.number = "";
-  card.dataset.trainerGallery = "false";
+  card.dataset.subtypes = fx.subtypes || "basic";
+  card.dataset.set = fx.set || "";
+  card.dataset.number = fx.number || "";
+  card.dataset.trainerGallery = fx.gallery ? "true" : "false";
+  card.classList.toggle("e151", !!fx.e151);
   document.querySelectorAll("#effects button").forEach((b) => {
     b.classList.toggle("active", b.dataset.effect === id);
   });
 }
 
 EFFECTS.forEach((fx) => {
+  if (fx.group) {
+    const h = document.createElement("h3");
+    h.className = "effects-group";
+    h.textContent = fx.group;
+    effectsBox.appendChild(h);
+    return;
+  }
   const b = document.createElement("button");
   b.type = "button";
   b.textContent = fx.label;
@@ -237,6 +268,50 @@ EFFECTS.forEach((fx) => {
   effectsBox.appendChild(b);
 });
 applyEffect("holo");
+
+/* ---------- masque auto (template fenêtre d'art, repris de ribi-holo) ---------- */
+
+async function buildMask(src) {
+  const image = await new Promise((res, rej) => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = rej;
+    im.src = src;
+  });
+  const MASK_MAX = 1024;
+  const k = Math.min(1, MASK_MAX / Math.max(image.naturalWidth, image.naturalHeight));
+  const w = Math.max(1, Math.round(image.naturalWidth * k));
+  const h = Math.max(1, Math.round(image.naturalHeight * k));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(image, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const px = data.data;
+  let translucent = 0;
+  for (let i = 3; i < px.length; i += 4) if (px[i] < 250) translucent++;
+  const hasAlpha = translucent > w * h * 0.005;
+  for (let i = 0; i < px.length; i += 4) {
+    const lum = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+    px[i + 3] = hasAlpha ? px[i + 3] : lum;
+    px[i] = px[i + 1] = px[i + 2] = 255;
+  }
+  ctx.putImageData(data, 0, 0);
+  const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+  return blob ? URL.createObjectURL(blob) : canvas.toDataURL("image/png");
+}
+
+async function applyDefaultMask() {
+  try {
+    const url = await buildMask("img/card_mask.webp");
+    card.style.setProperty("--mask", `url("${url}")`);
+    card.classList.add("masked");
+  } catch (e) {
+    console.warn("masque par défaut indisponible", e);
+  }
+}
+applyDefaultMask();
 
 /* ---------- upload ---------- */
 
