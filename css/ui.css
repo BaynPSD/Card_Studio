@@ -1,0 +1,242 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(1200px 800px at 70% 20%, #1c2b4a 0%, #0b1020 55%, #070a14 100%);
+  color: #e8ecf5;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 28px 16px 8px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #aab4d0;
+  font-size: 0.95rem;
+}
+
+.subtitle a {
+  color: #7fd4ff;
+}
+
+main {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.panel {
+  width: 320px;
+  max-width: 92vw;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 18px;
+  backdrop-filter: blur(8px);
+}
+
+.block {
+  margin-bottom: 22px;
+}
+
+.block h2 {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8fa0c4;
+}
+
+.upload-btn {
+  display: block;
+  text-align: center;
+  background: linear-gradient(135deg, #ffcb05, #f0a500);
+  color: #2a2000;
+  font-weight: 700;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.upload-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 203, 5, 0.35);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: #8fa0c4;
+  margin: 8px 0 0;
+}
+
+#fileName {
+  color: #7fd4ff;
+  word-break: break-all;
+}
+
+.effects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.effects button {
+  background: rgba(255, 255, 255, 0.07);
+  color: #dfe6f5;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  padding: 8px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.effects button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.effects button.active {
+  background: linear-gradient(135deg, rgba(127, 212, 255, 0.25), rgba(200, 130, 255, 0.25));
+  border-color: #7fd4ff;
+  color: #fff;
+}
+
+.slider {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+}
+
+.slider span {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  color: #c6cfe4;
+}
+
+.slider output {
+  color: #7fd4ff;
+  font-variant-numeric: tabular-nums;
+}
+
+.slider input[type="range"] {
+  width: 100%;
+  accent-color: #ffcb05;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.color-row input[type="color"] {
+  width: 48px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 11px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #4f8ef7, #7b5cff);
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(90, 120, 255, 0.4);
+}
+
+.btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: none;
+}
+
+.btn.running {
+  background: linear-gradient(135deg, #e05555, #b03030);
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-width: 320px;
+  min-height: 640px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.stage.dragging {
+  border-color: #ffcb05;
+  background: rgba(255, 203, 5, 0.08);
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffcb05;
+  background: rgba(10, 14, 26, 0.7);
+  z-index: 10;
+}
+
+.stage.dragging .drop-overlay {
+  display: grid;
+}
+
+.stage-hint {
+  position: absolute;
+  bottom: 14px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #8fa0c4;
+  margin: 0;
+  pointer-events: none;
+}
+
+#card {
+  width: 360px;
+}
