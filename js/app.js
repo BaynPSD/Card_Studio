@@ -267,7 +267,7 @@ EFFECTS.forEach((fx) => {
   b.addEventListener("click", () => applyEffect(fx.id));
   effectsBox.appendChild(b);
 });
-applyEffect("holo");
+applyEffect("tg-holo");
 
 /* ---------- masque auto (template fenêtre d'art, repris de ribi-holo) ---------- */
 
@@ -313,11 +313,22 @@ async function applyDefaultMask() {
 }
 applyDefaultMask();
 
-/* ---------- upload ---------- */
+/* ---------- slots : carte / masque / foil (comme ribi-holo) ---------- */
 
-const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
 const dropOverlay = document.getElementById("dropOverlay");
+
+const DEFAULT_FILES = {
+  card: "img/card.webp",
+  mask: "img/card_mask.webp",
+  foil: "img/card_foil.webp",
+};
+
+const slots = {
+  card: { url: DEFAULT_FILES.card, thumb: DEFAULT_FILES.card, custom: false, blob: null },
+  mask: { thumb: DEFAULT_FILES.mask, maskUrl: null, custom: false, blob: null },
+  foil: { url: DEFAULT_FILES.foil, thumb: DEFAULT_FILES.foil, custom: false, blob: null },
+};
 
 function randomizeSeeds() {
   card.style.setProperty("--seedx", String(Math.random()));
@@ -328,30 +339,102 @@ function randomizeSeeds() {
   );
 }
 
-function loadImageSource(src, name) {
+function applyImages() {
   card.classList.add("loading");
   img.onload = () => {
     card.classList.remove("loading");
     randomizeSeeds();
   };
-  img.src = src;
-  fileName.textContent = name ? "🖼 " + name : "";
-}
-
-function handleFile(file) {
-  if (!file || !file.type.startsWith("image/")) {
-    alert("Choisis un fichier image (PNG, JPG…).");
-    return;
+  img.src = slots.card.url;
+  if (slots.foil.url) {
+    card.style.setProperty("--foil", `url("${slots.foil.url}")`);
+  } else {
+    card.style.removeProperty("--foil");
   }
-  const reader = new FileReader();
-  reader.onload = () => loadImageSource(reader.result, file.name);
-  reader.readAsDataURL(file);
+  if (slots.mask.maskUrl) {
+    card.style.setProperty("--mask", `url("${slots.mask.maskUrl}")`);
+    card.classList.add("masked");
+  } else {
+    card.classList.remove("masked");
+  }
 }
 
-fileInput.addEventListener("change", (e) => {
-  handleFile(e.target.files[0]);
-  fileInput.value = "";
+function paintSlots() {
+  document.querySelectorAll(".slot").forEach((el) => {
+    const name = el.dataset.slot;
+    const s = slots[name];
+    const im = el.querySelector("img");
+    if (s.thumb) im.src = s.thumb;
+    el.toggleAttribute("data-empty", name === "mask" ? !s.maskUrl : !s.thumb);
+  });
+}
+
+async function setSlotFile(name, file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  const blob = URL.createObjectURL(file);
+  const s = slots[name];
+  if (s.blob) URL.revokeObjectURL(s.blob);
+  s.blob = blob;
+  s.custom = true;
+  if (name === "mask") {
+    try {
+      s.maskUrl = await buildMask(blob);
+    } catch (e) {
+      console.warn("Masque non traité", e);
+      s.maskUrl = blob;
+    }
+    s.thumb = blob;
+  } else {
+    s.url = blob;
+    s.thumb = blob;
+  }
+  paintSlots();
+  applyImages();
+  fileName.textContent = "🖼 " + file.name;
+}
+
+function clearSlot(name) {
+  const s = slots[name];
+  if (s.blob) URL.revokeObjectURL(s.blob);
+  s.blob = null;
+  s.custom = false;
+  if (name === "mask") {
+    s.maskUrl = defaultMaskUrl;
+    s.thumb = DEFAULT_FILES.mask;
+  } else {
+    s.url = s.thumb = DEFAULT_FILES[name];
+  }
+  paintSlots();
+  applyImages();
+}
+
+document.querySelectorAll(".slot").forEach((el) => {
+  const name = el.dataset.slot;
+  const input = el.querySelector("input");
+  const drop = el.querySelector(".slot__drop");
+  const clear = el.querySelector(".slot__clear");
+  drop.addEventListener("click", () => input.click());
+  input.addEventListener("change", () => {
+    setSlotFile(name, input.files[0]);
+    input.value = "";
+  });
+  clear.addEventListener("click", () => clearSlot(name));
+  ["dragenter", "dragover"].forEach((t) =>
+    el.addEventListener(t, (e) => {
+      e.preventDefault();
+      el.classList.add("is-over");
+    })
+  );
+  ["dragleave", "drop"].forEach((t) =>
+    el.addEventListener(t, (e) => {
+      e.preventDefault();
+      el.classList.remove("is-over");
+    })
+  );
+  el.addEventListener("drop", (e) => setSlotFile(name, e.dataTransfer.files[0]));
 });
+
+["dragover", "drop"].forEach((t) => window.addEventListener(t, (e) => e.preventDefault()));
 
 ["dragenter", "dragover"].forEach((ev) =>
   stage.addEventListener(ev, (e) => {
@@ -368,11 +451,22 @@ fileInput.addEventListener("change", (e) => {
 );
 stage.addEventListener("drop", (e) => {
   const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-  handleFile(file);
+  setSlotFile("card", file);
 });
 
+let defaultMaskUrl = null;
+async function applyDefaultMask() {
+  try {
+    defaultMaskUrl = await buildMask(DEFAULT_FILES.mask);
+    slots.mask.maskUrl = defaultMaskUrl;
+    paintSlots();
+    applyImages();
+  } catch (e) {
+    console.warn("masque par défaut indisponible", e);
+  }
+}
 img.addEventListener("load", () => card.classList.remove("loading"));
-randomizeSeeds();
+applyDefaultMask();
 
 /* ---------- réglages ---------- */
 
@@ -400,28 +494,20 @@ glowInput.addEventListener("input", () => {
   card.style.setProperty("--card-glow", glowInput.value);
 });
 
-/* ---------- démo auto ---------- */
+/* ---------- démo auto (activée par défaut, comme ribi-holo) ---------- */
 
-const demoBtn = document.getElementById("demoBtn");
+const autoBox = document.getElementById("auto");
 
 function endShowcase() {
   if (showcaseRunning) {
     clearInterval(showcaseInterval);
     showcaseRunning = false;
-    demoBtn.textContent = "▶ Démo auto";
-    demoBtn.classList.remove("running");
   }
 }
 
-demoBtn.addEventListener("click", () => {
-  if (showcaseRunning) {
-    endShowcase();
-    interactEnd();
-    return;
-  }
+function startShowcase() {
+  if (showcaseRunning) return;
   showcaseRunning = true;
-  demoBtn.textContent = "⏹ Stop démo";
-  demoBtn.classList.add("running");
   let r = 0;
   const amp = settings.rotMax * 1.75;
   showcaseInterval = setInterval(() => {
@@ -439,16 +525,65 @@ demoBtn.addEventListener("click", () => {
       { stiffness: 0.02, damping: 0.5 }
     );
   }, 20);
+}
+
+autoBox.addEventListener("input", () => {
+  if (autoBox.checked) startShowcase();
+  else {
+    endShowcase();
+    interactEnd();
+  }
 });
+
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  autoBox.checked = true;
+  startShowcase();
+} else {
+  autoBox.checked = false;
+}
+
+/* ---------- thème clair / sombre ---------- */
+
+const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+let themeMode = "dark";
+function applyTheme() {
+  const scheme = themeMode === "system" ? (themeMedia.matches ? "dark" : "light") : themeMode;
+  document.documentElement.dataset.scheme = scheme;
+  document.querySelectorAll(".theme button").forEach((b) =>
+    b.setAttribute("aria-pressed", String(b.dataset.theme === themeMode))
+  );
+}
+document.querySelectorAll(".theme button").forEach((b) =>
+  b.addEventListener("click", () => {
+    themeMode = b.dataset.theme;
+    applyTheme();
+  })
+);
+themeMedia.addEventListener("change", () => {
+  if (themeMode === "system") applyTheme();
+});
+applyTheme();
 
 /* ---------- reset ---------- */
 
 document.getElementById("resetBtn").addEventListener("click", () => {
   endShowcase();
-  fileInput.value = "";
   fileName.textContent = "";
-  loadImageSource("img/sample-card.png", "");
-  applyEffect("holo");
+  Object.keys(slots).forEach((name) => {
+    const s = slots[name];
+    if (s.blob) URL.revokeObjectURL(s.blob);
+    s.blob = null;
+    s.custom = false;
+    if (name === "mask") {
+      s.maskUrl = defaultMaskUrl;
+      s.thumb = DEFAULT_FILES.mask;
+    } else {
+      s.url = s.thumb = DEFAULT_FILES[name];
+    }
+  });
+  paintSlots();
+  applyImages();
+  applyEffect("tg-holo");
   rotMaxInput.value = 14;
   glareInput.value = 1;
   sizeInput.value = 360;

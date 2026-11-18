@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-scheme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,18 +11,36 @@
   <header>
     <h1>🎴 Holo Card Studio</h1>
     <p class="subtitle">
-      Upload ton PNG, choisis un effet holo et bouge la souris sur la carte ✨
-      <br /><small>Effets repris de <a href="https://github.com/simeydotme/pokemon-cards-css">pokemon-cards-css</a> (simeydotme)</small>
+      Upload ton PNG, choisis un effet holo (2 moteurs : SWSH + Écarlate/Violet) et bouge la souris sur la carte ✨
+      <br /><small>Moteurs de <a href="https://github.com/simeydotme/pokemon-cards-css">pokemon-cards-css</a> &amp; <a href="https://github.com/simeydotme/pokemon-cards-151">pokemon-cards-151</a>, embarqués via <a href="https://github.com/fyk0620/ribi-holo">ribi-holo</a></small>
     </p>
   </header>
 
   <main>
     <aside class="panel">
       <section class="block">
-        <h2>1 · Image</h2>
-        <label class="upload-btn" for="fileInput">📤 Importer un PNG</label>
-        <input type="file" id="fileInput" accept="image/*" hidden />
-        <p class="hint">…ou glisse-dépose ton image directement sur la carte.</p>
+        <h2>1 · Images</h2>
+        <div class="slots">
+          <div class="slot" data-slot="card">
+            <img alt="Carte" />
+            <div class="slot__drop">📤 Carte<br /><small>clic ou glisse un PNG</small></div>
+            <input type="file" accept="image/*" hidden />
+            <button type="button" class="slot__clear" title="Remettre la carte par défaut">✕</button>
+          </div>
+          <div class="slot" data-slot="mask">
+            <img alt="Masque" />
+            <div class="slot__drop">🎭 Masque<br /><small>optionnel</small></div>
+            <input type="file" accept="image/*" hidden />
+            <button type="button" class="slot__clear" title="Masque par défaut (plein cadre)">✕</button>
+          </div>
+          <div class="slot" data-slot="foil">
+            <img alt="Foil" />
+            <div class="slot__drop">✨ Foil<br /><small>optionnel</small></div>
+            <input type="file" accept="image/*" hidden />
+            <button type="button" class="slot__clear" title="Foil par défaut">✕</button>
+          </div>
+        </div>
+        <p class="hint">Le masque par défaut couvre <strong>toute la carte</strong> (comme ribi-holo), donc l'effet s'applique partout. Glisse aussi une image directement sur la carte.</p>
         <p class="hint" id="fileName"></p>
       </section>
 
@@ -49,10 +67,19 @@
           <span>Couleur de lueur</span>
           <input type="color" id="glowColor" value="#ccfff5" />
         </label>
+        <div class="theme">
+          <span>Thème</span>
+          <button type="button" data-theme="light">☀️</button>
+          <button type="button" data-theme="dark" aria-pressed="true">🌙</button>
+          <button type="button" data-theme="system">🖥️</button>
+        </div>
       </section>
 
       <section class="block actions">
-        <button id="demoBtn" class="btn">▶ Démo auto</button>
+        <label class="auto-row">
+          <input type="checkbox" id="auto" checked />
+          <span>Démo auto (la carte tourne toute seule)</span>
+        </label>
         <button id="resetBtn" class="btn secondary">⟲ Réinitialiser</button>
         <button id="exportBtn" class="btn secondary">💾 Télécharger le rendu (PNG)</button>
         <p class="hint">L'export fige une pose et capture la carte (approximatif : les modes de fusion avancés ne sont pas toujours reproduits). Sans internet, fais une capture d'écran.</p>
@@ -60,13 +87,13 @@
     </aside>
 
     <section class="stage" id="stage">
-      <div class="card interactive" id="card"
+      <div class="card interactive masked" id="card"
            data-rarity="rare holo" data-supertype="pokémon" data-subtypes="basic"
-           data-set="" data-number="" data-trainer-gallery="false">
+           data-set="" data-number="" data-trainer-gallery="true">
         <div class="card__translater">
           <div class="card__rotator" id="rotator">
             <div class="card__front" id="front">
-              <img id="cardImg" src="img/sample-card.png" width="660" height="921" alt="Carte" draggable="false" />
+              <img id="cardImg" src="img/card.webp" width="660" height="921" alt="Carte" draggable="false" />
               <div class="card__shine"></div>
               <div class="card__glitter"></div>
               <div class="card__glare"></div>
