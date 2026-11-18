@@ -21,28 +21,28 @@ Bouge la souris (ou le doigt / le gyroscope) sur la carte pour le rendu 3D.
 
 ## Utilisation
 
-1. **Importer un PNG** (bouton ou glisser-déposer sur la carte) — une carte
-   exemple est chargée par défaut.
-2. **Choisir un effet** dans la liste (groupée par moteur SWSH / 151).
-3. **Réglages** : rotation max, intensité de l'éclat, taille, couleur de lueur.
-4. **Démo auto** / **Réinitialiser** / **Télécharger le rendu (PNG)** (export
-   approximatif via html2canvas, nécessite internet ; sinon capture d'écran).
-
-Un masque automatique (template de la fenêtre d'art, `img/card_mask.webp`)
-est généré au chargement pour les effets masqués, comme dans ribi-holo.
+1. **Images** : 3 slots (carte / masque / foil), clic ou glisser-déposer —
+   la carte par défaut est `img/card.webp` (neutre, comme ribi-holo), et le
+   masque par défaut couvre **toute la carte** (`img/card_mask.webp`), donc
+   l'effet s'applique sur toute la carte. Glisse aussi une image directement
+   sur la carte.
+2. **Choisir un effet** dans la liste (groupée SWSH / Écarlate-Violet).
+3. **Réglages** : rotation max, intensité de l'éclat, taille, couleur de lueur,
+   thème clair/sombre/système.
+4. **Démo auto** (activée par défaut) / **Réinitialiser** / **Télécharger le
+   rendu (PNG)** (export approximatif via html2canvas, nécessite internet ;
+   sinon capture d'écran).
 
 ## Structure
 
 ```
 index.html            page (UI en français)
 css/cards.css         structure 3D + les deux moteurs d'effets (151 scopé sous .card.e151)
-css/ui.css            habillage de l'interface
-js/app.js             tilt 3D (springs), upload, masque auto, presets, export
+css/ui.css            habillage de l'interface (thème clair + sombre)
+js/app.js             tilt 3D (springs), slots carte/masque/foil, masque auto, presets, export
 img/foils/            vraies textures holo (ribi-holo, GPL-3.0)
 img/card*.webp        carte/masque/foil/dos par défaut (ribi-holo)
-img/sample-card.png   carte exemple générée (tools/make_sample_card.py)
 licenses/             licences GPL-3.0 des projets d'origine
-.github/workflows/pages.yml   déploiement GitHub Pages
 ```
 
 ## Crédits & licences
