@@ -346,7 +346,7 @@ const DEFAULT_FILES = {
   back: "img/card_back.webp",
 };
 
-const backImg = document.getElementById("cardBack");
+const backImg = document.getElementById("cardBackImg");
 
 const slots = {
   card: { url: DEFAULT_FILES.card, thumb: DEFAULT_FILES.card, custom: false, blob: null },
