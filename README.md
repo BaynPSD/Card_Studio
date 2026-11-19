@@ -21,11 +21,12 @@ Bouge la souris (ou le doigt / le gyroscope) sur la carte pour le rendu 3D.
 
 ## Utilisation
 
-1. **Images** : 3 slots (carte / masque / foil), clic ou glisser-déposer —
+1. **Images** : 4 slots (carte / masque / foil / dos), clic ou glisser-déposer —
    la carte par défaut est `img/card.webp` (neutre, comme ribi-holo), et le
    masque par défaut couvre **toute la carte** (`img/card_mask.webp`), donc
-   l'effet s'applique sur toute la carte. Glisse aussi une image directement
-   sur la carte.
+   l'effet s'applique sur toute la carte. Le **dos** (`img/card_back.webp`)
+   apparaît à mi-rotation quand tu cliques la carte (spin 360° + zoom).
+   Glisse aussi une image directement sur la carte.
 2. **Choisir un effet** dans la liste (groupée SWSH / Écarlate-Violet).
 3. **Réglages** : rotation max, intensité de l'éclat, taille, couleur de lueur,
    thème clair/sombre/système.
