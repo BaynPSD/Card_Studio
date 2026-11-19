@@ -51,7 +51,7 @@ const EFFECTS = [
   { id: "s151-illu", label: "Illustration rare", e151: true, rarity: "illustration rare", ...P },
   { id: "s151-special", label: "Special illustration rare", e151: true, rarity: "special illustration rare", subtypes: "basic ex", supertype: "pokémon" },
   { id: "s151-hyper", label: "Hyper rare (or)", e151: true, rarity: "hyper rare", subtypes: "basic ex", supertype: "pokémon" },
-  { id: "s151-pokeball", label: "Poké Ball holo", e151: true, rarity: "pokeball holo", ...P },
+  { id: "s151-pokeball", label: "Outcome Holo", e151: true, rarity: "pokeball holo", ...P },
   { id: "s151-masterball", label: "Master Ball holo", e151: true, rarity: "masterball holo", ...P },
 ];
 
