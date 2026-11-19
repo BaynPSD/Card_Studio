@@ -446,6 +446,7 @@ async function setSlotFile(name, file) {
 /* recrée automatiquement masque + foil à partir de l'image de la carte,
    sauf si l'utilisateur a uploadé un masque/foil perso */
 async function autoDeriveFromCard() {
+  if (!slots.card.custom) return;
   const src = slots.card.url;
   if (!slots.mask.custom) {
     try {
