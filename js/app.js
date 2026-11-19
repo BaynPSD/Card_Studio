@@ -63,6 +63,8 @@ const settings = {
 
 const INTERACT = { stiffness: 0.066, damping: 0.25 };
 const SNAP = { stiffness: 0.01, damping: 0.06 };
+const POPOVER = { stiffness: 0.033, damping: 0.45 };
+const SPIN = { stiffness: 0.012, damping: 0.27 };
 
 class Spring {
   constructor(value, opts) {
@@ -92,8 +94,12 @@ class Spring {
 const springRotate = new Spring({ x: 0, y: 0 }, INTERACT);
 const springGlare = new Spring({ x: 50, y: 50, o: 0 }, INTERACT);
 const springBackground = new Spring({ x: 50, y: 50 }, INTERACT);
+const springRotateDelta = new Spring({ x: 0, y: 0 }, POPOVER);
+const springTranslate = new Spring({ x: 0, y: 0 }, POPOVER);
+const springScale = new Spring({ v: 1 }, POPOVER);
 
 let interacting = false;
+let active = false;
 let snapTimer = null;
 let showcaseRunning = false;
 let showcaseInterval = null;
@@ -106,7 +112,6 @@ function updateSprings(background, rotate, glare) {
 }
 
 function interact(e) {
-  endShowcase();
   if (e.type === "touchmove" && e.touches[0]) {
     e.clientX = e.touches[0].clientX;
     e.clientY = e.touches[0].clientY;
@@ -154,6 +159,11 @@ function interactEnd() {
   snapTimer = setTimeout(() => {
     interacting = false;
     card.classList.remove("interacting");
+    const autoBox = document.getElementById("auto");
+    if (autoBox && autoBox.checked) {
+      startShowcase();
+      return;
+    }
     springRotate.set({ x: 0, y: 0 }, SNAP);
     springGlare.set({ x: 50, y: 50, o: 0 }, SNAP);
     springBackground.set({ x: 50, y: 50 }, SNAP);
@@ -207,6 +217,9 @@ function render(now) {
   springRotate.tick(f);
   springGlare.tick(f);
   springBackground.tick(f);
+  springRotateDelta.tick(f);
+  springTranslate.tick(f);
+  springScale.tick(f);
 
   const gx = springGlare.value.x;
   const gy = springGlare.value.y;
@@ -223,10 +236,13 @@ function render(now) {
   s.setProperty("--pointer-from-top", round(gy / 100, 4));
   s.setProperty("--pointer-from-left", round(gx / 100, 4));
   s.setProperty("--card-opacity", round(clamp(springGlare.value.o * settings.glareStrength, 0, 1.5), 4));
-  s.setProperty("--rotate-x", round(springRotate.value.x, 3) + "deg");
-  s.setProperty("--rotate-y", round(springRotate.value.y, 3) + "deg");
+  s.setProperty("--rotate-x", round(springRotate.value.x + springRotateDelta.value.x, 3) + "deg");
+  s.setProperty("--rotate-y", round(springRotate.value.y + springRotateDelta.value.y, 3) + "deg");
   s.setProperty("--background-x", round(springBackground.value.x, 3) + "%");
   s.setProperty("--background-y", round(springBackground.value.y, 3) + "%");
+  s.setProperty("--card-scale", round(springScale.value.v, 4));
+  s.setProperty("--translate-x", round(springTranslate.value.x, 2) + "px");
+  s.setProperty("--translate-y", round(springTranslate.value.y, 2) + "px");
 
   requestAnimationFrame(render);
 }
@@ -536,24 +552,80 @@ function endShowcase() {
 function startShowcase() {
   if (showcaseRunning) return;
   showcaseRunning = true;
-  let r = 0;
-  const amp = settings.rotMax * 1.75;
+  let phase = 0;
   showcaseInterval = setInterval(() => {
-    r += 0.05;
-    springRotate.set(
-      { x: Math.sin(r) * amp, y: Math.cos(r) * amp },
-      { stiffness: 0.02, damping: 0.5 }
-    );
+    if (interacting) return;
+    phase += 0.02 * 0.35;
+    const th = phase * Math.PI;
+    const amp = settings.rotMax;
+    const rot = { x: Math.cos(th) * amp, y: Math.sin(th) * amp * 0.6 };
+    const px = clamp(50 - rot.x * 3.5, 0, 100);
+    const py = clamp(50 + rot.y * 3.5, 0, 100);
+    const soft = { stiffness: 0.02, damping: 0.5 };
+    springRotate.set({ x: rot.x, y: rot.y }, soft);
     springGlare.set(
-      { x: 55 + Math.sin(r) * 55, y: 55 + Math.cos(r) * 55, o: 0.8 },
-      { stiffness: 0.02, damping: 0.5 }
+      { x: px, y: py, o: 1 },
+      soft
     );
     springBackground.set(
-      { x: 20 + Math.sin(r) * 20, y: 20 + Math.cos(r) * 20 },
-      { stiffness: 0.02, damping: 0.5 }
+      { x: adjust(px, 0, 100, 37, 63), y: adjust(py, 0, 100, 33, 67) },
+      soft
     );
   }, 20);
 }
+
+/* ---------- zoom popover (clic sur la carte, comme ribi-holo) ---------- */
+
+const veil = document.getElementById("veil");
+
+function setCenter() {
+  const rect = card.getBoundingClientRect();
+  const view = document.documentElement;
+  springTranslate.set({
+    x: round(view.clientWidth / 2 - rect.x - rect.width / 2),
+    y: round(view.clientHeight / 2 - rect.y - rect.height / 2),
+  });
+}
+
+function zoomScale() {
+  const w = card.offsetWidth;
+  const h = card.offsetHeight;
+  return Math.min((window.innerWidth / w) * 0.9, (window.innerHeight / h) * 0.9, 1.75);
+}
+
+function activate() {
+  if (active) return;
+  active = true;
+  card.classList.add("active");
+  veil.hidden = false;
+  springRotateDelta.set({ x: 360, y: 0 }, SPIN);
+  setCenter();
+  springScale.set({ v: zoomScale() }, POPOVER);
+}
+
+function deactivate() {
+  if (!active) return;
+  active = false;
+  card.classList.remove("active");
+  veil.hidden = true;
+  springRotateDelta.set({ x: 0, y: 0 }, POPOVER);
+  springScale.set({ v: 1 }, POPOVER);
+  springTranslate.set({ x: 0, y: 0 }, POPOVER);
+  interactEnd();
+}
+
+rotator.addEventListener("click", () => (active ? deactivate() : activate()));
+veil.addEventListener("click", deactivate);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && active) deactivate();
+});
+let repositionTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(repositionTimer);
+  repositionTimer = setTimeout(() => {
+    if (active) setCenter();
+  }, 150);
+});
 
 autoBox.addEventListener("input", () => {
   if (autoBox.checked) startShowcase();

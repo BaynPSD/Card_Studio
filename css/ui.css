@@ -401,7 +401,19 @@ main {
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px dashed rgba(255, 255, 255, 0.12);
-  overflow: hidden;
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(4, 6, 12, 0.55);
+  backdrop-filter: blur(2px);
+  cursor: zoom-out;
+}
+
+[data-scheme="light"] .veil {
+  background: rgba(230, 235, 245, 0.6);
 }
 
 .stage.dragging {

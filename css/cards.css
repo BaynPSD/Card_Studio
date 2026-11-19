@@ -87,7 +87,8 @@
   border-radius: var(--card-radius);
 }
 
-.card.interacting {
+.card.interacting,
+.card.active {
   z-index: calc(var(--card-scale) * 120);
 }
 
@@ -376,7 +377,8 @@
   border-radius: var(--card-radius);
 }
 
-.card.interacting {
+.card.interacting,
+.card.active {
   z-index: calc(var(--card-scale) * 120);
 }
 
