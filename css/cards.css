@@ -92,6 +92,14 @@
   z-index: calc(var(--card-scale) * 120);
 }
 
+.card:not(.active) .card__rotator {
+  cursor: zoom-in;
+}
+
+.card.active .card__rotator {
+  cursor: zoom-out;
+}
+
 .card__translater,
 .card__rotator {
   display: grid;
@@ -226,6 +234,29 @@
   );
   opacity: var(--card-opacity);
   mix-blend-mode: overlay;
+}
+
+/* ---------- couche texture grain optionnelle (toute la carte) ---------- */
+
+.card .card__texture {
+  display: none;
+  transform: translateZ(1.6px);
+  overflow: hidden;
+  z-index: 4;
+  background-image:
+    url("../img/foils/151/noise-base.webp"),
+    url("../img/foils/grain.webp");
+  background-size: 220px 220px, cover;
+  background-position:
+    calc(var(--background-x) * 1%) calc(var(--background-y) * 1%),
+    center center;
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.card.has-texture .card__texture {
+  display: block;
 }
 
 /* découpe de la fenêtre d'art pour les holos "classiques" */
@@ -380,6 +411,14 @@
 .card.interacting,
 .card.active {
   z-index: calc(var(--card-scale) * 120);
+}
+
+.card:not(.active) .card__rotator {
+  cursor: zoom-in;
+}
+
+.card.active .card__rotator {
+  cursor: zoom-out;
 }
 
 

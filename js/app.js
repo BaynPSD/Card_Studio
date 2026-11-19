@@ -170,8 +170,12 @@ function interactEnd() {
   }, 350);
 }
 
+let downPos = null;
 rotator.addEventListener("pointermove", interact);
-rotator.addEventListener("pointerdown", interact);
+rotator.addEventListener("pointerdown", (e) => {
+  downPos = { x: e.clientX, y: e.clientY };
+  interact(e);
+});
 rotator.addEventListener("pointerleave", interactEnd);
 rotator.addEventListener("pointerout", interactEnd);
 
@@ -541,6 +545,10 @@ glowInput.addEventListener("input", () => {
 /* ---------- démo auto (activée par défaut, comme ribi-holo) ---------- */
 
 const autoBox = document.getElementById("auto");
+const textureBox = document.getElementById("texture");
+textureBox.addEventListener("input", () => {
+  card.classList.toggle("has-texture", textureBox.checked);
+});
 
 function endShowcase() {
   if (showcaseRunning) {
@@ -614,7 +622,15 @@ function deactivate() {
   interactEnd();
 }
 
-rotator.addEventListener("click", () => (active ? deactivate() : activate()));
+rotator.addEventListener("pointerup", (e) => {
+  if (!downPos) return;
+  const moved = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y);
+  downPos = null;
+  if (moved < 8) {
+    if (active) deactivate();
+    else activate();
+  }
+});
 veil.addEventListener("click", deactivate);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && active) deactivate();
