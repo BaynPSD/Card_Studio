@@ -58,6 +58,7 @@ const EFFECTS = [
 const settings = {
   rotMax: 14,
   glareStrength: 1,
+  size: 360,
 };
 
 const INTERACT = { stiffness: 0.066, damping: 0.25 };
@@ -339,11 +340,34 @@ function randomizeSeeds() {
   );
 }
 
+/* ---------- taille adaptative : la carte adopte le ratio de l'image ---------- */
+
+function adaptCardAspect() {
+  if (img.naturalWidth && img.naturalHeight) {
+    card.style.setProperty("--card-aspect", String(img.naturalWidth / img.naturalHeight));
+  }
+  fitCard();
+}
+
+function fitCard() {
+  const aspect = parseFloat(getComputedStyle(card).getPropertyValue("--card-aspect")) || 0.718;
+  const availW = Math.max(160, stage.clientWidth - 32);
+  const availH = Math.max(160, stage.clientHeight - 80);
+  let w = Math.min(settings.size, availW, availH * aspect);
+  w = Math.max(160, Math.round(w));
+  card.style.width = w + "px";
+  const sizeOut = document.getElementById("sizeOut");
+  if (sizeOut) sizeOut.textContent = w + "px";
+}
+
+window.addEventListener("resize", fitCard);
+
 function applyImages() {
   card.classList.add("loading");
   img.onload = () => {
     card.classList.remove("loading");
     randomizeSeeds();
+    adaptCardAspect();
   };
   img.src = slots.card.url;
   if (slots.foil.url) {
@@ -465,8 +489,12 @@ async function applyDefaultMask() {
     console.warn("masque par défaut indisponible", e);
   }
 }
-img.addEventListener("load", () => card.classList.remove("loading"));
+img.addEventListener("load", () => {
+  card.classList.remove("loading");
+  adaptCardAspect();
+});
 applyDefaultMask();
+adaptCardAspect();
 
 /* ---------- réglages ---------- */
 
@@ -487,8 +515,8 @@ glareInput.addEventListener("input", () => {
   glareOut.textContent = Math.round(settings.glareStrength * 100) + "%";
 });
 sizeInput.addEventListener("input", () => {
-  card.style.width = sizeInput.value + "px";
-  sizeOut.textContent = sizeInput.value + "px";
+  settings.size = parseInt(sizeInput.value, 10);
+  fitCard();
 });
 glowInput.addEventListener("input", () => {
   card.style.setProperty("--card-glow", glowInput.value);
@@ -590,10 +618,10 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   glowInput.value = "#ccfff5";
   settings.rotMax = 14;
   settings.glareStrength = 1;
+  settings.size = 360;
   rotOut.textContent = "14°";
   glareOut.textContent = "100%";
-  sizeOut.textContent = "360px";
-  card.style.width = "360px";
+  fitCard();
   card.style.setProperty("--card-glow", "#ccfff5");
   interactEnd();
 });

@@ -394,8 +394,8 @@ main {
 .stage {
   position: relative;
   flex: 1;
-  min-width: 320px;
-  min-height: 640px;
+  min-width: 280px;
+  min-height: min(640px, calc(100vh - 220px));
   display: grid;
   place-items: center;
   border-radius: 20px;
