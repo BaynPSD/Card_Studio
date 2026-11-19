@@ -292,6 +292,35 @@ applyEffect("tg-holo");
 
 /* ---------- masque auto (template fenêtre d'art, repris de ribi-holo) ---------- */
 
+function processMaskCanvas(canvas) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const px = data.data;
+  let translucent = 0;
+  for (let i = 3; i < px.length; i += 4) if (px[i] < 250) translucent++;
+  const hasAlpha = translucent > canvas.width * canvas.height * 0.005;
+  for (let i = 0; i < px.length; i += 4) {
+    const lum = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+    px[i + 3] = hasAlpha ? px[i + 3] : lum;
+    px[i] = px[i + 1] = px[i + 2] = 255;
+  }
+  ctx.putImageData(data, 0, 0);
+  return new Promise((res) =>
+    canvas.toBlob((b) => res(b ? URL.createObjectURL(b) : canvas.toDataURL("image/png")), "image/png")
+  );
+}
+
+function canvasFromSource(drawable, naturalW, naturalH, maxDim) {
+  const k = Math.min(1, maxDim / Math.max(naturalW, naturalH));
+  const w = Math.max(1, Math.round(naturalW * k));
+  const h = Math.max(1, Math.round(naturalH * k));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d").drawImage(drawable, 0, 0, w, h);
+  return canvas;
+}
+
 async function buildMask(src) {
   const image = await new Promise((res, rej) => {
     const im = new Image();
@@ -299,28 +328,15 @@ async function buildMask(src) {
     im.onerror = rej;
     im.src = src;
   });
-  const MASK_MAX = 1024;
-  const k = Math.min(1, MASK_MAX / Math.max(image.naturalWidth, image.naturalHeight));
-  const w = Math.max(1, Math.round(image.naturalWidth * k));
-  const h = Math.max(1, Math.round(image.naturalHeight * k));
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(image, 0, 0, w, h);
-  const data = ctx.getImageData(0, 0, w, h);
-  const px = data.data;
-  let translucent = 0;
-  for (let i = 3; i < px.length; i += 4) if (px[i] < 250) translucent++;
-  const hasAlpha = translucent > w * h * 0.005;
-  for (let i = 0; i < px.length; i += 4) {
-    const lum = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
-    px[i + 3] = hasAlpha ? px[i + 3] : lum;
-    px[i] = px[i + 1] = px[i + 2] = 255;
-  }
-  ctx.putImageData(data, 0, 0);
-  const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
-  return blob ? URL.createObjectURL(blob) : canvas.toDataURL("image/png");
+  return processMaskCanvas(canvasFromSource(image, image.naturalWidth, image.naturalHeight, 1024));
+}
+
+function maskFromVideo(video) {
+  return processMaskCanvas(canvasFromSource(video, video.videoWidth, video.videoHeight, 1024));
+}
+
+function frameDataUrl(video, maxW = 640) {
+  return canvasFromSource(video, video.videoWidth, video.videoHeight, maxW).toDataURL("image/png");
 }
 
 async function applyDefaultMask() {
@@ -347,9 +363,10 @@ const DEFAULT_FILES = {
 };
 
 const backImg = document.getElementById("cardBackImg");
+const cardVideo = document.getElementById("cardVideo");
 
 const slots = {
-  card: { url: DEFAULT_FILES.card, thumb: DEFAULT_FILES.card, custom: false, blob: null },
+  card: { url: DEFAULT_FILES.card, thumb: DEFAULT_FILES.card, custom: false, blob: null, video: null },
   mask: { thumb: DEFAULT_FILES.mask, maskUrl: null, custom: false, blob: null },
   foil: { url: DEFAULT_FILES.foil, thumb: DEFAULT_FILES.foil, custom: false, blob: null },
   back: { url: DEFAULT_FILES.back, thumb: DEFAULT_FILES.back, custom: false, blob: null },
@@ -388,12 +405,33 @@ window.addEventListener("resize", fitCard);
 
 function applyImages() {
   card.classList.add("loading");
-  img.onload = () => {
-    card.classList.remove("loading");
-    randomizeSeeds();
-    adaptCardAspect();
-  };
-  img.src = slots.card.url;
+  if (slots.card.video) {
+    img.style.display = "none";
+    cardVideo.hidden = false;
+    cardVideo.onloadedmetadata = () => {
+      if (cardVideo.videoWidth && cardVideo.videoHeight) {
+        card.style.setProperty("--card-aspect", String(cardVideo.videoWidth / cardVideo.videoHeight));
+      }
+      fitCard();
+      card.classList.remove("loading");
+      randomizeSeeds();
+      slots.card.thumb = frameDataUrl(cardVideo, 320);
+      paintSlots();
+    };
+    if (!cardVideo.src.endsWith(slots.card.video)) cardVideo.src = slots.card.video;
+    cardVideo.play().catch(() => {});
+  } else {
+    cardVideo.pause();
+    cardVideo.removeAttribute("src");
+    cardVideo.hidden = true;
+    img.style.display = "";
+    img.onload = () => {
+      card.classList.remove("loading");
+      randomizeSeeds();
+      adaptCardAspect();
+    };
+    img.src = slots.card.url;
+  }
   if (backImg && slots.back.url) backImg.src = slots.back.url;
   if (slots.foil.url) {
     card.style.setProperty("--foil", `url("${slots.foil.url}")`);
@@ -425,6 +463,16 @@ async function setSlotFile(name, file) {
   if (s.blob) URL.revokeObjectURL(s.blob);
   s.blob = blob;
   s.custom = true;
+  if (name === "card" && file.type.startsWith("video/")) {
+    s.video = blob;
+    s.url = null;
+    s.thumb = null;
+    paintSlots();
+    applyImages();
+    fileName.textContent = "🎬 " + file.name;
+    autoDeriveFromCard();
+    return;
+  }
   if (name === "mask") {
     try {
       s.maskUrl = await buildMask(blob);
@@ -447,18 +495,18 @@ async function setSlotFile(name, file) {
    sauf si l'utilisateur a uploadé un masque/foil perso */
 async function autoDeriveFromCard() {
   if (!slots.card.custom) return;
-  const src = slots.card.url;
+  const isVideo = !!slots.card.video;
   if (!slots.mask.custom) {
     try {
-      slots.mask.maskUrl = await buildMask(src);
-      slots.mask.thumb = slots.card.thumb;
+      slots.mask.maskUrl = isVideo ? await maskFromVideo(cardVideo) : await buildMask(slots.card.url);
+      slots.mask.thumb = slots.card.thumb || slots.card.url;
     } catch (e) {
       console.warn("masque auto non dérivé", e);
     }
   }
   if (!slots.foil.custom) {
-    slots.foil.url = src;
-    slots.foil.thumb = slots.card.thumb;
+    slots.foil.url = isVideo ? frameDataUrl(cardVideo, 1024) : slots.card.url;
+    slots.foil.thumb = slots.card.thumb || slots.card.url;
   }
   paintSlots();
   applyImages();
@@ -474,6 +522,7 @@ function clearSlot(name) {
     s.thumb = DEFAULT_FILES.mask;
   } else {
     s.url = s.thumb = DEFAULT_FILES[name];
+    if (name === "card") s.video = null;
   }
   paintSlots();
   applyImages();
@@ -723,6 +772,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
       s.thumb = DEFAULT_FILES.mask;
     } else {
       s.url = s.thumb = DEFAULT_FILES[name];
+      if (name === "card") s.video = null;
     }
   });
   paintSlots();

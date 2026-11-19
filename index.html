@@ -23,8 +23,8 @@
         <div class="slots">
           <div class="slot" data-slot="card">
             <img alt="Carte" />
-            <div class="slot__drop">📤 Carte<br /><small>clic ou glisse un PNG</small></div>
-            <input type="file" accept="image/*" hidden />
+            <div class="slot__drop">📤 Carte<br /><small>image ou vidéo</small></div>
+            <input type="file" accept="image/*,video/*" hidden />
             <button type="button" class="slot__clear" title="Remettre la carte par défaut">✕</button>
           </div>
           <div class="slot" data-slot="mask">
@@ -111,6 +111,7 @@
               <div class="card__texture"></div>
             </div>
             <div class="card__front" id="front">
+              <video id="cardVideo" muted loop playsinline autoplay hidden></video>
               <img id="cardImg" src="img/card.webp" width="660" height="921" alt="Carte" draggable="false" />
               <div class="card__shine"></div>
               <div class="card__glitter"></div>
