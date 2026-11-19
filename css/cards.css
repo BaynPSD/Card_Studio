@@ -6126,3 +6126,12 @@ Shine & Glare Effects
   filter: contrast(.8);
 
 }
+
+/* ---------- dos de carte (flip 180° pendant le spin) ---------- */
+.card .card__rotator img.card__back {
+  transform: rotateY(180deg) translateZ(1px);
+  backface-visibility: visible;
+  height: 100%;
+  object-fit: cover;
+  background-color: var(--card-back);
+}

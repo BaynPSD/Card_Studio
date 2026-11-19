@@ -343,12 +343,16 @@ const DEFAULT_FILES = {
   card: "img/card.webp",
   mask: "img/card_mask.webp",
   foil: "img/card_foil.webp",
+  back: "img/card_back.webp",
 };
+
+const backImg = document.getElementById("cardBack");
 
 const slots = {
   card: { url: DEFAULT_FILES.card, thumb: DEFAULT_FILES.card, custom: false, blob: null },
   mask: { thumb: DEFAULT_FILES.mask, maskUrl: null, custom: false, blob: null },
   foil: { url: DEFAULT_FILES.foil, thumb: DEFAULT_FILES.foil, custom: false, blob: null },
+  back: { url: DEFAULT_FILES.back, thumb: DEFAULT_FILES.back, custom: false, blob: null },
 };
 
 function randomizeSeeds() {
@@ -390,6 +394,7 @@ function applyImages() {
     adaptCardAspect();
   };
   img.src = slots.card.url;
+  if (backImg && slots.back.url) backImg.src = slots.back.url;
   if (slots.foil.url) {
     card.style.setProperty("--foil", `url("${slots.foil.url}")`);
   } else {
