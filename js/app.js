@@ -440,6 +440,27 @@ async function setSlotFile(name, file) {
   paintSlots();
   applyImages();
   fileName.textContent = "🖼 " + file.name;
+  if (name === "card") autoDeriveFromCard();
+}
+
+/* recrée automatiquement masque + foil à partir de l'image de la carte,
+   sauf si l'utilisateur a uploadé un masque/foil perso */
+async function autoDeriveFromCard() {
+  const src = slots.card.url;
+  if (!slots.mask.custom) {
+    try {
+      slots.mask.maskUrl = await buildMask(src);
+      slots.mask.thumb = slots.card.thumb;
+    } catch (e) {
+      console.warn("masque auto non dérivé", e);
+    }
+  }
+  if (!slots.foil.custom) {
+    slots.foil.url = src;
+    slots.foil.thumb = slots.card.thumb;
+  }
+  paintSlots();
+  applyImages();
 }
 
 function clearSlot(name) {
@@ -455,6 +476,7 @@ function clearSlot(name) {
   }
   paintSlots();
   applyImages();
+  if (name === "mask" || name === "foil") autoDeriveFromCard();
 }
 
 document.querySelectorAll(".slot").forEach((el) => {
