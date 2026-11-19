@@ -6153,5 +6153,5 @@ Shine & Glare Effects
 /* ---------- logo perso à la place des poké balls (effet Poké Ball Holo) ---------- */
 .card.e151[data-rarity$="pokeball holo"] {
   --pokeball: url("../img/foils/151/logo-outer.webp");
-  --pokeball-inner: url("../img/foils/151/logo-inner.webp");
+  --pokeball-inner: url("../img/foils/151/empty.webp"); /* un seul motif : couche inner vidée */
 }
