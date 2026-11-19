@@ -6127,11 +6127,25 @@ Shine & Glare Effects
 
 }
 
-/* ---------- dos de carte (flip 180° pendant le spin) ---------- */
-.card .card__rotator img.card__back {
+/* ---------- dos de carte (flip 180° pendant le spin, avec ses propres couches d'effet) ---------- */
+.card .card__rotator .card__back {
   transform: rotateY(180deg) translateZ(1px);
   backface-visibility: visible;
-  height: 100%;
-  object-fit: cover;
   background-color: var(--card-back);
+}
+
+.card .card__rotator .card__back img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: var(--card-back);
+}
+
+/* le dos hérite des mêmes variables pointeur -> même effet holo que l'avant */
+.card .card__back .card__texture {
+  display: none;
+}
+
+.card.has-texture .card__back .card__texture {
+  display: block;
 }
