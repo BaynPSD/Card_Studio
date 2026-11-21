@@ -501,3 +501,39 @@ main {
 [data-scheme="light"] .field input[type="file"] {
   color: #5a6480;
 }
+
+/* ---------- onglets ---------- */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.tab {
+  flex: 1;
+  padding: 9px 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #dfe6f5;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #ffcb05, #f0a500);
+  color: #2a2000;
+  border-color: transparent;
+}
+
+[data-scheme="light"] .tab {
+  background: rgba(20, 30, 60, 0.06);
+  color: #1c2333;
+  border-color: rgba(20, 30, 60, 0.15);
+}
+
+[data-scheme="light"] .tab.active {
+  background: linear-gradient(135deg, #ffcb05, #f0a500);
+  color: #2a2000;
+}

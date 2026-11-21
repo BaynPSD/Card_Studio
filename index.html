@@ -18,6 +18,11 @@
 
   <main>
     <aside class="panel">
+      <nav class="tabs">
+        <button type="button" class="tab active" data-tab="card">🃏 Carte holo</button>
+        <button type="button" class="tab" data-tab="studio">🛠️ Studio</button>
+      </nav>
+      <div class="pane" id="pane-card">
       <section class="block">
         <h2>1 · Images</h2>
         <div class="slots">
@@ -100,22 +105,24 @@
         </div>
       </section>
 
+      </div>
+      <div class="pane" id="pane-studio" hidden>
       <section class="block">
-        <h2>4 · 🛠️ Studio (card maker)</h2>
+        <h2>🛠️ Studio (card maker)</h2>
         <label class="auto-row">
           <input type="checkbox" id="studioBox" />
           <span>Mode studio — template éditable</span>
         </label>
         <div class="fields">
-          <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="HYPURR" /></label>
-          <label class="field"><span>HP</span><input type="text" id="stHpIn" value="150" /></label>
-          <label class="field"><span>Attaque 1</span><input type="text" id="stAtk1In" value="Prediction" /></label>
-          <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" value="40" /></label>
-          <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" value="Outcome" /></label>
-          <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
-          <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
-          <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
-          <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
+          <label class="field"><span>Nom</span><input type="text" id="stNameIn" placeholder="Nom de la carte" /></label>
+          <label class="field"><span>HP</span><input type="text" id="stHpIn" placeholder="HP" /></label>
+          <label class="field"><span>Attaque 1</span><input type="text" id="stAtk1In" placeholder="Attaque 1" /></label>
+          <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" placeholder="40" /></label>
+          <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" placeholder="Attaque 2" /></label>
+          <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" placeholder="100" /></label>
+          <label class="field wide"><span>Description</span><input type="text" id="stDescIn" placeholder="Description…" /></label>
+          <label class="field"><span>Numéro</span><input type="text" id="stNumIn" placeholder="001/020" /></label>
+          <label class="field"><span>Rareté</span><input type="text" id="stRarIn" placeholder="UR" /></label>
         </div>
         <label class="slider color-row">
           <span>Couleur du cadre</span>

@@ -384,6 +384,7 @@ function fitCard() {
   let w = Math.min(settings.size, availW, availH * aspect);
   w = Math.max(160, Math.round(w));
   card.style.width = w + "px";
+  card.style.setProperty("--st-fs", w / 100 + "px");
   const sizeOut = document.getElementById("sizeOut");
   if (sizeOut) sizeOut.textContent = w + "px";
 }
@@ -586,6 +587,54 @@ const textureBox = document.getElementById("texture");
 textureBox.addEventListener("input", () => {
   card.classList.toggle("has-texture", textureBox.checked);
 });
+/* ---------- mode Studio (card maker) ---------- */
+
+const studioBox = document.getElementById("studioBox");
+studioBox.addEventListener("input", () => {
+  card.classList.toggle("studio", studioBox.checked);
+});
+
+const ST_TEXT = {
+  stNameIn: "stName",
+  stHpIn: "stHp",
+  stAtk1In: "stAtk1",
+  stDmg1In: "stDmg1",
+  stAtk2In: "stAtk2",
+  stDmg2In: "stDmg2",
+  stDescIn: "stDesc",
+  stNumIn: "stNum",
+  stRarIn: "stRar",
+};
+for (const [inputId, targetId] of Object.entries(ST_TEXT)) {
+  const input = document.getElementById(inputId);
+  const target = document.getElementById(targetId);
+  target.textContent = input.value;
+  input.addEventListener("input", () => {
+    target.textContent = input.value;
+  });
+}
+
+const ST_COLORS = {
+  stFrameIn: "--st-frame",
+  stHeadIn: "--st-head",
+  stTextIn: "--st-text",
+};
+for (const [inputId, varName] of Object.entries(ST_COLORS)) {
+  const input = document.getElementById(inputId);
+  card.style.setProperty(varName, input.value);
+  input.addEventListener("input", () => {
+    card.style.setProperty(varName, input.value);
+  });
+}
+
+const stLogoFile = document.getElementById("stLogoFile");
+stLogoFile.addEventListener("change", () => {
+  const file = stLogoFile.files[0];
+  if (!file) return;
+  card.style.setProperty("--st-logo", `url("${URL.createObjectURL(file)}")`);
+  stLogoFile.value = "";
+});
+
 const parallaxBox = document.getElementById("parallax");
 parallaxBox.addEventListener("input", () => {
   card.classList.toggle("parallax", parallaxBox.checked);
