@@ -400,7 +400,8 @@ function applyImages() {
   };
   img.src = slots.card.url;
   if (backImg && slots.back.url) backImg.src = slots.back.url;
-  card.style.setProperty("--layer-bg", slots.card.url ? `url("${slots.card.url}")` : "none");
+  const studioEmpty = card.classList.contains("studio") && !slots.card.custom;
+  card.style.setProperty("--layer-bg", !studioEmpty && slots.card.url ? `url("${slots.card.url}")` : "none");
   if (slots.fg.url) card.style.setProperty("--layer-fg", `url("${slots.fg.url}")`);
   else card.style.removeProperty("--layer-fg");
   if (slots.foil.url) {
@@ -592,7 +593,24 @@ textureBox.addEventListener("input", () => {
 const studioBox = document.getElementById("studioBox");
 studioBox.addEventListener("input", () => {
   card.classList.toggle("studio", studioBox.checked);
+  applyImages();
 });
+
+/* onglets Carte holo / Studio */
+const tabs = document.querySelectorAll(".tab");
+tabs.forEach((t) =>
+  t.addEventListener("click", () => {
+    tabs.forEach((x) => x.classList.toggle("active", x === t));
+    const isStudio = t.dataset.tab === "studio";
+    document.getElementById("pane-card").hidden = isStudio;
+    document.getElementById("pane-studio").hidden = !isStudio;
+    if (studioBox.checked !== isStudio) {
+      studioBox.checked = isStudio;
+      card.classList.toggle("studio", isStudio);
+      applyImages();
+    }
+  })
+);
 
 const ST_TEXT = {
   stNameIn: "stName",
