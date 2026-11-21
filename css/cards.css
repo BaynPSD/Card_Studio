@@ -6205,3 +6205,141 @@ Shine & Glare Effects
   clip-path: var(--clip);
   transform: translate3d(calc(var(--par-x, 0) * 10px), calc(var(--par-y, 0) * 10px), 50px) scale(1.04);
 }
+
+/* ---------- mode Studio (card maker) ---------- */
+.card .st {
+  display: none;
+}
+
+.card.studio {
+  background: #101528;
+}
+
+.card.studio .st {
+  display: block;
+  position: absolute;
+  inset: 0;
+  transform: translateZ(10px);
+}
+
+/* l'image uploadée devient le fond, cachée derrière le template */
+.card.studio .card__front > img {
+  opacity: 0;
+  transform: none;
+}
+
+.card.studio .card__layer-bg,
+.card.studio .card__layer-fg {
+  display: none;
+}
+
+.card .st > div {
+  position: absolute;
+}
+
+.st-bg {
+  inset: 0;
+  background-image: var(--layer-bg, none);
+  background-size: 100% 100%;
+}
+
+.st-art {
+  inset: 10% 4.2% 30% 4.2%;
+  background-image: var(--layer-fg, var(--layer-bg, none));
+  background-size: 100% 100%;
+  background-color: rgba(0, 0, 0, 0.18);
+  clip-path: var(--clip);
+  border-radius: 4% / 3%;
+}
+
+.st-frame {
+  inset: 0;
+  border-radius: 4.5% / 3.5%;
+  border: calc(var(--st-fs, 3.6px) * 1.1) solid var(--st-frame, #e8b23a);
+  box-shadow:
+    inset 0 0 0 calc(var(--st-fs, 3.6px) * 0.35) rgba(255, 255, 255, 0.4),
+    inset 0 0 calc(var(--st-fs, 3.6px) * 3) rgba(0, 0, 0, 0.28);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.2));
+  pointer-events: none;
+}
+
+.st-head {
+  top: 2.5%;
+  left: 4.2%;
+  right: 4.2%;
+  height: 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--st-head, #1c2440);
+  color: var(--st-text, #f4f6ff);
+  border-radius: 999px;
+  padding: 0 5%;
+  box-sizing: border-box;
+  font-weight: 800;
+}
+
+.st-name {
+  font-size: calc(var(--st-fs, 3.6px) * 5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.st-hp {
+  font-size: calc(var(--st-fs, 3.6px) * 4.4);
+  color: #ffd34d;
+}
+
+.st-logo {
+  top: 3%;
+  right: 6.5%;
+  width: 10%;
+  aspect-ratio: 1;
+  background-image: var(--st-logo, url("../img/studio/logo.webp"));
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.st-body {
+  left: 5%;
+  right: 5%;
+  top: 71%;
+  bottom: 11%;
+  box-sizing: border-box;
+  background: rgba(8, 10, 20, 0.55);
+  border-radius: 3% / 2.2%;
+  padding: 2.5% 4%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  color: var(--st-text, #f4f6ff);
+}
+
+.st-atk {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: calc(var(--st-fs, 3.6px) * 3.4);
+}
+
+.st-atk-dmg {
+  color: #ffd34d;
+}
+
+.st-desc {
+  margin: 0;
+  font-size: calc(var(--st-fs, 3.6px) * 2.4);
+  opacity: 0.85;
+}
+
+.st-foot {
+  left: 6%;
+  right: 6%;
+  bottom: 3.2%;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: calc(var(--st-fs, 3.6px) * 2.5);
+  color: var(--st-text, #f4f6ff);
+}

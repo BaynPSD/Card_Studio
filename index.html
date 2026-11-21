@@ -100,6 +100,42 @@
         </div>
       </section>
 
+      <section class="block">
+        <h2>4 · 🛠️ Studio (card maker)</h2>
+        <label class="auto-row">
+          <input type="checkbox" id="studioBox" />
+          <span>Mode studio — template éditable</span>
+        </label>
+        <div class="fields">
+          <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="HYPURR" /></label>
+          <label class="field"><span>HP</span><input type="text" id="stHpIn" value="150" /></label>
+          <label class="field"><span>Attaque 1</span><input type="text" id="stAtk1In" value="Prediction" /></label>
+          <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" value="40" /></label>
+          <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" value="Outcome" /></label>
+          <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
+          <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
+          <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
+          <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
+        </div>
+        <label class="slider color-row">
+          <span>Couleur du cadre</span>
+          <input type="color" id="stFrameIn" value="#e8b23a" />
+        </label>
+        <label class="slider color-row">
+          <span>Bannière haut</span>
+          <input type="color" id="stHeadIn" value="#1c2440" />
+        </label>
+        <label class="slider color-row">
+          <span>Couleur du texte</span>
+          <input type="color" id="stTextIn" value="#f4f6ff" />
+        </label>
+        <label class="field">
+          <span>Logo (haut droite)</span>
+          <input type="file" id="stLogoFile" accept="image/*" />
+        </label>
+        <p class="hint">Fond = slot 📤 Carte (PNG) · Illustration = slot 🎭 Perso (PNG, dans la fenêtre d'art) · les effets holo s'appliquent par-dessus le template.</p>
+      </section>
+
       <section class="block actions">
         <label class="auto-row">
           <input type="checkbox" id="auto" checked />
@@ -129,6 +165,19 @@
               <img id="cardImg" src="img/card.webp" width="660" height="921" alt="Carte" draggable="false" />
               <div class="card__layer-bg"></div>
               <div class="card__layer-fg"></div>
+              <div class="st" aria-hidden="true">
+                <div class="st-bg"></div>
+                <div class="st-art"></div>
+                <div class="st-frame"></div>
+                <div class="st-head"><span class="st-name" id="stName"></span><span class="st-hp" id="stHp"></span></div>
+                <div class="st-logo"></div>
+                <div class="st-body">
+                  <div class="st-atk"><span class="st-atk-name" id="stAtk1"></span><span class="st-atk-dmg" id="stDmg1"></span></div>
+                  <p class="st-desc" id="stDesc"></p>
+                  <div class="st-atk"><span class="st-atk-name" id="stAtk2"></span><span class="st-atk-dmg" id="stDmg2"></span></div>
+                </div>
+                <div class="st-foot"><span id="stNum"></span><span id="stRar"></span></div>
+              </div>
               <div class="card__shine"></div>
               <div class="card__glitter"></div>
               <div class="card__glare"></div>
