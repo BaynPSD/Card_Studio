@@ -6244,7 +6244,7 @@ Shine & Glare Effects
 }
 
 .st-art {
-  inset: 10% 4.2% 30% 4.2%;
+  inset: 12% 5% 23% 5%;
   background-image: var(--layer-fg, var(--layer-bg, none));
   background-size: 100% 100%;
   background-color: rgba(0, 0, 0, 0.18);
@@ -6255,7 +6255,7 @@ Shine & Glare Effects
 .st-frame {
   inset: 0;
   border-radius: 4.5% / 3.5%;
-  border: calc(var(--st-fs, 3.6px) * 1.1) solid var(--st-frame, #e8b23a);
+  border: calc(var(--st-fs, 3.6px) * 1.4) solid var(--st-frame, #d9d9e3);
   box-shadow:
     inset 0 0 0 calc(var(--st-fs, 3.6px) * 0.35) rgba(255, 255, 255, 0.4),
     inset 0 0 calc(var(--st-fs, 3.6px) * 3) rgba(0, 0, 0, 0.28);
@@ -6264,15 +6264,15 @@ Shine & Glare Effects
 }
 
 .st-head {
-  top: 2.5%;
-  left: 4.2%;
-  right: 4.2%;
-  height: 7%;
+  top: 2%;
+  left: 5%;
+  right: 5%;
+  height: 8%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--st-head, #1c2440);
-  color: var(--st-text, #f4f6ff);
+  background: var(--st-head, #f2f2f6);
+  color: var(--st-head-text, #1a2340);
   border-radius: 999px;
   padding: 0 5%;
   box-sizing: border-box;
@@ -6291,9 +6291,9 @@ Shine & Glare Effects
 }
 
 .st-logo {
-  top: 3%;
-  right: 6.5%;
-  width: 10%;
+  top: 2.5%;
+  right: 7%;
+  width: 9%;
   aspect-ratio: 1;
   background-image: var(--st-logo, url("../img/studio/logo.webp"));
   background-size: contain;
@@ -6304,8 +6304,8 @@ Shine & Glare Effects
 .st-body {
   left: 5%;
   right: 5%;
-  top: 71%;
-  bottom: 11%;
+  top: 78.5%;
+  bottom: 4.5%;
   box-sizing: border-box;
   background: rgba(8, 10, 20, 0.55);
   border-radius: 3% / 2.2%;
@@ -6336,7 +6336,7 @@ Shine & Glare Effects
 .st-foot {
   left: 6%;
   right: 6%;
-  bottom: 3.2%;
+  bottom: 1.8%;
   display: flex;
   justify-content: space-between;
   font-weight: 600;
