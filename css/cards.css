@@ -6178,3 +6178,30 @@ Shine & Glare Effects
 .card.parallax .card__back {
   transform: rotateY(180deg) translate3d(calc(var(--par-x, 0) * -9px), calc(var(--par-y, 0) * -9px), 24px) scale(1.1);
 }
+
+/* ---------- parallaxe en couches : fond d'illu vs perso, clipé à la fenêtre d'art ---------- */
+.card .card__layer-bg,
+.card .card__layer-fg {
+  display: none;
+}
+
+/* en mode couches, l'image de base (texte + bordure) reste fixe */
+.card.parallax-layers .card__front > img {
+  transform: none;
+}
+
+.card.parallax-layers .card__layer-bg {
+  display: block;
+  background-image: var(--layer-bg);
+  background-size: 100% 100%;
+  clip-path: var(--clip);
+  transform: translate3d(calc(var(--par-x, 0) * -5px), calc(var(--par-y, 0) * -5px), 20px);
+}
+
+.card.parallax-layers .card__layer-fg {
+  display: block;
+  background-image: var(--layer-fg);
+  background-size: 100% 100%;
+  clip-path: var(--clip);
+  transform: translate3d(calc(var(--par-x, 0) * 10px), calc(var(--par-y, 0) * 10px), 50px) scale(1.04);
+}

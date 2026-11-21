@@ -346,6 +346,7 @@ const DEFAULT_FILES = {
   mask: "img/card_mask.webp",
   foil: "img/card_foil.webp",
   back: "img/card_back.webp",
+  fg: null,
 };
 
 const backImg = document.getElementById("cardBackImg");
@@ -355,6 +356,7 @@ const slots = {
   mask: { thumb: DEFAULT_FILES.mask, maskUrl: null, custom: false, blob: null },
   foil: { url: DEFAULT_FILES.foil, thumb: DEFAULT_FILES.foil, custom: false, blob: null },
   back: { url: DEFAULT_FILES.back, thumb: DEFAULT_FILES.back, custom: false, blob: null },
+  fg: { url: null, thumb: null, custom: false, blob: null },
 };
 
 function randomizeSeeds() {
@@ -397,6 +399,9 @@ function applyImages() {
   };
   img.src = slots.card.url;
   if (backImg && slots.back.url) backImg.src = slots.back.url;
+  card.style.setProperty("--layer-bg", slots.card.url ? `url("${slots.card.url}")` : "none");
+  if (slots.fg.url) card.style.setProperty("--layer-fg", `url("${slots.fg.url}")`);
+  else card.style.removeProperty("--layer-fg");
   if (slots.foil.url) {
     card.style.setProperty("--foil", `url("${slots.foil.url}")`);
   } else {
@@ -416,6 +421,7 @@ function paintSlots() {
     const s = slots[name];
     const im = el.querySelector("img");
     if (s.thumb) im.src = s.thumb;
+    else im.removeAttribute("src");
     el.toggleAttribute("data-empty", name === "mask" ? !s.maskUrl : !s.thumb);
   });
 }
@@ -479,6 +485,7 @@ function clearSlot(name) {
   }
   paintSlots();
   applyImages();
+  if (name === "fg" && parallaxLayersBox.checked) setLayersMode(false);
   if (name === "mask" || name === "foil") autoDeriveFromCard();
 }
 
@@ -582,6 +589,68 @@ textureBox.addEventListener("input", () => {
 const parallaxBox = document.getElementById("parallax");
 parallaxBox.addEventListener("input", () => {
   card.classList.toggle("parallax", parallaxBox.checked);
+});
+
+const parallaxLayersBox = document.getElementById("parallaxLayers");
+function setLayersMode(on) {
+  card.classList.toggle("parallax-layers", on);
+  if (on) card.classList.add("parallax");
+  else if (!parallaxBox.checked) card.classList.remove("parallax");
+  parallaxLayersBox.checked = on;
+}
+parallaxLayersBox.addEventListener("input", () => {
+  if (parallaxLayersBox.checked && !slots.fg.url) {
+    parallaxLayersBox.checked = false;
+    alert("Ajoute d'abord une couche avant : PNG transparent dans le slot 🎭 Perso, ou clique sur « ✂️ Découpe IA auto ».");
+    return;
+  }
+  setLayersMode(parallaxLayersBox.checked);
+});
+
+/* découpe IA dans le navigateur (background-removal, modèle chargé via CDN) */
+const cutBtn = document.getElementById("cutBtn");
+let imglyLoading = null;
+cutBtn.addEventListener("click", async () => {
+  if (!slots.card.url) return;
+  cutBtn.disabled = true;
+  cutBtn.textContent = "⏳ Découpe IA… (1er chargement ~40 Mo)";
+  try {
+    if (!window.removeBackground) {
+      imglyLoading =
+        imglyLoading ||
+        new Promise((res, rej) => {
+          const s = document.createElement("script");
+          s.src = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/dist/bundle.js";
+          s.onload = res;
+          s.onerror = () => rej(new Error("CDN indisponible"));
+          document.head.appendChild(s);
+        });
+      await imglyLoading;
+    }
+    const blob = await window.removeBackground(slots.card.url, {
+      publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.7/dist/",
+      progress: (p) => {
+        cutBtn.textContent = "⏳ " + Math.round(p * 100) + "%";
+      },
+    });
+    const url = URL.createObjectURL(blob);
+    const s = slots.fg;
+    if (s.blob) URL.revokeObjectURL(s.blob);
+    s.blob = blob;
+    s.custom = true;
+    s.url = url;
+    s.thumb = url;
+    paintSlots();
+    applyImages();
+    setLayersMode(true);
+    cutBtn.textContent = "✂️ Découpe IA auto (perso vs fond)";
+  } catch (e) {
+    console.error(e);
+    alert("Découpe IA indisponible (hors ligne ?). Mets un PNG transparent dans le slot 🎭 Perso à la place.");
+    cutBtn.textContent = "✂️ Découpe IA auto (perso vs fond)";
+  } finally {
+    cutBtn.disabled = false;
+  }
 });
 
 function endShowcase() {

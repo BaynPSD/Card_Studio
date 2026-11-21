@@ -45,7 +45,14 @@
             <input type="file" accept="image/*" hidden />
             <button type="button" class="slot__clear" title="Dos par défaut">✕</button>
           </div>
+          <div class="slot" data-slot="fg">
+            <img alt="Couche avant" />
+            <div class="slot__drop">🎭 Perso<br /><small>PNG transparent</small></div>
+            <input type="file" accept="image/*" hidden />
+            <button type="button" class="slot__clear" title="Retirer la couche avant">✕</button>
+          </div>
         </div>
+        <button id="cutBtn" class="btn secondary">✂️ Découpe IA auto (perso vs fond)</button>
         <p class="hint">Quand tu uploads une <strong>carte</strong>, le <strong>masque</strong> et le <strong>foil</strong> sont recréés automatiquement à partir de cette image (sauf si tu uploads les leurs). Glisse aussi une image directement sur la carte.</p>
         <p class="hint" id="fileName"></p>
       </section>
@@ -80,6 +87,10 @@
         <label class="auto-row">
           <input type="checkbox" id="parallax" />
           <span>🧿 Parallaxe multicouche (fond vs effets)</span>
+        </label>
+        <label class="auto-row">
+          <input type="checkbox" id="parallaxLayers" />
+          <span>🧿 Parallaxe en couches (illu seule, texte fixe)</span>
         </label>
         <div class="theme">
           <span>Thème</span>
@@ -116,6 +127,8 @@
             </div>
             <div class="card__front" id="front">
               <img id="cardImg" src="img/card.webp" width="660" height="921" alt="Carte" draggable="false" />
+              <div class="card__layer-bg"></div>
+              <div class="card__layer-fg"></div>
               <div class="card__shine"></div>
               <div class="card__glitter"></div>
               <div class="card__glare"></div>
