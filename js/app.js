@@ -655,6 +655,20 @@ stLogoFile.addEventListener("change", () => {
   stLogoFile.value = "";
 });
 
+/* uploads du studio : fond (slot carte) + illustration (slot perso) */
+const stBgFile = document.getElementById("stBgFile");
+stBgFile.addEventListener("change", () => {
+  const file = stBgFile.files[0];
+  if (file) setSlotFile("card", file);
+  stBgFile.value = "";
+});
+const stArtFile = document.getElementById("stArtFile");
+stArtFile.addEventListener("change", () => {
+  const file = stArtFile.files[0];
+  if (file) setSlotFile("fg", file);
+  stArtFile.value = "";
+});
+
 const parallaxBox = document.getElementById("parallax");
 parallaxBox.addEventListener("input", () => {
   card.classList.toggle("parallax", parallaxBox.checked);
