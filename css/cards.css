@@ -6155,3 +6155,26 @@ Shine & Glare Effects
   --pokeball: url("../img/foils/151/logo-outer.webp");
   --pokeball-inner: url("../img/foils/151/empty.webp"); /* un seul motif : couche inner vidée */
 }
+
+/* ---------- parallaxe multicouche (case "Parallaxe") ---------- */
+/* le fond bouge en sens inverse, les couches d'effet suivent avec des facteurs croissants */
+.card.parallax .card__front > img {
+  transform: translate3d(calc(var(--par-x, 0) * -9px), calc(var(--par-y, 0) * -9px), 24px) scale(1.1);
+}
+
+.card.parallax .card__shine {
+  transform: translate3d(calc(var(--par-x, 0) * 5px), calc(var(--par-y, 0) * 5px), 60px);
+}
+
+.card.parallax .card__texture {
+  transform: translate3d(calc(var(--par-x, 0) * 12px), calc(var(--par-y, 0) * 12px), 45px);
+}
+
+.card.parallax .card__glare,
+.card.parallax .card__glare2 {
+  transform: translate3d(calc(var(--par-x, 0) * 16px), calc(var(--par-y, 0) * 16px), 90px);
+}
+
+.card.parallax .card__back {
+  transform: rotateY(180deg) translate3d(calc(var(--par-x, 0) * -9px), calc(var(--par-y, 0) * -9px), 24px) scale(1.1);
+}
