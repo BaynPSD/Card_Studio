@@ -236,6 +236,8 @@ function render(now) {
   const s = card.style;
   s.setProperty("--pointer-x", gx + "%");
   s.setProperty("--pointer-y", gy + "%");
+  s.setProperty("--par-x", round((springGlare.value.x - 50) / 50, 3));
+  s.setProperty("--par-y", round((springGlare.value.y - 50) / 50, 3));
   s.setProperty("--pointer-from-center", round(fromCenter, 4));
   s.setProperty("--pointer-from-top", round(gy / 100, 4));
   s.setProperty("--pointer-from-left", round(gx / 100, 4));
@@ -576,6 +578,10 @@ const autoBox = document.getElementById("auto");
 const textureBox = document.getElementById("texture");
 textureBox.addEventListener("input", () => {
   card.classList.toggle("has-texture", textureBox.checked);
+});
+const parallaxBox = document.getElementById("parallax");
+parallaxBox.addEventListener("input", () => {
+  card.classList.toggle("parallax", parallaxBox.checked);
 });
 
 function endShowcase() {
