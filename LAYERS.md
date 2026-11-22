@@ -63,3 +63,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Pied : bottom 1.5%, blanc
 - Cadre : argent `#b6b8c9`, radius 4%/2.9%
 - Fond propre par défaut : `img/studio/fond.webp` (ta carte avec ces zones vidées)
+
+## Icônes d'attaque (style ref strip 425×130)
+- Cercle **contour blanc** 2px (`border: .16em solid #fff`), fond transparent, `border-radius: 50%`
+- Symbole blanc **flat** à l'intérieur via `::before { content: var(--st-glyph) }` + `filter: brightness(0) invert(1)` (blanc garanti même pour les émojis 🎲⭐🪙)
+- Proportions mesurées sur la ref : Ø cercle ≈ 1.2× cap du nom (1.9em), trait ≈ 0.067×Ø, symbole ≈ 0.5×Ø (1.35em), gap entre icônes ≈ 0.6em
+- `--cost` = nombre réel d'icônes (plus de min 4) → nom attaque à `left: calc(2.8% + cost*9%)`

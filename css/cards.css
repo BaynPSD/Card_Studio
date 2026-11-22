@@ -6675,3 +6675,47 @@ Shine & Glare Effects
   line-height: 1;
   color: #ffffff;
 }
+
+/* ---------- icônes d'attaque style ref : cercle CONTOUR blanc + symbole blanc flat ----------
+   ref (strip 425x130) : cercle Ø30px, trait 2px, symbole ~15px, nom cap ~25px
+   => Ø cercle ≈ 1.2x cap du nom ; trait ≈ 0.067xØ ; symbole ≈ 0.5xØ */
+.st-atk {
+  align-items: center;
+}
+
+.st-cost {
+  font-size: 1em;
+  gap: 0.6em;
+  align-items: center;
+}
+
+.st-cost i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9em;
+  height: 1.9em;
+  box-sizing: border-box;
+  border: 0.16em solid #ffffff;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  font-style: normal;
+  line-height: 1;
+  font-size: 1em;
+  color: #ffffff;
+  /* blanc flat garanti même pour les émojis couleur (🎲⭐🪙) */
+  filter: brightness(0) invert(1);
+}
+
+/* le symbole vient d'une var posée sur la ligne (bindCost) ; son em est relatif au i (1em) */
+.st-cost i::before {
+  content: var(--st-glyph, "⚡");
+  font-size: 1.35em;
+  line-height: 1;
+}
+
+/* le nom d'attaque démarre juste après les icônes (plus de max(4,...)) */
+.st-atk-name {
+  left: calc(2.8% + var(--cost, 1) * 9%);
+}

@@ -668,8 +668,9 @@ function bindCost(inputId, costId, rowId, iconId) {
   const apply = () => {
     const n = Math.max(0, Math.min(5, parseInt(input.value || "0", 10) || 0));
     const glyph = icon.value || "\u26a1";
-    cost.innerHTML = `<i>${glyph}</i>`.repeat(n);
-    row.style.setProperty("--cost", String(Math.max(4, n)));
+    cost.innerHTML = "<i></i>".repeat(n);
+    row.style.setProperty("--st-glyph", JSON.stringify(glyph));
+    row.style.setProperty("--cost", String(n));
   };
   input.addEventListener("input", apply);
   icon.addEventListener("input", apply);
