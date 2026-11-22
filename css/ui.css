@@ -395,7 +395,7 @@ main {
   position: relative;
   flex: 1;
   min-width: 280px;
-  min-height: min(640px, calc(100vh - 220px));
+  min-height: min(820px, calc(100vh - 130px));
   display: grid;
   place-items: center;
   border-radius: 20px;
@@ -609,4 +609,24 @@ main {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+/* inspecteur façon Figma */
+.inspector {
+  border: 1px solid rgba(255, 159, 67, 0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  background: rgba(255, 159, 67, 0.06);
+}
+
+.inspector h3 {
+  margin: 0 0 8px;
+  font-size: 0.95em;
+}
+
+.inspector .insp-name,
+#inspName {
+  color: #ff9f43;
+  font-weight: 700;
 }

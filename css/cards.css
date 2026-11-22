@@ -7026,3 +7026,14 @@ Shine & Glare Effects
   font-size: calc(2em * var(--st-k-zone, 1));
   color: var(--st-c-zone, #ffffff);
 }
+
+/* ---------- logo BLANC par défaut (upload = tel quel) ---------- */
+.card.studio .st-logo {
+  filter: var(--st-logo-filter, brightness(0) invert(1));
+}
+
+/* ---------- sélection façon Figma ---------- */
+.card.edit .st .selected {
+  outline: 2px solid #ff9f43 !important;
+  outline-offset: 0;
+}

@@ -58,7 +58,7 @@ const EFFECTS = [
 const settings = {
   rotMax: 14,
   glareStrength: 1,
-  size: 360,
+  size: 500,
 };
 
 const INTERACT = { stiffness: 0.066, damping: 0.25 };
@@ -380,8 +380,8 @@ function adaptCardAspect() {
 
 function fitCard() {
   const aspect = parseFloat(getComputedStyle(card).getPropertyValue("--card-aspect")) || 0.718;
-  const availW = Math.max(160, stage.clientWidth - 32);
-  const availH = Math.max(160, stage.clientHeight - 80);
+  const availW = Math.max(160, stage.clientWidth - 16);
+  const availH = Math.max(160, stage.clientHeight - 24);
   let w = Math.min(settings.size, availW, availH * aspect);
   w = Math.max(160, Math.round(w));
   card.style.width = w + "px";
@@ -1085,6 +1085,7 @@ function makeDraggable(el) {
         const dy = ((ev.clientY - start.y) / c.height) * 100;
         el.style.left = r0.x + dx + "%";
         el.style.top = r0.y + dy + "%";
+        if (typeof selectedZone !== "undefined" && el === selectedZone && typeof refreshInspector === "function") refreshInspector();
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
@@ -1108,6 +1109,7 @@ function makeDraggable(el) {
       const dh = ((ev.clientY - start.y) / c.height) * 100;
       el.style.width = Math.max(4, r0.w + dw) + "%";
       el.style.height = Math.max(2, r0.h + dh) + "%";
+      if (typeof selectedZone !== "undefined" && el === selectedZone && typeof refreshInspector === "function") refreshInspector();
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
@@ -1292,4 +1294,133 @@ setTimeout(pushUndo, 800);
 document.querySelector(".st").addEventListener("dblclick", (e) => {
   const z = e.target.closest && e.target.closest(".st-zone-new");
   if (z) z.remove();
+});
+
+/* ---------- inspecteur façon Figma : clic sur une zone (mode édition) -> panneau de propriétés ---------- */
+const ZONE_META = {
+  "st-bg": { label: "Fond de carte" },
+  "st-pill": { label: "Pill header" },
+  "st-art": { label: "Fenêtre d'art" },
+  "st-frame": { label: "Cadre" },
+  "st-brand": { label: "Marque « Outcome »", sizeVar: "--st-k-brand", colorVar: "--st-c-brand", textId: "stBrandIn" },
+  "st-name": { label: "Nom de la carte", sizeVar: "--st-k-name", colorVar: "--st-c-name", textId: "stNameIn" },
+  "st-hp": { label: "HP", sizeVar: "--st-k-hp", colorVar: "--st-c-hp", textId: "stHpIn" },
+  "st-logo": { label: "Logo" },
+  "st-body": { label: "Panneau attaques" },
+  "st-typebar": { label: "Barre de type", sizeVar: "--st-k-type", colorVar: "--st-c-type" },
+  "st-foot": { label: "Pied de carte", sizeVar: "--st-k-foot", colorVar: "--st-c-foot" },
+  "st-zone-new": { label: "Zone perso", sizeVar: "--st-k-zone", colorVar: "--st-c-zone", textId: null },
+};
+
+let selectedZone = null;
+const insp = {
+  box: document.getElementById("inspector"),
+  name: document.getElementById("inspName"),
+  textRow: document.getElementById("inspTextRow"),
+  text: document.getElementById("inspText"),
+  X: document.getElementById("inspX"), Y: document.getElementById("inspY"),
+  W: document.getElementById("inspW"), H: document.getElementById("inspH"),
+  Xv: document.getElementById("inspXv"), Yv: document.getElementById("inspYv"),
+  Wv: document.getElementById("inspWv"), Hv: document.getElementById("inspHv"),
+  sizeRow: document.getElementById("inspSizeRow"), size: document.getElementById("inspSize"), sizeV: document.getElementById("inspSizeV"),
+  colorRow: document.getElementById("inspColorRow"), color: document.getElementById("inspColor"),
+  del: document.getElementById("inspDel"),
+};
+
+function zoneMeta(el) {
+  for (const cls of el.classList) if (ZONE_META[cls]) return ZONE_META[cls];
+  return { label: el.className || "zone" };
+}
+
+function refreshInspector() {
+  if (!selectedZone || !insp.box) return;
+  const r = zoneRect(selectedZone);
+  insp.X.value = r.x; insp.Y.value = r.y; insp.W.value = r.w; insp.H.value = r.h;
+  insp.Xv.textContent = r.x.toFixed(1) + "%";
+  insp.Yv.textContent = r.y.toFixed(1) + "%";
+  insp.Wv.textContent = r.w.toFixed(1) + "%";
+  insp.Hv.textContent = r.h.toFixed(1) + "%";
+  const meta = zoneMeta(selectedZone);
+  if (meta.sizeVar) {
+    const k = parseFloat(card.style.getPropertyValue(meta.sizeVar)) || 1;
+    insp.size.value = Math.round(k * 100);
+    insp.sizeV.textContent = Math.round(k * 100) + "%";
+    insp.sizeRow.hidden = false;
+  } else insp.sizeRow.hidden = true;
+  if (meta.colorVar) {
+    insp.color.value = card.style.getPropertyValue(meta.colorVar) || "#ffffff";
+    insp.colorRow.hidden = false;
+  } else insp.colorRow.hidden = true;
+  if (meta.textId || selectedZone.classList.contains("st-zone-new")) {
+    insp.text.value = meta.textId
+      ? document.getElementById(meta.textId).value
+      : selectedZone.textContent;
+    insp.textRow.hidden = false;
+  } else insp.textRow.hidden = true;
+  insp.del.hidden = !selectedZone.classList.contains("st-zone-new");
+}
+
+function selectZone(el) {
+  document.querySelectorAll(".st .selected").forEach((z) => z.classList.remove("selected"));
+  selectedZone = el;
+  if (!el) {
+    if (insp.box) insp.box.hidden = true;
+    return;
+  }
+  el.classList.add("selected");
+  if (insp.box) {
+    insp.box.hidden = false;
+    insp.name.textContent = zoneMeta(el).label;
+  }
+  refreshInspector();
+}
+
+/* clic sur une zone en mode édition -> sélection (phase capture, avant le drag) */
+document.querySelector(".st").addEventListener(
+  "pointerdown",
+  (e) => {
+    if (!card.classList.contains("edit")) return;
+    const z = e.target.closest(EDIT_SEL);
+    selectZone(z || null);
+  },
+  true
+);
+
+/* application live des champs de l'inspecteur */
+function inspApply() {
+  if (!selectedZone) return;
+  normalizeZone(selectedZone);
+  selectedZone.style.left = insp.X.value + "%";
+  selectedZone.style.top = insp.Y.value + "%";
+  selectedZone.style.width = insp.W.value + "%";
+  selectedZone.style.height = insp.H.value + "%";
+  refreshInspector();
+}
+for (const k of ["X", "Y", "W", "H"]) insp[k].addEventListener("input", inspApply);
+
+insp.size.addEventListener("input", () => {
+  const meta = zoneMeta(selectedZone);
+  if (meta.sizeVar) card.style.setProperty(meta.sizeVar, String(insp.size.value / 100));
+  insp.sizeV.textContent = insp.size.value + "%";
+});
+insp.color.addEventListener("input", () => {
+  const meta = zoneMeta(selectedZone);
+  if (meta.colorVar) card.style.setProperty(meta.colorVar, insp.color.value);
+});
+insp.text.addEventListener("input", () => {
+  if (!selectedZone) return;
+  const meta = zoneMeta(selectedZone);
+  if (meta.textId) {
+    const inpEl = document.getElementById(meta.textId);
+    inpEl.value = insp.text.value;
+    inpEl.dispatchEvent(new Event("input", { bubbles: true }));
+  } else {
+    selectedZone.textContent = insp.text.value;
+  }
+});
+insp.del.addEventListener("click", () => {
+  if (selectedZone && selectedZone.classList.contains("st-zone-new")) {
+    selectedZone.remove();
+    selectZone(null);
+  }
 });

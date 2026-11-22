@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795391192" />
-  <link rel="stylesheet" href="css/ui.css?v=1795391192" />
+  <link rel="stylesheet" href="css/cards.css?v=1795391429" />
+  <link rel="stylesheet" href="css/ui.css?v=1795391429" />
 </head>
 <body>
   <header>
@@ -82,8 +82,8 @@
           <input type="range" id="glare" min="0" max="1.5" step="0.05" value="1" />
         </label>
         <label class="slider">
-          <span>Taille de la carte <output id="sizeOut">360px</output></span>
-          <input type="range" id="cardSize" min="200" max="560" step="10" value="360" />
+          <span>Taille de la carte <output id="sizeOut">500px</output></span>
+          <input type="range" id="cardSize" min="240" max="720" step="10" value="500" />
         </label>
         <label class="slider color-row">
           <span>Couleur de lueur</span>
@@ -136,6 +136,19 @@
         </div>
         <h3>Tailles &amp; couleurs par texte</h3>
         <div class="fields" id="textStyles"></div>
+        <div class="inspector" id="inspector" hidden>
+          <h3>🎯 Sélection : <span id="inspName">—</span></h3>
+          <div class="fields">
+            <label class="field" id="inspTextRow" hidden><span>Texte</span><input type="text" id="inspText" /></label>
+            <label class="slider"><span>X <b id="inspXv">0%</b></span><input type="range" id="inspX" min="-20" max="120" step="0.1" /></label>
+            <label class="slider"><span>Y <b id="inspYv">0%</b></span><input type="range" id="inspY" min="-20" max="120" step="0.1" /></label>
+            <label class="slider"><span>Largeur <b id="inspWv">0%</b></span><input type="range" id="inspW" min="2" max="130" step="0.1" /></label>
+            <label class="slider"><span>Hauteur <b id="inspHv">0%</b></span><input type="range" id="inspH" min="2" max="130" step="0.1" /></label>
+            <label class="slider" id="inspSizeRow" hidden><span>Taille texte <b id="inspSizeV">100%</b></span><input type="range" id="inspSize" min="50" max="200" /></label>
+            <label class="slider color-row" id="inspColorRow" hidden><span>Couleur</span><input type="color" id="inspColor" /></label>
+            <button type="button" id="inspDel" class="btn" hidden>🗑 Supprimer la zone</button>
+          </div>
+        </div>
         <div class="fields">
           <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="ALI" /></label>
           <label class="field"><span>Marque (haut gauche)</span><input type="text" id="stBrandIn" value="Outcome" /></label>
@@ -274,6 +287,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795391192"></script>
+  <script src="js/app.js?v=1795391429"></script>
 </body>
 </html>

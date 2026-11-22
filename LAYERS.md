@@ -125,3 +125,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Boutons ↩️ Annuler / ↪️ Rétablir dans le panneau Studio
 - Snapshot = style inline de #card (toutes les vars --st-*) + innerHTML de .st (sans les .st-handle) + valeurs des champs #pane-studio
 - pushUndo au pointerdown sur tout élément interactif (dédoublonné), snapshot initial à 800ms ; restauration ré-attache les handlers de drag (makeDraggable) et la délégation dblclick-delete sur .st
+
+## Interface façon Figma + tailles
+- Logo blanc par défaut (filter brightness(0) invert(1) ; upload logo = tel quel)
+- Carte par défaut 500px (cardSize 240–720, settings.size 500) ; stage min-height 820px, fitCard marges 16/24
+- Inspecteur 🎯 (mode édition) : clic sur une zone → panneau avec X/Y/L/H (%), texte, taille texte, couleur, supprimer (zones perso) ; se met à jour pendant le drag ; ZONE_META mappe chaque zone à ses vars --st-k-*/--st-c-*
