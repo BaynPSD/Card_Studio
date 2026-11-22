@@ -6235,6 +6235,9 @@ Shine & Glare Effects
 
 .card .st > div {
   position: absolute;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
 }
 
 .st-bg {
@@ -6248,8 +6251,9 @@ Shine & Glare Effects
   background-image: var(--layer-fg, var(--layer-bg, none));
   background-size: 100% 100%;
   background-color: rgba(0, 0, 0, 0.18);
-  clip-path: var(--clip);
   border-radius: 4% / 3%;
+  border: calc(var(--st-fs, 3.6px) * 0.5) solid rgba(255, 255, 255, 0.85);
+  box-sizing: border-box;
 }
 
 .st-frame {
@@ -6343,3 +6347,11 @@ Shine & Glare Effects
   font-size: calc(var(--st-fs, 3.6px) * 2.5);
   color: var(--st-text, #f4f6ff);
 }
+
+/* ---------- visualisation des zones du template (case 🗺️) ---------- */
+.card.show-zones .st-head { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #ff5964; outline-offset: -2px; }
+.card.show-zones .st-art { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #3ddc84; outline-offset: -2px; }
+.card.show-zones .st-body { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #4f8ef7; outline-offset: -2px; }
+.card.show-zones .st-foot { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #ffd34d; outline-offset: -2px; }
+.card.show-zones .st-logo { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #e056fd; outline-offset: -2px; }
+.card.show-zones .st-frame { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #ffffff; outline-offset: calc(var(--st-fs, 3.6px) * -1.6); }
