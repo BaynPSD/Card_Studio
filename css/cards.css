@@ -5,7 +5,7 @@
    ============================================================ */
 
 :root {
-  --card-aspect: 0.718;
+  --card-aspect: 0.7197;
   --card-radius: 4.55% / 3.5%;
   --card-edge: hsl(47, 100%, 78%);
   --card-back: hsl(205, 100%, 25%);
@@ -6247,18 +6247,18 @@ Shine & Glare Effects
 }
 
 .st-art {
-  inset: 12% 5% 23% 5%;
+  inset: 9.85% 8% 52.85% 8%;
   background-image: var(--layer-fg, var(--layer-bg, none));
   background-size: 100% 100%;
   background-color: rgba(0, 0, 0, 0.18);
-  border-radius: 4% / 3%;
+  border-radius: calc(var(--st-fs, 3.6px) * 1.2);
   border: calc(var(--st-fs, 3.6px) * 0.5) solid rgba(255, 255, 255, 0.85);
   box-sizing: border-box;
 }
 
 .st-frame {
   inset: 0;
-  border-radius: 4.5% / 3.5%;
+  border-radius: 4% / 2.9%;
   border: calc(var(--st-fs, 3.6px) * 1.4) solid var(--st-frame, #d9d9e3);
   box-shadow:
     inset 0 0 0 calc(var(--st-fs, 3.6px) * 0.35) rgba(255, 255, 255, 0.4),
@@ -6268,17 +6268,17 @@ Shine & Glare Effects
 }
 
 .st-head {
-  top: 2%;
-  left: 5%;
-  right: 5%;
-  height: 8%;
+  top: 3.3%;
+  left: 19%;
+  width: 53%;
+  height: 6%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--st-head, #f2f2f6);
+  background: transparent;
   color: var(--st-head-text, #1a2340);
-  border-radius: 999px;
-  padding: 0 5%;
+  border-radius: 0;
+  padding: 0;
   box-sizing: border-box;
   font-weight: 800;
 }
@@ -6290,8 +6290,11 @@ Shine & Glare Effects
 }
 
 .st-hp {
+  top: 3.5%;
+  right: 13.2%;
   font-size: calc(var(--st-fs, 3.6px) * 4.4);
-  color: #ffd34d;
+  font-weight: 800;
+  color: var(--st-head-text, #1a2340);
 }
 
 .st-logo {
@@ -6306,14 +6309,13 @@ Shine & Glare Effects
 }
 
 .st-body {
+  top: 53%;
   left: 5%;
-  right: 5%;
-  top: 78.5%;
-  bottom: 4.5%;
+  width: 90%;
+  height: 30.5%;
   box-sizing: border-box;
-  background: rgba(8, 10, 20, 0.55);
-  border-radius: 3% / 2.2%;
-  padding: 2.5% 4%;
+  background: transparent;
+  padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -6338,9 +6340,9 @@ Shine & Glare Effects
 }
 
 .st-foot {
-  left: 6%;
-  right: 6%;
-  bottom: 1.8%;
+  left: 6.6%;
+  right: 6.6%;
+  bottom: 3.6%;
   display: flex;
   justify-content: space-between;
   font-weight: 600;
