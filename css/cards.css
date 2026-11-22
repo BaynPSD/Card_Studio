@@ -6209,6 +6209,10 @@ Shine & Glare Effects
 /* ---------- mode Studio (card maker) ---------- */
 .card :where(.st > div) {
   position: absolute;
+}
+
+/* reset aussi sur TOUS les descendants (spans, p, i) : .card__rotator * leur met width/height/aspect 100% */
+.card :where(.st *) {
   width: auto;
   height: auto;
   aspect-ratio: auto;
@@ -6340,8 +6344,8 @@ Shine & Glare Effects
   white-space: nowrap;
   height: 6%;
   top: 3.5%;
-  left: 80%;
-  width: 6.8%;
+  left: 70%;
+  width: 16.8%;
   text-align: right;
   font-size: calc(var(--st-fs, 3.6px) * 4.4);
   font-weight: 800;
