@@ -6751,20 +6751,14 @@ Shine & Glare Effects
   transform: translateY(-50%);
 }
 
-/* ---------- motif de fond en overlay FIN (img/studio/fond-overlay.webp) + teinte réglable ----------
-   .st-fond est enfant DIRECT de .card__front (pas de .st) car .st a un transform => stacking context ;
-   z-index 5 = au-dessus du template (z<=4), de shine(3) et texture(4), sous les effets holo (z auto, ordre DOM) */
-.card .st-fond {
-  display: none;
-}
-
-.card.studio .st-fond {
-  display: block;
+/* ---------- motif de fond DANS le fond opaque (img/studio/fond-overlay.webp) + teinte réglable ----------
+   Le motif va en ::after de .st-bg : au-dessus du dégradé opaque (::before), sous pill/art/textes =>
+   le fond n'est jamais transparent et le header reste propre comme la ref. */
+.card.studio .st-bg::after {
+  content: "";
   position: absolute;
   inset: 0;
-  z-index: 5;
   pointer-events: none;
-  border-radius: 4% / 2.9%;
   background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
   background-size: cover;
   background-position: center;

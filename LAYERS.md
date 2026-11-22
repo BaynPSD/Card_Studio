@@ -74,8 +74,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Pill blanche 5–95% × 1.5–11.5% ; à l'intérieur, de gauche à droite : **logo bolt 7% (left 6.5%, centré verticalement)** + **texte marque "Outcome" éditable (stBrandIn, 1.35em, left 13.5%)** + **nom (left 32%, max avant HP)** + **HP à droite (right 12%)**
 - Le logo n'est PLUS à droite ; upload "Logo" (stLogoFile) remplace le bolt du lockup haut-gauche
 
-## Motif de fond overlay (asset utilisateur 1062x1482, 85% transparent)
+## Motif de fond (asset utilisateur 1062x1482, 85% transparent) — DANS le fond opaque
 - Asset : `img/studio/fond-overlay.webp` (webp q80, alpha conservé)
-- `.st-fond` = enfant DIRECT de `.card__front` (PAS dans `.st`, car `.st` a un transform → stacking context qui piégerait le z-index), z-index 5, `border-radius: 4%/2.9%`, `pointer-events: none`, affiché seulement en `.card.studio`
-- Contrôles Studio : 🎨 `stFondColor` (teinte → `filter: sepia(1) saturate(4) hue-rotate(Xdeg)` sur l'overlay ; #ffffff = couleurs d'origine) + slider `stFondOp` (opacité 0–100%, défaut 25% = "fin")
-- Vars : `--st-fond-opacity`, `--st-fond-filter`, `--st-fond-img`
+- Le motif va en `.card.studio .st-bg::after` : au-dessus du dégradé opaque (`::before`), sous pill/art/frame/textes (z1 < z2..4) => fond jamais transparent, header propre comme la ref
+- Contrôles Studio : 🎨 `stFondColor` (teinte → `filter: sepia(1) saturate(4) hue-rotate(Xdeg)` ; #ffffff = couleurs d'origine) + slider `stFondOp` (opacité 0–100%, défaut 25%)
+- Vars : `--st-fond-opacity`, `--st-fond-filter`, `--st-fond-img` (posées sur #card)
