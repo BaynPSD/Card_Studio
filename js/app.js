@@ -656,6 +656,11 @@ stLogoFile.addEventListener("change", () => {
 });
 
 /* uploads du studio : fond (slot carte) + illustration (slot perso) */
+const showZonesBox = document.getElementById("showZones");
+showZonesBox.addEventListener("input", () => {
+  card.classList.toggle("show-zones", showZonesBox.checked);
+});
+
 const stBgFile = document.getElementById("stBgFile");
 stBgFile.addEventListener("change", () => {
   const file = stBgFile.files[0];
