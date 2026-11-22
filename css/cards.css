@@ -6588,3 +6588,17 @@ Shine & Glare Effects
 .st-frame {
   border-color: var(--st-frame, #b6b8c9);
 }
+
+/* fond couleur (dégradé) quand aucune image de fond uploadée */
+.card.studio .st-bg {
+  background-image: var(--layer-bg, none);
+  background-color: transparent;
+}
+
+.card.studio .st-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--st-bg-grad, none);
+  z-index: -1;
+}

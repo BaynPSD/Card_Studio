@@ -552,3 +552,29 @@ main {
 .slot__clear:hover {
   background: #ff5964;
 }
+
+/* ---------- pastilles de couleur de fond ---------- */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+
+.swatches button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatches button:hover {
+  transform: scale(1.15);
+  border-color: #fff;
+}
+
+[data-scheme="light"] .swatches button {
+  border-color: rgba(20, 30, 60, 0.3);
+}

@@ -400,8 +400,8 @@ function applyImages() {
   };
   img.src = slots.card.url;
   if (backImg && slots.back.url) backImg.src = slots.back.url;
-  const studioEmpty = card.classList.contains("studio") && !slots.card.custom;
-  const bg = !studioEmpty && slots.card.url ? slots.card.url : card.classList.contains("studio") ? "img/studio/fond.webp" : null;
+  const studioColorMode = card.classList.contains("studio") && !slots.card.custom;
+  const bg = studioColorMode ? null : slots.card.url || null;
   card.style.setProperty("--layer-bg", bg ? `url("${bg}")` : "none");
   if (slots.fg.url) card.style.setProperty("--layer-fg", `url("${slots.fg.url}")`);
   else card.style.removeProperty("--layer-fg");
@@ -674,6 +674,30 @@ function bindCost(inputId, costId, rowId) {
 }
 bindCost("stCost1In", "stCost1", "stAtkRow1");
 bindCost("stCost2In", "stCost2", "stAtkRow2");
+
+/* ---------- fond de carte en couleur (dégradé façon types Pokémon) ---------- */
+function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+function shade(hex, amt) {
+  const [r, g, b] = hexToRgb(hex);
+  const f = (v) => Math.max(0, Math.min(255, Math.round(v + amt)));
+  return "#" + [f(r), f(g), f(b)].map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+function setStudioBg(hex) {
+  const grad = `linear-gradient(160deg, ${shade(hex, 55)} 0%, ${hex} 45%, ${shade(hex, -45)} 100%)`;
+  card.style.setProperty("--st-bg-grad", grad);
+  if (!slots.card.custom) card.style.setProperty("--layer-bg", "none");
+  const inp = document.getElementById("stBgColor");
+  if (inp) inp.value = hex;
+}
+const stBgColor = document.getElementById("stBgColor");
+stBgColor.addEventListener("input", () => setStudioBg(stBgColor.value));
+document.querySelectorAll("#bgSwatches button").forEach((b) =>
+  b.addEventListener("click", () => setStudioBg(b.dataset.c))
+);
+setStudioBg(stBgColor.value || "#2f6fd0");
 
 const showZonesBox = document.getElementById("showZones");
 showZonesBox.addEventListener("input", () => {
