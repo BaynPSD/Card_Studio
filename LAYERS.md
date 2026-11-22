@@ -100,3 +100,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - "HP 150" blanc 1.4em à droite ~85% (st-hp right 15%)
 - Logo bolt CYAN tout à droite ~90-98% (st-logo right 2%, w 8%, plus de filtre blanc par défaut)
 - Pas de pill par défaut ; texte blanc sur fond opaque
+
+## Header FINAL (vérifié = ref image 2) : [Outcome ~5%] [bolt CYAN 10.6-12.5%] [ALI 2.6em ~24%] ... [HP 150 right 10% + ♥ vert #3ddc84]
+- logo.webp recolorié cyan #5af0d2 ; plus de filtre blanc
+- art-default.webp = crop haute res (935x934) de la carte ref 1062x1482 (x 6-94%, y 13-76%) → illustration nette

@@ -6858,3 +6858,44 @@ Shine & Glare Effects
 .card.studio .st-logo {
   filter: var(--st-logo-filter, none);
 }
+
+/* ---------- header FINAL2 mesuré sur la carte image 2 (1062x1482) ----------
+   [Outcome ~5%] [bolt CYAN ~10-15%] [ALI gros ~24%] ... [HP 150 ~80-85%] [♥ vert ~90%] */
+.st-brand {
+  left: 1%;
+  font-size: 1.6em;
+}
+
+.st-logo {
+  left: 9%;
+  right: auto;
+  top: 3%;
+  transform: none;
+  width: 5.5%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+}
+
+.st-name {
+  left: 21%;
+  right: 22%;
+  font-size: 2.6em;
+  font-weight: 800;
+}
+
+.st-hp {
+  left: auto;
+  right: 16%;
+  font-size: 1.4em;
+}
+
+.st-hp-ico {
+  font-style: normal;
+  color: #3ddc84;
+  margin-left: 0.25em;
+  font-size: 1em;
+}
+
+.st-hp {
+  right: 10%;
+}
