@@ -6602,3 +6602,76 @@ Shine & Glare Effects
   background: var(--st-bg-grad, none);
   z-index: -1;
 }
+
+/* ---------- ajustement fin carte de référence : pill blanche, texte navy, tailles mesurées ---------- */
+.st-pill {
+  top: 1.5%;
+  left: 5%;
+  right: 5%;
+  height: 10%;
+  background: var(--st-head, #ffffff);
+}
+
+.st-head {
+  top: 1.5%;
+  left: 5%;
+  right: 5%;
+  width: auto;
+  height: 10%;
+  color: var(--st-head-text, #0c1628);
+}
+
+.st-name {
+  font-size: 2.1em;
+  font-weight: 800;
+}
+
+.st-hp {
+  top: 3.2%;
+  height: 7%;
+  left: auto;
+  right: 12%;
+  width: auto;
+  min-width: 14%;
+  font-size: 1.4em;
+  font-weight: 700;
+  color: var(--st-head-text, #0c1628);
+}
+
+.st-logo {
+  top: 2.5%;
+  right: 2%;
+  width: 10%;
+}
+
+/* tailles attaques mesurées sur la ref : plus petites que karl */
+.st-atk-name {
+  font-size: 2.2em;
+  left: calc(6% + max(4, var(--cost, 4)) * 5.5%);
+}
+
+.st-atk-dmg {
+  font-size: 2em;
+}
+
+.st-desc {
+  font-size: 1.3em;
+}
+
+/* icônes d'attaque = symboles blancs (⚡♥🎲⭐🪙◆∞●), pas des cercles pleins */
+.st-cost {
+  font-size: 1.9em;
+  color: #ffffff;
+  align-items: center;
+}
+
+.st-cost i {
+  width: auto;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  font-style: normal;
+  line-height: 1;
+  color: #ffffff;
+}

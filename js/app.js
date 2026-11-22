@@ -660,20 +660,23 @@ stLogoFile.addEventListener("change", () => {
 });
 
 /* uploads du studio : fond (slot carte) + illustration (slot perso) */
-function bindCost(inputId, costId, rowId) {
+function bindCost(inputId, costId, rowId, iconId) {
   const input = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
   const cost = document.getElementById(costId);
   const row = document.getElementById(rowId);
   const apply = () => {
     const n = Math.max(0, Math.min(5, parseInt(input.value || "0", 10) || 0));
-    cost.innerHTML = "<i></i>".repeat(n);
+    const glyph = icon.value || "\u26a1";
+    cost.innerHTML = `<i>${glyph}</i>`.repeat(n);
     row.style.setProperty("--cost", String(Math.max(4, n)));
   };
   input.addEventListener("input", apply);
+  icon.addEventListener("input", apply);
   apply();
 }
-bindCost("stCost1In", "stCost1", "stAtkRow1");
-bindCost("stCost2In", "stCost2", "stAtkRow2");
+bindCost("stCost1In", "stCost1", "stAtkRow1", "stIcon1In");
+bindCost("stCost2In", "stCost2", "stAtkRow2", "stIcon2In");
 
 /* ---------- fond de carte en couleur (dégradé façon types Pokémon) ---------- */
 function hexToRgb(hex) {
