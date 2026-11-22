@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795388911" />
-  <link rel="stylesheet" href="css/ui.css?v=1795388911" />
+  <link rel="stylesheet" href="css/cards.css?v=1795391192" />
+  <link rel="stylesheet" href="css/ui.css?v=1795391192" />
 </head>
 <body>
   <header>
@@ -130,6 +130,10 @@
           <input type="range" id="stScaleIn" min="50" max="200" value="100" />
         </label>
         <button type="button" id="addZoneBtn" class="btn">➕ Ajouter une zone texte</button>
+        <div class="btn-row">
+          <button type="button" id="undoBtn" class="btn" title="Ctrl+Z">↩️ Annuler</button>
+          <button type="button" id="redoBtn" class="btn" title="Ctrl+Shift+Z / Ctrl+Y / Ctrl+V">↪️ Rétablir</button>
+        </div>
         <h3>Tailles &amp; couleurs par texte</h3>
         <div class="fields" id="textStyles"></div>
         <div class="fields">
@@ -270,6 +274,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795388911"></script>
+  <script src="js/app.js?v=1795391192"></script>
 </body>
 </html>

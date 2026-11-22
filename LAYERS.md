@@ -119,3 +119,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Panneau Studio → « Tailles & couleurs par texte » : 9 lignes (Marque, Nom, HP, Noms attaques, Dégâts, Description, Typebar, Pied, Zones ajoutées), chacune = slider 50–200% + color picker
 - Vars par élément sur #card : `--st-k-*` (échelle) et `--st-c-*` (couleur) ; CSS : ex. `.st-name { font-size: calc(2.6em * var(--st-k-name,1)); color: var(--st-c-name, ...) }`
 - Le slider global « Taille du texte » (--st-scale) reste dispo en plus
+
+## Undo / Redo
+- Raccourcis : Ctrl+Z (annuler), Ctrl+Shift+Z / Ctrl+Y / Ctrl+V (rétablir, Ctrl+V seulement hors champ texte)
+- Boutons ↩️ Annuler / ↪️ Rétablir dans le panneau Studio
+- Snapshot = style inline de #card (toutes les vars --st-*) + innerHTML de .st (sans les .st-handle) + valeurs des champs #pane-studio
+- pushUndo au pointerdown sur tout élément interactif (dédoublonné), snapshot initial à 800ms ; restauration ré-attache les handlers de drag (makeDraggable) et la délégation dblclick-delete sur .st

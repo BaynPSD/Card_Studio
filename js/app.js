@@ -1154,7 +1154,6 @@ addZoneBtn.addEventListener("click", () => {
   z.style.width = "45%";
   z.style.height = "8%";
   z.title = "Glisser la poignée orange pour déplacer/redimensionner · double-clic pour supprimer";
-  z.addEventListener("dblclick", () => z.remove());
   st.appendChild(z);
   makeDraggable(z);
   if (!editModeBox.checked) {
@@ -1204,3 +1203,93 @@ for (const [label, sizeVar, colorVar, defColor] of TEXT_STYLES) {
   row.append(span, range, pct, color);
   tsBox.appendChild(row);
 }
+
+/* ---------- UNDO / REDO (Ctrl+Z · Ctrl+Shift+Z · Ctrl+Y · Ctrl+V) ---------- */
+const undoStack = [];
+const redoStack = [];
+
+function snapshotStudio() {
+  const st = document.querySelector(".st");
+  const clone = st ? st.cloneNode(true) : null;
+  if (clone) clone.querySelectorAll(".st-handle").forEach((h) => h.remove());
+  const inputs = {};
+  document.querySelectorAll("#pane-studio input, #pane-studio select").forEach((el) => {
+    inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  return JSON.stringify({
+    cardStyle: card.getAttribute("style") || "",
+    stHTML: clone ? clone.innerHTML : "",
+    inputs,
+  });
+}
+
+function restoreStudio(s) {
+  const data = JSON.parse(s);
+  card.setAttribute("style", data.cardStyle);
+  const st = document.querySelector(".st");
+  if (st && data.stHTML) {
+    st.innerHTML = data.stHTML;
+    document.querySelectorAll(EDIT_SEL).forEach(makeDraggable);
+  }
+  for (const [id, v] of Object.entries(data.inputs || {})) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.type === "checkbox") el.checked = !!v;
+    else el.value = v;
+  }
+}
+
+function pushUndo() {
+  const s = snapshotStudio();
+  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;
+  undoStack.push(s);
+  if (undoStack.length > 100) undoStack.shift();
+  redoStack.length = 0;
+}
+
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(snapshotStudio());
+  restoreStudio(undoStack.pop());
+}
+
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(snapshotStudio());
+  restoreStudio(redoStack.pop());
+}
+
+/* snapshot avant chaque action (clic sur champ/bouton/zone) */
+document.addEventListener(
+  "pointerdown",
+  (e) => {
+    const t = e.target;
+    if (t.closest && (t.closest("input, select, button, a") || t.closest(EDIT_SEL))) pushUndo();
+  },
+  true
+);
+
+document.addEventListener("keydown", (e) => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) return;
+  const tag = (e.target.tagName || "").toLowerCase();
+  const typing = tag === "input" || tag === "textarea" || e.target.isContentEditable;
+  const k = e.key.toLowerCase();
+  if (k === "z" && !e.shiftKey) {
+    e.preventDefault();
+    undo();
+  } else if ((k === "z" && e.shiftKey) || k === "y" || (k === "v" && (e.shiftKey || !typing))) {
+    e.preventDefault();
+    redo();
+  }
+});
+
+document.getElementById("undoBtn").addEventListener("click", undo);
+document.getElementById("redoBtn").addEventListener("click", redo);
+
+/* snapshot initial + suppression de zone par double-clic (délégation, survit aux restaurations) */
+setTimeout(pushUndo, 800);
+document.querySelector(".st").addEventListener("dblclick", (e) => {
+  const z = e.target.closest && e.target.closest(".st-zone-new");
+  if (z) z.remove();
+});
