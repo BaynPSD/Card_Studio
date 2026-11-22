@@ -6765,3 +6765,9 @@ Shine & Glare Effects
   opacity: var(--st-fond-opacity, 0.25);
   filter: var(--st-fond-filter, none);
 }
+
+/* ---------- illustration par défaut dans la fenêtre d'art (extraite de la carte ref de l'utilisateur) ----------
+   --layer-fg (upload "Illustration") reste prioritaire ; sinon art-default.webp */
+.st-art {
+  background-image: var(--layer-fg, url("../img/studio/art-default.webp"));
+}

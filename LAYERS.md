@@ -79,3 +79,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Le motif va en `.card.studio .st-bg::after` : au-dessus du dégradé opaque (`::before`), sous pill/art/frame/textes (z1 < z2..4) => fond jamais transparent, header propre comme la ref
 - Contrôles Studio : 🎨 `stFondColor` (teinte → `filter: sepia(1) saturate(4) hue-rotate(Xdeg)` ; #ffffff = couleurs d'origine) + slider `stFondOp` (opacité 0–100%, défaut 25%)
 - Vars : `--st-fond-opacity`, `--st-fond-filter`, `--st-fond-img` (posées sur #card)
+
+## Illustration par défaut
+- `img/studio/art-default.webp` = crop de la carte envoyée (x 10–90%, y 19–72%) : personnage gants de boxe sur dégradé bleu
+- `.st-art { background-image: var(--layer-fg, url("../img/studio/art-default.webp")) }` → upload "Illustration" (--layer-fg) prioritaire
