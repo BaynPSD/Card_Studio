@@ -6494,3 +6494,97 @@ Shine & Glare Effects
 }
 
 .card.show-zones .st-pill { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #ff9f43; outline-offset: -2px; }
+
+/* ---------- composition exacte de la carte de référence (image 2) + police Barlow Condensed ---------- */
+.card .st {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+}
+
+/* header : texte blanc directement sur le fond (pas de pill opaque par défaut) */
+.st-pill {
+  background: var(--st-head, transparent);
+}
+
+.st-head {
+  top: 2%;
+  left: 5%;
+  right: 5%;
+  width: auto;
+  height: 8%;
+  color: var(--st-head-text, #ffffff);
+}
+
+.st-name {
+  font-size: 2.9em;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.st-hp {
+  top: 2.5%;
+  height: 8%;
+  left: auto;
+  right: 13.2%;
+  width: auto;
+  min-width: 16%;
+  text-align: right;
+  color: var(--st-head-text, #ffffff);
+  font-size: 2.3em;
+  font-weight: 700;
+}
+
+.st-logo {
+  top: 2.5%;
+  right: 2.5%;
+  width: 8%;
+}
+
+/* grande fenêtre d'art de la carte ref : 12% -> 77% */
+.st-art {
+  inset: 12% 5% 23% 5%;
+}
+
+/* typebar entre l'art et les attaques : ~70-75% */
+.st-typebar {
+  top: 70%;
+  bottom: auto;
+  left: 5%;
+  width: 90%;
+  height: 5%;
+  color: var(--st-text, #ffffff);
+  font-size: 1.6em;
+}
+
+/* panneau attaques navy : 78.5% -> 95.5% */
+.st-body {
+  top: 78.5%;
+  left: 5%;
+  width: 90%;
+  height: 17%;
+  background: rgba(18, 44, 84, 0.85);
+  border-radius: 2% / 1.4%;
+  padding: 1% 3%;
+  color: var(--st-text, #ffffff);
+}
+
+.st-atk-name {
+  font-weight: 700;
+}
+
+.st-atk-dmg {
+  color: var(--st-text, #ffffff);
+}
+
+.st-desc {
+  font-family: "Barlow", "Helvetica Neue", sans-serif;
+  color: #dfe6ff;
+}
+
+.st-foot {
+  bottom: 1.5%;
+  color: var(--st-text, #ffffff);
+}
+
+.st-frame {
+  border-color: var(--st-frame, #b6b8c9);
+}
