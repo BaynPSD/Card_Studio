@@ -89,3 +89,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Texte header BLANC sur le fond opaque : `.st-head`/`.st-hp` color `var(--st-head-text, #ffffff)` ; stHeadTextIn défaut #ffffff
 - Lockup haut gauche : logo bolt blanc (filter brightness(0) invert(1) par défaut ; upload logo => `--st-logo-filter: none`) left 6.5% w 7%, "Outcome" (stBrandIn) left 13.5%, nom left 32%, HP right 12%
 - Fond opaque : dégradé `--st-bg-grad` + motif `fond-overlay.webp` en `.st-bg::after`
+
+## Cadre + header — positions exactes carte image 2 (1062x1482)
+- Cadre `.st-frame` OPAQUE : bord `calc(st-fs*2.3) solid var(--st-frame, #eceaf2)`, plus de fond translucide ni d'ombre (le voile "désopacifié" est supprimé) ; stFrameIn défaut #eceaf2
+- Header (ref) : logo bolt x 2–5% (left 2%, w 4.5%, aspect 3/4), "Outcome" ~7% (st-brand left 2.5% du head), nom ~24% (st-name left 21% du head), HP jusqu'à ~98% (st-hp right 2.5%)

@@ -6791,3 +6791,35 @@ Shine & Glare Effects
 .card.studio .st-logo {
   filter: var(--st-logo-filter, brightness(0) invert(1));
 }
+
+/* ---------- cadre OPAQUE (plus de voile translucide) + header aux positions exactes de la carte image 2 ----------
+   ref 1062x1482 : cadre ~2.3%W blanc cassé ; logo x 2-5% ; "Outcome" ~7-21% ; nom ~24-40% ; HP jusqu'à ~98% */
+.st-frame {
+  border: calc(var(--st-fs, 3.6px) * 2.3) solid var(--st-frame, #eceaf2);
+  background: none;
+  box-shadow: none;
+}
+
+.st-logo {
+  left: 2%;
+  right: auto;
+  top: 2.5%;
+  transform: none;
+  width: 4.5%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+}
+
+.st-brand {
+  left: 2.5%;
+}
+
+.st-name {
+  left: 21%;
+  right: 8%;
+}
+
+.st-hp {
+  left: auto;
+  right: 2.5%;
+}
