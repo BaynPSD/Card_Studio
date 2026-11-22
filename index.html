@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Holo Card Studio — effets 3D façon Pokémon</title>
+  <meta name="description" content="Card_Studio : crée des cartes holo personnalisées (upload PNG, 30+ effets, tilt 3D, studio card maker) — 100% client, GitHub Pages." />
   <link rel="stylesheet" href="css/cards.css?v=1795306574" />
   <link rel="stylesheet" href="css/ui.css?v=1795306574" />
 </head>
@@ -30,31 +31,31 @@
             <img alt="Carte" />
             <div class="slot__drop">📤 Carte<br /><small>clic ou glisse un PNG</small></div>
             <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Remettre la carte par défaut">✕</button>
+            <button type="button" class="slot__clear" title="Remettre la carte par défaut" aria-label="Remettre la carte par défaut">✕</button>
           </div>
           <div class="slot" data-slot="mask">
             <img alt="Masque" />
             <div class="slot__drop">🎭 Masque<br /><small>optionnel</small></div>
             <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Masque par défaut (plein cadre)">✕</button>
+            <button type="button" class="slot__clear" title="Masque par défaut (plein cadre)" aria-label="Masque par défaut (plein cadre)">✕</button>
           </div>
           <div class="slot" data-slot="foil">
             <img alt="Foil" />
             <div class="slot__drop">✨ Foil<br /><small>optionnel</small></div>
             <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Foil par défaut">✕</button>
+            <button type="button" class="slot__clear" title="Foil par défaut" aria-label="Foil par défaut">✕</button>
           </div>
           <div class="slot" data-slot="back">
             <img alt="Dos" />
             <div class="slot__drop">🂠 Dos<br /><small>optionnel</small></div>
             <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Dos par défaut">✕</button>
+            <button type="button" class="slot__clear" title="Dos par défaut" aria-label="Dos par défaut">✕</button>
           </div>
           <div class="slot" data-slot="fg">
             <img alt="Couche avant" />
             <div class="slot__drop">🎭 Perso<br /><small>PNG transparent</small></div>
             <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Retirer la couche avant">✕</button>
+            <button type="button" class="slot__clear" title="Retirer la couche avant" aria-label="Retirer la couche avant">✕</button>
           </div>
         </div>
         <button id="cutBtn" class="btn secondary">✂️ Découpe IA auto (perso vs fond)</button>
@@ -99,9 +100,9 @@
         </label>
         <div class="theme">
           <span>Thème</span>
-          <button type="button" data-theme="light">☀️</button>
-          <button type="button" data-theme="dark" aria-pressed="true">🌙</button>
-          <button type="button" data-theme="system">🖥️</button>
+          <button type="button" data-theme="light" aria-label="Thème clair">☀️</button>
+          <button type="button" data-theme="dark" aria-pressed="true" aria-label="Thème sombre">🌙</button>
+          <button type="button" data-theme="system" aria-label="Thème système">🖥️</button>
         </div>
       </section>
 

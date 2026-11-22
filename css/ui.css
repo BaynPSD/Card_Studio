@@ -537,3 +537,18 @@ main {
   background: linear-gradient(135deg, #ffcb05, #f0a500);
   color: #2a2000;
 }
+
+/* ---------- audit web-design-guidelines : focus visible + hover ---------- */
+:focus-visible {
+  outline: 2px solid #7fd4ff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.tab:hover {
+  border-color: #ffcb05;
+}
+
+.slot__clear:hover {
+  background: #ff5964;
+}
