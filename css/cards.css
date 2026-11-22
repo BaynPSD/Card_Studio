@@ -6947,3 +6947,36 @@ Shine & Glare Effects
 .card.edit .st * {
   pointer-events: auto;
 }
+
+/* ---------- brand et nom = blocs INDÉPENDANTS (draggables séparément en mode édition) ---------- */
+.card .st-brand,
+.card .st-name {
+  position: absolute;
+  z-index: 4;
+  top: 6.5%;
+  transform: translateY(-50%);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.st-brand {
+  left: 5%;
+  font-size: 1.6em;
+  font-weight: 800;
+  color: var(--st-head-text, #ffffff);
+}
+
+.st-name {
+  left: 24%;
+  right: 22%;
+  font-size: 2.6em;
+  font-weight: 800;
+  color: var(--st-head-text, #ffffff);
+}
+
+/* le conteneur .st-head est vide maintenant (brand/nom sont des blocs séparés) */
+.card .st-head {
+  display: none;
+}

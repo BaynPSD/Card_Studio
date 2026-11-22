@@ -111,3 +111,6 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Slider « Taille du texte » (stScaleIn 50–200%) → `--st-scale` multiplié dans `.card .st { font-size: calc(st-fs*2.1407*var(--st-scale,1)) }`
 - Bouton « ➕ Ajouter une zone texte » → `.st-zone-new` contenteditable, draggable, double-clic = supprimer
 - En mode edit : tilt 3D et zoom désactivés (guards dans interact/pointerup) + `.card.edit .st * { pointer-events:auto }`
+
+## Blocs indépendants
+- `.st-brand` (Outcome) et `.st-name` (ALI) sont des enfants DIRECTS de `.st` (plus dans .st-head, qui est display:none) → draggables séparément en mode édition ; positions card-level : brand left 5% top 6.5%, name left 24% top 6.5%

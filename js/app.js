@@ -1039,7 +1039,7 @@ document.getElementById("exportBtn").addEventListener("click", async () => {
 
 /* ---------- mode édition directe : drag + resize des zones, échelle texte, zones perso ---------- */
 const editModeBox = document.getElementById("editMode");
-const EDIT_SEL = ".st-bg,.st-pill,.st-art,.st-frame,.st-head,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
+const EDIT_SEL = ".st-bg,.st-pill,.st-art,.st-frame,.st-brand,.st-name,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
 
 function zoneRect(el) {
   const c = card.getBoundingClientRect();
