@@ -52,3 +52,14 @@ Le template (`css/cards.css`, bloc « mode Studio ») applique exactement ces va
 Mesurée sur ton image : bannière 5/2/90/10%, art 5/12/90/77%, panneau 5/78.5/90/95.5%,
 pied ~98%, cadre argent `#d9d9e3`. Si tu préfères coller à **ta** carte plutôt qu'au standard
 S&S, dis-le et je rebascule les % du template sur ces valeurs.
+
+## ✅ Composition active du Studio = ta carte de référence (image 2, 1062×1482)
+
+- Police : **Barlow Condensed** (Google Fonts, fallback Arial Narrow) — header/attaques en condensé bold ; description en Barlow
+- Header 0–11.5% : texte **blanc sur le fond** (pill transparente par défaut, colorable via « Bannière haut ») ; nom 2.9em/800, HP « HP 150 » blanc à droite (right 13.2%) ; logo cyan 8% à droite
+- Fenêtre d'art : inset **12% 5% 23% 5%** (12→77%)
+- Typebar : **70–75%**
+- Panneau attaques : **78.5–95.5%**, fond navy `rgba(18,44,84,.85)`
+- Pied : bottom 1.5%, blanc
+- Cadre : argent `#b6b8c9`, radius 4%/2.9%
+- Fond propre par défaut : `img/studio/fond.webp` (ta carte avec ces zones vidées)
