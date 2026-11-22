@@ -69,3 +69,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Symbole blanc **flat** à l'intérieur via `::before { content: var(--st-glyph) }` + `filter: brightness(0) invert(1)` (blanc garanti même pour les émojis 🎲⭐🪙)
 - Proportions mesurées sur la ref : Ø cercle ≈ 1.2× cap du nom (1.9em), trait ≈ 0.067×Ø, symbole ≈ 0.5×Ø (1.35em), gap entre icônes ≈ 0.6em
 - `--cost` = nombre réel d'icônes (plus de min 4) → nom attaque à `left: calc(2.8% + cost*9%)`
+
+## Header : lockup marque en HAUT À GAUCHE (ref image 530x692)
+- Pill blanche 5–95% × 1.5–11.5% ; à l'intérieur, de gauche à droite : **logo bolt 7% (left 6.5%, centré verticalement)** + **texte marque "Outcome" éditable (stBrandIn, 1.35em, left 13.5%)** + **nom (left 32%, max avant HP)** + **HP à droite (right 12%)**
+- Le logo n'est PLUS à droite ; upload "Logo" (stLogoFile) remplace le bolt du lockup haut-gauche

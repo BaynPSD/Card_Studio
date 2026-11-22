@@ -615,6 +615,7 @@ tabs.forEach((t) =>
 
 const ST_TEXT = {
   stNameIn: "stName",
+  stBrandIn: "stBrand",
   stHpIn: "stHp",
   stAtk1In: "stAtk1",
   stDmg1In: "stDmg1",

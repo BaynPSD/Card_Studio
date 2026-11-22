@@ -6719,3 +6719,34 @@ Shine & Glare Effects
 .st-atk-name {
   left: calc(2.8% + var(--cost, 1) * 9%);
 }
+
+/* ---------- lockup marque en HAUT À GAUCHE de la pill (comme la carte de ref) ----------
+   [logo bolt] [Outcome] [   NOM   ] ............ [HP 150] */
+.st-logo {
+  left: 6.5%;
+  right: auto;
+  top: 6.5%;
+  transform: translateY(-50%);
+  width: 7%;
+  height: auto;
+}
+
+.st-brand {
+  position: absolute;
+  left: 13.5%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.35em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--st-head-text, #0c1628);
+}
+
+.st-name {
+  position: absolute;
+  left: 32%;
+  right: 20%;
+  top: 50%;
+  transform: translateY(-50%);
+}
