@@ -6207,6 +6207,13 @@ Shine & Glare Effects
 }
 
 /* ---------- mode Studio (card maker) ---------- */
+.card :where(.st > div) {
+  position: absolute;
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
+}
+
 .card .st {
   display: none;
 }
@@ -6260,9 +6267,9 @@ Shine & Glare Effects
   color: var(--st-text, #f4f6ff);
 }
 
-.st-typebar span:nth-child(1) { position: absolute; left: 13.3%; }
-.st-typebar span:nth-child(2) { position: absolute; left: 42.5%; }
-.st-typebar span:nth-child(3) { position: absolute; left: 71.7%; }
+.st-typebar span:nth-child(1) { position: absolute; left: 13.3%; white-space: nowrap; }
+.st-typebar span:nth-child(2) { position: absolute; left: 42.5%; white-space: nowrap; }
+.st-typebar span:nth-child(3) { position: absolute; left: 71.7%; white-space: nowrap; }
 
 .card.show-zones .st-typebar { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #00c2ff; outline-offset: -2px; }
 
@@ -6278,12 +6285,7 @@ Shine & Glare Effects
   display: none;
 }
 
-.card .st > div {
-  position: absolute;
-  width: auto;
-  height: auto;
-  aspect-ratio: auto;
-}
+
 
 .st-bg {
   inset: 0;
@@ -6335,8 +6337,12 @@ Shine & Glare Effects
 }
 
 .st-hp {
+  white-space: nowrap;
+  height: 6%;
   top: 3.5%;
-  right: 13.2%;
+  left: 80%;
+  width: 6.8%;
+  text-align: right;
   font-size: calc(var(--st-fs, 3.6px) * 4.4);
   font-weight: 800;
   color: var(--st-head-text, #1a2340);
@@ -6385,6 +6391,7 @@ Shine & Glare Effects
 }
 
 .st-foot {
+  height: 3%;
   left: 6.6%;
   right: 6.6%;
   bottom: 3.6%;
