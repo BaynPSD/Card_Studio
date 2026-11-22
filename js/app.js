@@ -630,9 +630,10 @@ const ST_TEXT = {
 for (const [inputId, targetId] of Object.entries(ST_TEXT)) {
   const input = document.getElementById(inputId);
   const target = document.getElementById(targetId);
-  target.textContent = input.value;
+  const prefix = targetId === "stHp" ? "HP " : "";
+  target.textContent = prefix + input.value;
   input.addEventListener("input", () => {
-    target.textContent = input.value;
+    target.textContent = prefix + input.value;
   });
 }
 

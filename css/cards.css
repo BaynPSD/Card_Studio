@@ -6350,8 +6350,8 @@ Shine & Glare Effects
 
 .st-logo {
   top: 2.5%;
-  right: 7%;
-  width: 9%;
+  right: 2.5%;
+  width: 8%;
   aspect-ratio: 1;
   background-image: var(--st-logo, url("../img/studio/logo.webp"));
   background-size: contain;
