@@ -6980,3 +6980,49 @@ Shine & Glare Effects
 .card .st-head {
   display: none;
 }
+
+/* ---------- taille & couleur INDÉPENDANTES par texte (--st-k-* = échelle, --st-c-* = couleur) ---------- */
+.st-brand {
+  font-size: calc(1.6em * var(--st-k-brand, 1));
+  color: var(--st-c-brand, var(--st-head-text, #ffffff));
+}
+
+.st-name {
+  font-size: calc(2.6em * var(--st-k-name, 1));
+  color: var(--st-c-name, var(--st-head-text, #ffffff));
+}
+
+.st-hp {
+  font-size: calc(1.4em * var(--st-k-hp, 1));
+  color: var(--st-c-hp, var(--st-head-text, #ffffff));
+}
+
+.st-atk-name {
+  font-size: calc(2.2em * var(--st-k-atk, 1));
+  color: var(--st-c-atk, var(--st-text, #ffffff));
+}
+
+.st-atk-dmg {
+  font-size: calc(2em * var(--st-k-dmg, 1));
+  color: var(--st-c-dmg, var(--st-text, #ffffff));
+}
+
+.st-desc {
+  font-size: calc(1.3em * var(--st-k-desc, 1));
+  color: var(--st-c-desc, #dfe6ff);
+}
+
+.st-typebar {
+  font-size: calc(1.6em * var(--st-k-type, 1));
+  color: var(--st-c-type, #ffffff);
+}
+
+.st-foot {
+  font-size: calc(var(--st-fs, 3.6px) * 2.5 * var(--st-k-foot, 1));
+  color: var(--st-c-foot, #ffffff);
+}
+
+.st-zone-new {
+  font-size: calc(2em * var(--st-k-zone, 1));
+  color: var(--st-c-zone, #ffffff);
+}

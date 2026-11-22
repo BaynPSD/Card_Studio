@@ -1162,3 +1162,45 @@ addZoneBtn.addEventListener("click", () => {
     setEdit(true);
   }
 });
+
+/* ---------- taille & couleur indépendantes PAR TEXTE (sliders + color pickers générés) ---------- */
+const TEXT_STYLES = [
+  ["Marque « Outcome »", "--st-k-brand", "--st-c-brand", "#ffffff"],
+  ["Nom de la carte", "--st-k-name", "--st-c-name", "#ffffff"],
+  ["HP", "--st-k-hp", "--st-c-hp", "#ffffff"],
+  ["Noms d'attaques", "--st-k-atk", "--st-c-atk", "#ffffff"],
+  ["Dégâts", "--st-k-dmg", "--st-c-dmg", "#ffffff"],
+  ["Description", "--st-k-desc", "--st-c-desc", "#dfe6ff"],
+  ["Barre de type", "--st-k-type", "--st-c-type", "#ffffff"],
+  ["Pied de carte", "--st-k-foot", "--st-c-foot", "#ffffff"],
+  ["Zones ajoutées", "--st-k-zone", "--st-c-zone", "#ffffff"],
+];
+const tsBox = document.getElementById("textStyles");
+for (const [label, sizeVar, colorVar, defColor] of TEXT_STYLES) {
+  const row = document.createElement("label");
+  row.className = "field textstyle-row";
+  const span = document.createElement("span");
+  span.textContent = label;
+  const range = document.createElement("input");
+  range.type = "range";
+  range.min = "50";
+  range.max = "200";
+  range.value = "100";
+  range.setAttribute("aria-label", "Taille " + label);
+  const pct = document.createElement("b");
+  pct.textContent = "100%";
+  const color = document.createElement("input");
+  color.type = "color";
+  color.value = defColor;
+  color.setAttribute("aria-label", "Couleur " + label);
+  range.addEventListener("input", () => {
+    card.style.setProperty(sizeVar, String(range.value / 100));
+    pct.textContent = range.value + "%";
+  });
+  color.addEventListener("input", () => {
+    card.style.setProperty(colorVar, color.value);
+  });
+  card.style.setProperty(colorVar, defColor);
+  row.append(span, range, pct, color);
+  tsBox.appendChild(row);
+}

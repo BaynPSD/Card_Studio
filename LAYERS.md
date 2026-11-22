@@ -114,3 +114,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 
 ## Blocs indépendants
 - `.st-brand` (Outcome) et `.st-name` (ALI) sont des enfants DIRECTS de `.st` (plus dans .st-head, qui est display:none) → draggables séparément en mode édition ; positions card-level : brand left 5% top 6.5%, name left 24% top 6.5%
+
+## Taille & couleur par texte (indépendantes)
+- Panneau Studio → « Tailles & couleurs par texte » : 9 lignes (Marque, Nom, HP, Noms attaques, Dégâts, Description, Typebar, Pied, Zones ajoutées), chacune = slider 50–200% + color picker
+- Vars par élément sur #card : `--st-k-*` (échelle) et `--st-c-*` (couleur) ; CSS : ex. `.st-name { font-size: calc(2.6em * var(--st-k-name,1)); color: var(--st-c-name, ...) }`
+- Le slider global « Taille du texte » (--st-scale) reste dispo en plus
