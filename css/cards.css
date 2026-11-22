@@ -6231,6 +6231,7 @@ Shine & Glare Effects
 .card .st-bg { z-index: 1; }
 .card .st-art { z-index: 2; overflow: hidden; }
 .card .st-frame { z-index: 3; }
+.card .st-pill { z-index: 3; }
 .card .st-head,
 .card .st-hp,
 .card .st-logo,
@@ -6469,3 +6470,16 @@ Shine & Glare Effects
   white-space: pre-wrap;
   opacity: 0.95;
 }
+
+/* pill de la bannière (comme la carte de base) */
+.st-pill {
+  top: 2%;
+  left: 5%;
+  right: 5%;
+  height: 8%;
+  background: var(--st-head, #f2f2f6);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.card.show-zones .st-pill { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #ff9f43; outline-offset: -2px; }

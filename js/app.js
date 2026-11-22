@@ -401,7 +401,7 @@ function applyImages() {
   img.src = slots.card.url;
   if (backImg && slots.back.url) backImg.src = slots.back.url;
   const studioEmpty = card.classList.contains("studio") && !slots.card.custom;
-  const bg = !studioEmpty && slots.card.url ? slots.card.url : card.classList.contains("studio") ? "img/studio/base-card.webp" : null;
+  const bg = !studioEmpty && slots.card.url ? slots.card.url : card.classList.contains("studio") ? "img/studio/fond.webp" : null;
   card.style.setProperty("--layer-bg", bg ? `url("${bg}")` : "none");
   if (slots.fg.url) card.style.setProperty("--layer-fg", `url("${slots.fg.url}")`);
   else card.style.removeProperty("--layer-fg");
