@@ -6750,3 +6750,24 @@ Shine & Glare Effects
   top: 50%;
   transform: translateY(-50%);
 }
+
+/* ---------- motif de fond en overlay FIN (img/studio/fond-overlay.webp) + teinte réglable ----------
+   .st-fond est enfant DIRECT de .card__front (pas de .st) car .st a un transform => stacking context ;
+   z-index 5 = au-dessus du template (z<=4), de shine(3) et texture(4), sous les effets holo (z auto, ordre DOM) */
+.card .st-fond {
+  display: none;
+}
+
+.card.studio .st-fond {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: 4% / 2.9%;
+  background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
+  background-size: cover;
+  background-position: center;
+  opacity: var(--st-fond-opacity, 0.25);
+  filter: var(--st-fond-filter, none);
+}

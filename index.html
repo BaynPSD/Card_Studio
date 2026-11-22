@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795373179" />
-  <link rel="stylesheet" href="css/ui.css?v=1795373179" />
+  <link rel="stylesheet" href="css/cards.css?v=1795379589" />
+  <link rel="stylesheet" href="css/ui.css?v=1795379589" />
 </head>
 <body>
   <header>
@@ -157,7 +157,7 @@
           <input type="color" id="stTextIn" value="#ffffff" />
         </label>
         <label class="field">
-          <span>Logo (haut droite)</span>
+          <span>Logo (haut gauche)</span>
           <input type="file" id="stLogoFile" accept="image/*" />
         </label>
         <label class="slider color-row">
@@ -180,6 +180,14 @@
         <label class="field wide">
           <span>🖼 Fond de carte (PNG pleine carte)</span>
           <input type="file" id="stBgFile" accept="image/*" />
+        </label>
+        <label class="slider color-row">
+          <span>🎨 Teinte du motif de fond</span>
+          <input type="color" id="stFondColor" value="#ffffff" />
+        </label>
+        <label class="slider">
+          <span>Motif de fond (overlay) : <b id="stFondOpVal">25%</b></span>
+          <input type="range" id="stFondOp" min="0" max="100" value="25" />
         </label>
         <label class="field wide">
           <span>🎨 Illustration (PNG, fenêtre d'art)</span>
@@ -234,6 +242,7 @@
                 <div class="st-typebar"><span id="stWeak"></span><span id="stRes"></span><span id="stRet"></span></div>
                 <div class="st-foot"><span id="stNum"></span><span id="stRar"></span></div>
               </div>
+              <div class="st-fond" aria-hidden="true"></div>
               <div class="card__shine"></div>
               <div class="card__glitter"></div>
               <div class="card__glare"></div>
@@ -249,6 +258,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795373179"></script>
+  <script src="js/app.js?v=1795379589"></script>
 </body>
 </html>

@@ -704,6 +704,39 @@ document.querySelectorAll("#bgSwatches button").forEach((b) =>
 );
 setStudioBg(stBgColor.value || "#2f6fd0");
 
+/* ---------- motif de fond overlay : opacité + filtre de teinte ---------- */
+const stFondOp = document.getElementById("stFondOp");
+const stFondOpVal = document.getElementById("stFondOpVal");
+const applyFondOp = () => {
+  const v = Math.max(0, Math.min(100, parseInt(stFondOp.value, 10) || 0)) / 100;
+  card.style.setProperty("--st-fond-opacity", String(v));
+  if (stFondOpVal) stFondOpVal.textContent = Math.round(v * 100) + "%";
+};
+stFondOp.addEventListener("input", applyFondOp);
+applyFondOp();
+
+function hexHue(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  if (mx === mn) return 0;
+  const d = mx - mn;
+  let h;
+  if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0));
+  else if (mx === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return Math.round(h * 60);
+}
+const stFondColor = document.getElementById("stFondColor");
+const applyFondColor = () => {
+  const hex = (stFondColor.value || "#ffffff").toLowerCase();
+  // blanc = aucun filtre (couleurs d'origine du motif) ; sinon teinte via sepia+hue-rotate
+  const filter = hex === "#ffffff" ? "none" : `sepia(1) saturate(4) hue-rotate(${hexHue(hex)}deg) brightness(1.05)`;
+  card.style.setProperty("--st-fond-filter", filter);
+};
+stFondColor.addEventListener("input", applyFondColor);
+applyFondColor();
+
 const showZonesBox = document.getElementById("showZones");
 showZonesBox.addEventListener("input", () => {
   card.classList.toggle("show-zones", showZonesBox.checked);
