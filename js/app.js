@@ -1158,6 +1158,7 @@ addZoneBtn.addEventListener("click", () => {
   z.title = "Glisser la poignée orange pour déplacer/redimensionner · double-clic pour supprimer";
   st.appendChild(z);
   makeDraggable(z);
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
   if (!editModeBox.checked) {
     editModeBox.checked = true;
     setEdit(true);
@@ -1239,6 +1240,8 @@ function restoreStudio(s) {
     if (el.type === "checkbox") el.checked = !!v;
     else el.value = v;
   }
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
+  if (selectedZone && !selectedZone.isConnected) selectZone(null);
 }
 
 function pushUndo() {
@@ -1291,9 +1294,13 @@ document.getElementById("redoBtn").addEventListener("click", redo);
 
 /* snapshot initial + suppression de zone par double-clic (délégation, survit aux restaurations) */
 setTimeout(pushUndo, 800);
+setTimeout(syncLayersPanel, 900);
 document.querySelector(".st").addEventListener("dblclick", (e) => {
   const z = e.target.closest && e.target.closest(".st-zone-new");
-  if (z) z.remove();
+  if (z) {
+    z.remove();
+    if (typeof syncLayersPanel === "function") syncLayersPanel();
+  }
 });
 
 /* ---------- inspecteur façon Figma : clic sur une zone (mode édition) -> panneau de propriétés ---------- */
@@ -1424,3 +1431,87 @@ insp.del.addEventListener("click", () => {
     selectZone(null);
   }
 });
+
+/* ---------- panneau de CALQUES à droite (style Photoshop/Figma) ---------- */
+const layersPanel = document.getElementById("layersPanel");
+const layersList = document.getElementById("layersList");
+
+function layerLabel(el) {
+  const meta = zoneMeta(el);
+  return meta.label || el.className;
+}
+
+function buildLayers() {
+  if (!layersList) return;
+  const zones = [...document.querySelectorAll(EDIT_SEL)];
+  // ordre = z-index croissant (les hauts de pile en bas, comme Figma/Photoshop)
+  zones.sort((a, b) => {
+    const za = parseInt(getComputedStyle(a).zIndex) || 0;
+    const zb = parseInt(getComputedStyle(b).zIndex) || 0;
+    return za - zb;
+  });
+  layersList.innerHTML = "";
+  for (const el of zones) {
+    const row = document.createElement("div");
+    row.className = "layer-row" + (el === selectedZone ? " selected" : "") + (el.style.visibility === "hidden" ? " off" : "");
+    row.dataset.zone = el.className;
+
+    const eye = document.createElement("button");
+    eye.className = "layer-eye";
+    eye.textContent = el.style.visibility === "hidden" ? "🚫" : "👁";
+    eye.title = "Afficher / masquer";
+    eye.addEventListener("click", (e) => {
+      e.stopPropagation();
+      el.style.visibility = el.style.visibility === "hidden" ? "" : "hidden";
+      buildLayers();
+    });
+
+    const name = document.createElement("span");
+    name.className = "layer-name";
+    name.textContent = layerLabel(el);
+
+    const up = document.createElement("button");
+    up.className = "layer-z";
+    up.textContent = "▲";
+    up.title = "Monter d'un niveau";
+    up.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const z = parseInt(el.style.zIndex || getComputedStyle(el).zIndex) || 0;
+      el.style.zIndex = String(z + 1);
+      buildLayers();
+    });
+    const down = document.createElement("button");
+    down.className = "layer-z";
+    down.textContent = "▼";
+    down.title = "Descendre d'un niveau";
+    down.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const z = parseInt(el.style.zIndex || getComputedStyle(el).zIndex) || 0;
+      el.style.zIndex = String(Math.max(0, z - 1));
+      buildLayers();
+    });
+
+    row.append(eye, name, up, down);
+    row.addEventListener("click", () => {
+      if (!card.classList.contains("edit")) setEdit(true);
+      selectZone(el);
+      buildLayers();
+    });
+    layersList.appendChild(row);
+  }
+}
+
+function syncLayersPanel() {
+  if (!layersPanel) return;
+  const studioOn = !document.getElementById("pane-studio").hidden;
+  layersPanel.hidden = !studioOn;
+  if (studioOn) buildLayers();
+}
+
+/* synchro : onglets, mode édition, ajout/suppression de zone, undo/redo */
+document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => setTimeout(syncLayersPanel, 250)));
+const _setEdit = setEdit;
+setEdit = function (on) {
+  _setEdit(on);
+  setTimeout(syncLayersPanel, 50);
+};

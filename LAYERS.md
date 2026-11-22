@@ -130,3 +130,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Logo blanc par défaut (filter brightness(0) invert(1) ; upload logo = tel quel)
 - Carte par défaut 500px (cardSize 240–720, settings.size 500) ; stage min-height 820px, fitCard marges 16/24
 - Inspecteur 🎯 (mode édition) : clic sur une zone → panneau avec X/Y/L/H (%), texte, taille texte, couleur, supprimer (zones perso) ; se met à jour pendant le drag ; ZONE_META mappe chaque zone à ses vars --st-k-*/--st-c-*
+
+## UX simplifiée façon Photoshop/Figma
+- Panneau Studio réorganisé en <details> repliables : 🎯 Sélection (ouvert), 📝 Textes (ouvert), 🔤 Tailles & couleurs par texte, 🎨 Couleurs/fond/images ; en haut : mode studio, ✏️ édition, taille texte, ➕ zone, ↩️↪️ undo/redo
+- Panneau 🧅 CALQUES à droite (#layersPanel, visible onglet Studio uniquement) : liste des zones triées par z-index, 👁 show/hide, clic = sélection (sync inspecteur), ▲▼ = ordre de pile ; sync sur onglet/édition/ajout/suppression/undo-redo (buildLayers/syncLayersPanel)

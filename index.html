@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795391429" />
-  <link rel="stylesheet" href="css/ui.css?v=1795391429" />
+  <link rel="stylesheet" href="css/cards.css?v=1795391762" />
+  <link rel="stylesheet" href="css/ui.css?v=1795391762" />
 </head>
 <body>
   <header>
@@ -134,8 +134,10 @@
           <button type="button" id="undoBtn" class="btn" title="Ctrl+Z">↩️ Annuler</button>
           <button type="button" id="redoBtn" class="btn" title="Ctrl+Shift+Z / Ctrl+Y / Ctrl+V">↪️ Rétablir</button>
         </div>
-        <h3>Tailles &amp; couleurs par texte</h3>
+        <details class="grp"><summary>🔤 Tailles &amp; couleurs par texte</summary>
         <div class="fields" id="textStyles"></div>
+        </details>
+        <details class="grp" open><summary>🎯 Sélection — clique une zone sur la carte</summary>
         <div class="inspector" id="inspector" hidden>
           <h3>🎯 Sélection : <span id="inspName">—</span></h3>
           <div class="fields">
@@ -149,6 +151,8 @@
             <button type="button" id="inspDel" class="btn" hidden>🗑 Supprimer la zone</button>
           </div>
         </div>
+        </details>
+        <details class="grp" open><summary>📝 Textes de la carte</summary>
         <div class="fields">
           <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="ALI" /></label>
           <label class="field"><span>Marque (haut gauche)</span><input type="text" id="stBrandIn" value="Outcome" /></label>
@@ -168,6 +172,8 @@
           <label class="field"><span>Résistance</span><input type="text" id="stResIn" value="−30" /></label>
           <label class="field"><span>Retraite</span><input type="text" id="stRetIn" value="★" /></label>
         </div>
+        </details>
+        <details class="grp"><summary>🎨 Couleurs, fond &amp; images</summary>
         <label class="slider color-row">
           <span>Cadre (argent)</span>
           <input type="color" id="stFrameIn" value="#eceaf2" />
@@ -222,6 +228,7 @@
           <input type="file" id="stArtFile" accept="image/*" />
         </label>
         <p class="hint">Fond = PNG pleine carte (remplace la carte de base) · Illustration = PNG affiché dans la fenêtre d'art (coins arrondis auto) · les effets holo s'appliquent par-dessus le template.</p>
+        </details>
       </section>
 
       </div>
@@ -284,9 +291,15 @@
       <div class="drop-overlay" id="dropOverlay">Dépose ton image ici 📥</div>
       <p class="stage-hint">Bouge la souris (ou le doigt) sur la carte pour incliner en 3D</p>
     </section>
+
+    <aside class="layers" id="layersPanel" hidden>
+      <h3>🧅 Calques</h3>
+      <div class="layers-list" id="layersList"></div>
+      <p class="hint">👁 show/hide · clic = sélectionner · ▲▼ = ordre</p>
+    </aside>
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795391429"></script>
+  <script src="js/app.js?v=1795391762"></script>
 </body>
 </html>

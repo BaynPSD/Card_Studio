@@ -630,3 +630,97 @@ main {
   color: #ff9f43;
   font-weight: 700;
 }
+
+/* ---------- panneau de calques (droite) ---------- */
+.layers {
+  width: 212px;
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 14px;
+  align-self: flex-start;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+}
+
+.layers h3 {
+  margin: 0 0 8px;
+  font-size: 0.95em;
+}
+
+.layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  font-size: 0.86em;
+  user-select: none;
+}
+
+.layer-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.layer-row.selected {
+  background: rgba(255, 159, 67, 0.22);
+  outline: 1px solid #ff9f43;
+}
+
+.layer-row.off .layer-name {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.layer-eye {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 0 2px;
+}
+
+.layer-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-z {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.7em;
+  padding: 0 1px;
+  opacity: 0.7;
+}
+
+/* groupes repliables du panneau studio */
+details.grp {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 10px;
+  padding-top: 8px;
+}
+
+details.grp > summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.92em;
+  padding: 2px 0;
+  user-select: none;
+}
+
+details.grp > summary:hover {
+  color: #ff9f43;
+}
