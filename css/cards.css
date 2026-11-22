@@ -6899,3 +6899,51 @@ Shine & Glare Effects
 .st-hp {
   right: 10%;
 }
+
+/* ---------- mode édition directe (✏️) ---------- */
+/* échelle globale du texte du template */
+.card .st {
+  font-size: calc(var(--st-fs, 3.6px) * 2.1407 * var(--st-scale, 1));
+}
+
+.card.edit .st > * {
+  cursor: move;
+  outline: 1px dashed rgba(255, 159, 67, 0.9);
+  outline-offset: -1px;
+}
+
+.st-handle {
+  display: none;
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  width: 16px;
+  height: 16px;
+  background: #ff9f43;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: nwse-resize;
+  z-index: 99;
+}
+
+.card.edit .st .st-handle {
+  display: block;
+}
+
+/* zone texte ajoutée à la volée */
+.st-zone-new {
+  position: absolute;
+  z-index: 4;
+  color: var(--st-text, #ffffff);
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: move;
+  overflow: hidden;
+}
+
+/* en mode édition, les zones reçoivent les événements souris */
+.card.edit .st,
+.card.edit .st * {
+  pointer-events: auto;
+}

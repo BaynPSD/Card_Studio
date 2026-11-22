@@ -112,6 +112,7 @@ function updateSprings(background, rotate, glare) {
 }
 
 function interact(e) {
+  if (card.classList.contains("edit")) return; // mode édition : pas de tilt 3D
   if (e.type === "touchmove" && e.touches[0]) {
     e.clientX = e.touches[0].clientX;
     e.clientY = e.touches[0].clientY;
@@ -897,6 +898,7 @@ function deactivate() {
 }
 
 rotator.addEventListener("pointerup", (e) => {
+  if (card.classList.contains("edit")) { downPos = null; return; } // pas de zoom en mode édition
   if (!downPos) return;
   const moved = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y);
   downPos = null;
@@ -1032,5 +1034,131 @@ document.getElementById("exportBtn").addEventListener("click", async () => {
   } finally {
     btn.disabled = false;
     interactEnd();
+  }
+});
+
+/* ---------- mode édition directe : drag + resize des zones, échelle texte, zones perso ---------- */
+const editModeBox = document.getElementById("editMode");
+const EDIT_SEL = ".st-bg,.st-pill,.st-art,.st-frame,.st-head,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
+
+function zoneRect(el) {
+  const c = card.getBoundingClientRect();
+  const b = el.getBoundingClientRect();
+  return {
+    x: ((b.x - c.x) / c.width) * 100,
+    y: ((b.y - c.y) / c.height) * 100,
+    w: (b.width / c.width) * 100,
+    h: (b.height / c.height) * 100,
+  };
+}
+
+function normalizeZone(el) {
+  const r = zoneRect(el);
+  el.style.inset = "auto";
+  el.style.right = "auto";
+  el.style.bottom = "auto";
+  el.style.left = r.x + "%";
+  el.style.top = r.y + "%";
+  el.style.width = r.w + "%";
+  el.style.height = r.h + "%";
+}
+
+function makeDraggable(el) {
+  if (el.dataset.dragBound) return;
+  el.dataset.dragBound = "1";
+  const handle = document.createElement("div");
+  handle.className = "st-handle";
+  handle.title = "Redimensionner";
+  el.appendChild(handle);
+
+  if (!el.classList.contains("st-zone-new")) {
+    el.addEventListener("pointerdown", (e) => {
+      if (!card.classList.contains("edit") || e.target === handle) return;
+      e.stopPropagation();
+      e.preventDefault();
+      normalizeZone(el);
+      const c = card.getBoundingClientRect();
+      const start = { x: e.clientX, y: e.clientY };
+      const r0 = zoneRect(el);
+      const move = (ev) => {
+        const dx = ((ev.clientX - start.x) / c.width) * 100;
+        const dy = ((ev.clientY - start.y) / c.height) * 100;
+        el.style.left = r0.x + dx + "%";
+        el.style.top = r0.y + dy + "%";
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    });
+  }
+
+  handle.addEventListener("pointerdown", (e) => {
+    if (!card.classList.contains("edit")) return;
+    e.stopPropagation();
+    e.preventDefault();
+    normalizeZone(el);
+    const c = card.getBoundingClientRect();
+    const start = { x: e.clientX, y: e.clientY };
+    const r0 = zoneRect(el);
+    const move = (ev) => {
+      const dw = ((ev.clientX - start.x) / c.width) * 100;
+      const dh = ((ev.clientY - start.y) / c.height) * 100;
+      el.style.width = Math.max(4, r0.w + dw) + "%";
+      el.style.height = Math.max(2, r0.h + dh) + "%";
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  });
+}
+
+function setEdit(on) {
+  card.classList.toggle("edit", on);
+  if (on) {
+    card.classList.add("show-zones");
+    document.getElementById("showZones").checked = true;
+    document.querySelectorAll(EDIT_SEL).forEach(makeDraggable);
+  }
+}
+editModeBox.addEventListener("change", () => setEdit(editModeBox.checked));
+
+/* échelle globale du texte */
+const stScaleIn = document.getElementById("stScaleIn");
+const stScaleVal = document.getElementById("stScaleVal");
+const applyScale = () => {
+  const v = Math.max(50, Math.min(200, parseInt(stScaleIn.value, 10) || 100));
+  card.style.setProperty("--st-scale", String(v / 100));
+  if (stScaleVal) stScaleVal.textContent = v + "%";
+};
+stScaleIn.addEventListener("input", applyScale);
+applyScale();
+
+/* ajouter une zone texte déplaçable */
+const addZoneBtn = document.getElementById("addZoneBtn");
+addZoneBtn.addEventListener("click", () => {
+  if (!card.classList.contains("studio")) return;
+  const st = document.querySelector(".st");
+  const z = document.createElement("div");
+  z.className = "st-zone-new";
+  z.contentEditable = "true";
+  z.spellcheck = false;
+  z.textContent = "Nouveau texte";
+  z.style.left = "25%";
+  z.style.top = "30%";
+  z.style.width = "45%";
+  z.style.height = "8%";
+  z.title = "Glisser la poignée orange pour déplacer/redimensionner · double-clic pour supprimer";
+  z.addEventListener("dblclick", () => z.remove());
+  st.appendChild(z);
+  makeDraggable(z);
+  if (!editModeBox.checked) {
+    editModeBox.checked = true;
+    setEdit(true);
   }
 });

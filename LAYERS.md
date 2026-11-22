@@ -104,3 +104,10 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Header FINAL (vérifié = ref image 2) : [Outcome ~5%] [bolt CYAN 10.6-12.5%] [ALI 2.6em ~24%] ... [HP 150 right 10% + ♥ vert #3ddc84]
 - logo.webp recolorié cyan #5af0d2 ; plus de filtre blanc
 - art-default.webp = crop haute res (935x934) de la carte ref 1062x1482 (x 6-94%, y 13-76%) → illustration nette
+
+## Mode édition directe (✏️ editMode)
+- Cases/poignées : chaque zone du template (`.st > div` + `.st-zone-new`) devient draggable (pointerdown → left/top en %) et redimensionnable via la poignée orange `.st-handle` (bas-droite)
+- `normalizeZone` convertit inset/right/bottom en left/top/width/height en % au début du drag
+- Slider « Taille du texte » (stScaleIn 50–200%) → `--st-scale` multiplié dans `.card .st { font-size: calc(st-fs*2.1407*var(--st-scale,1)) }`
+- Bouton « ➕ Ajouter une zone texte » → `.st-zone-new` contenteditable, draggable, double-clic = supprimer
+- En mode edit : tilt 3D et zoom désactivés (guards dans interact/pointerup) + `.card.edit .st * { pointer-events:auto }`

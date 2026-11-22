@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795385385" />
-  <link rel="stylesheet" href="css/ui.css?v=1795385385" />
+  <link rel="stylesheet" href="css/cards.css?v=1795385759" />
+  <link rel="stylesheet" href="css/ui.css?v=1795385759" />
 </head>
 <body>
   <header>
@@ -121,6 +121,15 @@
           <input type="checkbox" id="showZones" />
           <span>🗺️ Contours des zones (voir chaque couche)</span>
         </label>
+        <label class="auto-row">
+          <input type="checkbox" id="editMode" />
+          <span>✏️ Mode édition — déplacer / redimensionner les zones sur la carte</span>
+        </label>
+        <label class="slider">
+          <span>Taille du texte : <b id="stScaleVal">100%</b></span>
+          <input type="range" id="stScaleIn" min="50" max="200" value="100" />
+        </label>
+        <button type="button" id="addZoneBtn" class="btn">➕ Ajouter une zone texte</button>
         <div class="fields">
           <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="ALI" /></label>
           <label class="field"><span>Marque (haut gauche)</span><input type="text" id="stBrandIn" value="Outcome" /></label>
@@ -257,6 +266,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795385385"></script>
+  <script src="js/app.js?v=1795385759"></script>
 </body>
 </html>
