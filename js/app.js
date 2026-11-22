@@ -659,6 +659,21 @@ stLogoFile.addEventListener("change", () => {
 });
 
 /* uploads du studio : fond (slot carte) + illustration (slot perso) */
+function bindCost(inputId, costId, rowId) {
+  const input = document.getElementById(inputId);
+  const cost = document.getElementById(costId);
+  const row = document.getElementById(rowId);
+  const apply = () => {
+    const n = Math.max(0, Math.min(5, parseInt(input.value || "0", 10) || 0));
+    cost.innerHTML = "<i></i>".repeat(n);
+    row.style.setProperty("--cost", String(Math.max(4, n)));
+  };
+  input.addEventListener("input", apply);
+  apply();
+}
+bindCost("stCost1In", "stCost1", "stAtkRow1");
+bindCost("stCost2In", "stCost2", "stAtkRow2");
+
 const showZonesBox = document.getElementById("showZones");
 showZonesBox.addEventListener("input", () => {
   card.classList.toggle("show-zones", showZonesBox.checked);

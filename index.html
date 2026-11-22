@@ -124,6 +124,8 @@
           <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" value="40" /></label>
           <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" value="Outcome" /></label>
           <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
+          <label class="field"><span>Coût énergie 1</span><input type="number" id="stCost1In" value="1" min="0" max="5" /></label>
+          <label class="field"><span>Coût énergie 2</span><input type="number" id="stCost2In" value="2" min="0" max="5" /></label>
           <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
           <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
           <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
@@ -200,9 +202,9 @@
                 <div class="st-hp" id="stHp"></div>
                 <div class="st-logo"></div>
                 <div class="st-body">
-                  <div class="st-atk"><span class="st-atk-name" id="stAtk1"></span><span class="st-atk-dmg" id="stDmg1"></span></div>
+                  <div class="st-atk" id="stAtkRow1"><div class="st-cost" id="stCost1"></div><span class="st-atk-name" id="stAtk1"></span><span class="st-atk-dmg" id="stDmg1"></span></div>
+                  <div class="st-atk" id="stAtkRow2"><div class="st-cost" id="stCost2"></div><span class="st-atk-name" id="stAtk2"></span><span class="st-atk-dmg" id="stDmg2"></span></div>
                   <p class="st-desc" id="stDesc"></p>
-                  <div class="st-atk"><span class="st-atk-name" id="stAtk2"></span><span class="st-atk-dmg" id="stDmg2"></span></div>
                 </div>
                 <div class="st-typebar"><span id="stWeak"></span><span id="stRes"></span><span id="stRet"></span></div>
                 <div class="st-foot"><span id="stNum"></span><span id="stRar"></span></div>
