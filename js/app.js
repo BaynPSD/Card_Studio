@@ -623,6 +623,9 @@ const ST_TEXT = {
   stDescIn: "stDesc",
   stNumIn: "stNum",
   stRarIn: "stRar",
+  stWeakIn: "stWeak",
+  stResIn: "stRes",
+  stRetIn: "stRet",
 };
 for (const [inputId, targetId] of Object.entries(ST_TEXT)) {
   const input = document.getElementById(inputId);

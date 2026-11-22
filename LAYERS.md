@@ -1,37 +1,54 @@
-# 🗺️ Carte des couches — carte de base (1062×1482, ratio 0.716)
+# 🗺️ Composition exacte d'une carte — référence `karl/pokecardmaker.net` (Sword & Shield)
 
-Image de base : `img/studio/base-card.webp` (fournie par BaynPSD).
-Positions en % de la carte (x, y, largeur, hauteur), mesurées sur l'image.
+Étudié depuis [github.com/karl/pokecardmaker.net](https://github.com/karl/pokecardmaker.net)
+(`src/features/cardEditor/cardStyles/` + `cardOptions/*/data.ts` + `public/assets/cards/baseSets/swordAndShield/`).
 
-| # | Couche | Position (gauche, haut, droite, bas) | Aspect / couleur mesurée | Asset à recréer |
-|---|--------|--------------------------------------|--------------------------|-----------------|
-| 1 | **Fond général** | 0, 0, 100, 100 | dégradé bleu foncé (ex. `#1b4694` → `#0b3d91`) avec reflets lumineux | PNG pleine carte `fond.png` → slot 📤 Carte |
-| 2 | **Bordure / cadre extérieur** | 0, 0, 100, 100 | contour argenté `#d9d9e3`, épaisseur ≈ 1.5–2% de la largeur, coins arrondis ~4.5%/3.5% | PNG transparent avec juste le contour `cadre.png` (ou couleur via le sélecteur « Cadre ») |
-| 3 | **Bannière haute (nom + HP)** | 5%, 2%, 95%, 10% | fond blanc `#f2f2f6`, coins très arrondis (pill), texte foncé `#1a2340` | texte éditable (champs Nom / HP) + couleur via « Bannière haut » / « Texte bannière » |
-| 4 | **Logo haut droite** | ~84%, 2.5%, 93%, 11.5% (≈ 9% de large) | cercle + symbole (éclair) | `img/studio/logo.webp` par défaut, remplaçable via champ « Logo » |
-| 5 | **Fenêtre d'illustration (art)** | 5%, 12%, 95%, 77% | rectangle coins arrondis, fine bordure blanche interne | PNG de l'illustration → slot 🎭 Perso (affiché dans la fenêtre via `clip-path: var(--clip)`) |
-| 6 | **Panneau attaques/texte** | 5%, 78.5%, 95%, 95.5% | fond noir semi-transparent `rgba(8,10,20,.55)`, coins arrondis | textes éditables (Attaque 1 + dégâts, description, Attaque 2 + dégâts) |
-| 7 | **Pied de carte (numéro / rareté)** | 6%, 98.2%, 94%, 100% | texte clair `#f4f6ff` sur le fond | champs Numéro / Rareté |
+## Canvas
 
-## Ordre d'empilement (du fond vers le dessus)
+- **747 × 1038 px**, ratio `0.7197` (le Studio utilise `--card-aspect: 0.7197`)
+- coins arrondis **30 px** = 4% de la largeur (2,9% de la hauteur)
+- fond blanc de secours inset **4 px**, radius 30 px
+- **font-size de base = 16 px à 747 px de large** → `1em = largeur / 46,69` (Studio : `--st-fs = largeur / 100`)
+
+## Empilement des couches (z-order)
 
 ```
-1 fond.png            (slot 📤 Carte)
-2 cadre (bordure)     (sélecteur couleur ou PNG transparent)
-3 fenêtre d'art       (slot 🎭 Perso, clipée à la zone #5)
-4 bannière + logo     (textes éditables + logo)
-5 panneau attaques    (textes éditables)
-6 pied                (numéro + rareté)
-7 effets holo         (shine / glare / texture — par-dessus tout)
+z -10  fond blanc inset 4px, radius 30
+z  -2  BackgroundImg   (fond perso)  inset 4px, radius 30
+z  -1  ImgLayer1       (ART)         inset 4px, radius 30   ← derrière le cadre
+z  -1  CardImage       (cadre avec trou transparent = fenêtre d'art)  pleine taille
+z  10  CardContent     (texte/blocs, positionnés en absolu)
+z   2  ImgLayer2       (overlay)     pleine taille, radius 21 px
 ```
 
-## Pour recréer chaque couche facilement
+⚠️ principe clé : **le cadre est une image PNG avec un trou transparent** ; l'illustration passe
+**derrière** le cadre (ImgLayer1), donc jamais recadrée par le texte.
 
-Exporte chaque couche en **PNG transparent** de 1062×1482 (ou 660×921, même ratio 0.716) :
-- `fond.png` → slot **📤 Carte**
-- `illustration.png` (perso sur fond transparent) → slot **🎭 Perso**
-- `cadre.png` (contour seul, transparent ailleurs) → à brancher si besoin (actuellement couleur unie)
-- logo → champ **Logo** de l'onglet Studio
-- textes → champs de l'onglet Studio (rien à exporter)
+## Blocs de contenu (position absolue, % de la carte 747×1038)
 
-Le template Studio applique automatiquement les positions du tableau ci-dessus.
+| Bloc | top | left | width | height | notes |
+|------|-----|------|-------|--------|-------|
+| **NameBar** (nom, supertype Pokémon) | 3.3% | 19% | 53% | 6% | Trainer : top 6.7%, left 6.3%, width 87.3% |
+| **HP** | 3.5% | — | — | — | `right: 13.2%` (size lg : top 2.5%, right 13.8%) |
+| **Fenêtre d'art** (trou du cadre) | 9.85% | 8% | 84% | 37.3% | = `inset(9.85% 8% 52.85% 8%)`, mesuré 10.02%→47.30% |
+| **Moves** (attaques) | 53% | 5% | 90% | 30.5% | gap 0.5em ; V : bottom 14.5% à la place |
+| **TypeBar** (faiblesse/résistance/retraite) | bottom 11.2% | 4.2% | 88.8% | 3% | weakness left 13.3%, résistance 42.5% |
+| **Description** (Trainer) | 54% | 11.9% | 77% | 31.7% | line-height 2.2em, font 1.635em |
+| **CardInfo** (set, numéro, rareté) | bottom 3.6% | 6.6% | — | — | |
+
+## Dans notre Studio
+
+Le template (`css/cards.css`, bloc « mode Studio ») applique exactement ces valeurs :
+`.st-head` 3.3/19/53/6%, `.st-hp` top 3.5% right 13.2%, `.st-art` inset 9.85% 8% 52.85% 8%,
+`.st-body` 53/5/90/30.5%, `.st-foot` bottom 3.6% left 6.6%, cadre radius 4%/2.9%.
+
+- 🖼 **Fond** (slot Studio « Fond de carte ») = BackgroundImg → `--layer-bg`
+- 🎨 **Illustration** (slot « Illustration ») = ImgLayer1 → `--layer-fg`, affiché dans `.st-art`
+- 🎭 logo, textes, couleurs = blocs CardContent éditables
+- case **🗺️ Contours des zones** = overlay de debug coloré par couche (comme le bloc Debug de karl)
+
+## Ta carte de base perso (1062×1482, ratio 0.716)
+
+Mesurée sur ton image : bannière 5/2/90/10%, art 5/12/90/77%, panneau 5/78.5/90/95.5%,
+pied ~98%, cadre argent `#d9d9e3`. Si tu préfères coller à **ta** carte plutôt qu'au standard
+S&S, dis-le et je rebascule les % du template sur ces valeurs.

@@ -6222,6 +6222,50 @@ Shine & Glare Effects
   transform: translateZ(10px);
 }
 
+/* z-order des couches du template : fond < art < cadre < textes (jamais de chevauchement) */
+.card.studio .st {
+  overflow: hidden;
+  border-radius: 4% / 2.9%;
+}
+
+.card .st-bg { z-index: 1; }
+.card .st-art { z-index: 2; overflow: hidden; }
+.card .st-frame { z-index: 3; }
+.card .st-head,
+.card .st-hp,
+.card .st-logo,
+.card .st-body,
+.card .st-typebar,
+.card .st-foot { z-index: 4; }
+
+/* le nom ne déborde jamais sur le logo */
+.st-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* TypeBar façon karl : bottom 11.2%, left 4.2%, width 88.8%, height 3% */
+.st-typebar {
+  bottom: 11.2%;
+  left: 4.2%;
+  width: 88.8%;
+  height: 3%;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+  font-size: calc(var(--st-fs, 3.6px) * 2.6);
+  color: var(--st-text, #f4f6ff);
+}
+
+.st-typebar span:nth-child(1) { position: absolute; left: 13.3%; }
+.st-typebar span:nth-child(2) { position: absolute; left: 42.5%; }
+.st-typebar span:nth-child(3) { position: absolute; left: 71.7%; }
+
+.card.show-zones .st-typebar { outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #00c2ff; outline-offset: -2px; }
+
+
 /* l'image uploadée devient le fond, cachée derrière le template */
 .card.studio .card__front > img {
   opacity: 0;
