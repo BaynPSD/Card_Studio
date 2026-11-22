@@ -6823,3 +6823,38 @@ Shine & Glare Effects
   left: auto;
   right: 2.5%;
 }
+
+/* ---------- header EXACT comme la carte ref (image 2) ----------
+   "Outcome" petit blanc à gauche (~5%) · "ALI" GROS blanc (~24%) · "HP 150" blanc à droite (~85%) · bolt CYAN tout à droite (~90%) */
+.st-brand {
+  left: 1%;
+  font-size: 1.6em;
+}
+
+.st-name {
+  left: 21%;
+  right: 22%;
+  font-size: 2.6em;
+  font-weight: 800;
+}
+
+.st-hp {
+  left: auto;
+  right: 15%;
+  font-size: 1.4em;
+}
+
+.st-logo {
+  left: auto;
+  right: 2%;
+  top: 2.5%;
+  transform: none;
+  width: 8%;
+  aspect-ratio: 1;
+  height: auto;
+}
+
+/* bolt CYAN par défaut (plus de filtre blanc) */
+.card.studio .st-logo {
+  filter: var(--st-logo-filter, none);
+}

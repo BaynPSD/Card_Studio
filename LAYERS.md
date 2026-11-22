@@ -93,3 +93,10 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Cadre + header — positions exactes carte image 2 (1062x1482)
 - Cadre `.st-frame` OPAQUE : bord `calc(st-fs*2.3) solid var(--st-frame, #eceaf2)`, plus de fond translucide ni d'ombre (le voile "désopacifié" est supprimé) ; stFrameIn défaut #eceaf2
 - Header (ref) : logo bolt x 2–5% (left 2%, w 4.5%, aspect 3/4), "Outcome" ~7% (st-brand left 2.5% du head), nom ~24% (st-name left 21% du head), HP jusqu'à ~98% (st-hp right 2.5%)
+
+## Header FINAL (mesuré sur carte image 2) — PAS de lockup à gauche
+- "Outcome" (stBrandIn) petit blanc à gauche ~5-7% (st-brand left 1% du head, 1.6em)
+- Nom "ALI" GROS blanc 2.6em à ~24% (st-name left 21% du head)
+- "HP 150" blanc 1.4em à droite ~85% (st-hp right 15%)
+- Logo bolt CYAN tout à droite ~90-98% (st-logo right 2%, w 8%, plus de filtre blanc par défaut)
+- Pas de pill par défaut ; texte blanc sur fond opaque
