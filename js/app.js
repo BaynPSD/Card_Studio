@@ -646,7 +646,8 @@ const ST_COLORS = {
 };
 for (const [inputId, varName] of Object.entries(ST_COLORS)) {
   const input = document.getElementById(inputId);
-  card.style.setProperty(varName, input.value);
+  // stHeadIn : pas de pill par défaut (transparent) — posée seulement si l'utilisateur choisit une couleur
+  if (inputId !== "stHeadIn") card.style.setProperty(varName, input.value);
   input.addEventListener("input", () => {
     card.style.setProperty(varName, input.value);
   });
@@ -657,6 +658,7 @@ stLogoFile.addEventListener("change", () => {
   const file = stLogoFile.files[0];
   if (!file) return;
   card.style.setProperty("--st-logo", `url("${URL.createObjectURL(file)}")`);
+  card.style.setProperty("--st-logo-filter", "none"); // logo perso affiché tel quel
   stLogoFile.value = "";
 });
 

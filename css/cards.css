@@ -6771,3 +6771,23 @@ Shine & Glare Effects
 .st-art {
   background-image: var(--layer-fg, url("../img/studio/art-default.webp"));
 }
+
+/* ---------- header comme la ref : PAS de pill par défaut, texte BLANC sur le fond opaque ----------
+   (la pill n'apparaît que si l'utilisateur choisit une couleur "Bannière haut" -> --st-head) */
+.st-pill {
+  background: var(--st-head, transparent);
+  box-shadow: none;
+}
+
+.st-head {
+  color: var(--st-head-text, #ffffff);
+}
+
+.st-hp {
+  color: var(--st-head-text, #ffffff);
+}
+
+/* bolt blanc par défaut (comme la ref) ; upload logo => filtre désactivé */
+.card.studio .st-logo {
+  filter: var(--st-logo-filter, brightness(0) invert(1));
+}

@@ -83,3 +83,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Illustration par défaut
 - `img/studio/art-default.webp` = crop de la carte envoyée (x 10–90%, y 19–72%) : personnage gants de boxe sur dégradé bleu
 - `.st-art { background-image: var(--layer-fg, url("../img/studio/art-default.webp")) }` → upload "Illustration" (--layer-fg) prioritaire
+
+## Header final (comme la ref, PAS de pill blanche par défaut)
+- `.st-pill` transparent par défaut (`--st-head` non posé au chargement) ; pill colorée seulement si "Bannière haut" choisi
+- Texte header BLANC sur le fond opaque : `.st-head`/`.st-hp` color `var(--st-head-text, #ffffff)` ; stHeadTextIn défaut #ffffff
+- Lockup haut gauche : logo bolt blanc (filter brightness(0) invert(1) par défaut ; upload logo => `--st-logo-filter: none`) left 6.5% w 7%, "Outcome" (stBrandIn) left 13.5%, nom left 32%, HP right 12%
+- Fond opaque : dégradé `--st-bg-grad` + motif `fond-overlay.webp` en `.st-bg::after`
