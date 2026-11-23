@@ -693,7 +693,15 @@ function shade(hex, amt) {
   return "#" + [f(r), f(g), f(b)].map((v) => v.toString(16).padStart(2, "0")).join("");
 }
 function setStudioBg(hex) {
-  const grad = `linear-gradient(160deg, ${shade(hex, 55)} 0%, ${hex} 45%, ${shade(hex, -45)} 100%)`;
+  /* teinte TRANSLUCIDE (alpha 0.65) : le fond de carte passe PAR-DESSUS l'illustration pleine carte
+     (z art < z bg) -> l'art reste visible à travers la teinte, comme le motif ribi-holo sur toute la carte */
+  const A = 0.65;
+  const [r, g, b] = hexToRgb(hex);
+  const stop = (amt) => {
+    const s = hexToRgb(shade(hex, amt));
+    return `rgba(${s[0]},${s[1]},${s[2]},${A})`;
+  };
+  const grad = `linear-gradient(160deg, ${stop(55)} 0%, rgba(${r},${g},${b},${A}) 45%, ${stop(-45)} 100%)`;
   card.style.setProperty("--st-bg-grad", grad);
   if (!slots.card.custom) card.style.setProperty("--layer-bg", "none");
   const inp = document.getElementById("stBgColor");

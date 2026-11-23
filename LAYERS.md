@@ -148,3 +148,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Calques : réordonner par drag + attaques sans fond
 - Glisser une ligne du panneau Calques VERTICALEMENT = monter/descendre le calque dans l'ordre (au drop, z-index réassigné selon l'ordre DOM des lignes, bas de liste = haut de pile) ; simple clic = sélection seule ; Ctrl+Z annule ; .layer-row.dragging = feedback visuel
 - `.st-body { background: transparent; border-radius: 0 }` (dernier bloc) : panneau attaques SANS fond navy — texte blanc + icônes cerclées directement sur l'illustration (ref utilisateur)
+
+## Ordre des couches : art DERRIÈRE le fond
+- `.card .st-art { z-index: 0 }` (< `.st-bg` z1, dernier bloc) : l'illu pleine carte est la couche du dessous, le fond de carte (teinte + motif overlay) recouvre toute la carte par-dessus
+- La teinte du fond est translucide (alpha 0.65 dans setStudioBg) pour laisser voir l'art à travers ; le color picker change la teinte, le slider d'opacité du motif règle le pattern
+- Ordre dans le panneau Calques : Fenêtre d'art en bas, puis Fond de carte, puis le reste

@@ -7054,3 +7054,10 @@ Shine & Glare Effects
   background: transparent;
   border-radius: 0;
 }
+
+/* ---------- ordre des couches : l'illustration est DERRIÈRE le fond de carte ----------
+   .st-art z 0 < .st-bg z 1 => le fond (teinte translucide + motif overlay) recouvre TOUTE la carte,
+   par-dessus l'illu pleine carte (comme le motif ribi-holo appliqué sur toute la carte) */
+.card .st-art {
+  z-index: 0;
+}
