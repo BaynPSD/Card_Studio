@@ -187,3 +187,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Export : qualité 1×/2×/3× + nom de fichier depuis le nom de la carte
 - ✨ Aperçu effet holo : toggle .preview-holo qui réactive shine/glare à 0.5 par-dessus le template studio
 - Barre d'astuce contextuelle #studioHint selon sélection/mode
+
+## Studio : carte plate + taille de police partout
+- Studio = plus de rotation 3D : guards dans interact()/interactEnd()/startShowcase()/pointerup-zoom + CSS `.card.studio { --rotate-x/y: 0deg !important; --card-scale: 1 !important; --translate-x/y: 0 !important }` (testé : souris bougée + démo auto -> computed rotate 0deg, transform identity ; l'onglet Carte garde la rotation)
+- Inspecteur : "Panneau attaques" a maintenant sizeVar --st-k-atk / colorVar --st-c-atk -> slider taille + couleur visibles dès la sélection (toutes les zones texte ont leur taille dans l'inspecteur)

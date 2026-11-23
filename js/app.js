@@ -113,6 +113,7 @@ function updateSprings(background, rotate, glare) {
 
 function interact(e) {
   if (card.classList.contains("edit")) return; // mode édition : pas de tilt 3D
+  if (card.classList.contains("studio")) return; // studio : carte TOUJOURS plate, pas de rotation
   if (e.type === "touchmove" && e.touches[0]) {
     e.clientX = e.touches[0].clientX;
     e.clientY = e.touches[0].clientY;
@@ -161,7 +162,7 @@ function interactEnd() {
     interacting = false;
     card.classList.remove("interacting");
     const autoBox = document.getElementById("auto");
-    if (autoBox && autoBox.checked) {
+    if (autoBox && autoBox.checked && !card.classList.contains("studio")) {
       startShowcase();
       return;
     }
@@ -892,6 +893,7 @@ function endShowcase() {
 
 function startShowcase() {
   if (showcaseRunning) return;
+  if (card.classList.contains("studio")) return; // pas de rotation auto en studio
   showcaseRunning = true;
   let phase = 0;
   showcaseInterval = setInterval(() => {
@@ -956,7 +958,7 @@ function deactivate() {
 }
 
 rotator.addEventListener("pointerup", (e) => {
-  if (card.classList.contains("edit")) { downPos = null; return; } // pas de zoom en mode édition
+  if (card.classList.contains("edit") || card.classList.contains("studio")) { downPos = null; return; } // pas de zoom en édition/studio
   if (!downPos) return;
   const moved = Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y);
   downPos = null;
@@ -1384,7 +1386,7 @@ const ZONE_META = {
   "st-name": { label: "Nom de la carte", sizeVar: "--st-k-name", colorVar: "--st-c-name", textId: "stNameIn" },
   "st-hp": { label: "HP", sizeVar: "--st-k-hp", colorVar: "--st-c-hp", textId: "stHpIn" },
   "st-logo": { label: "Logo" },
-  "st-body": { label: "Panneau attaques" },
+  "st-body": { label: "Panneau attaques", sizeVar: "--st-k-atk", colorVar: "--st-c-atk" },
   "st-typebar": { label: "Barre de type", sizeVar: "--st-k-type", colorVar: "--st-c-type" },
   "st-foot": { label: "Pied de carte", sizeVar: "--st-k-foot", colorVar: "--st-c-foot" },
   "st-zone-new": { label: "Zone perso", sizeVar: "--st-k-zone", colorVar: "--st-c-zone", textId: null },

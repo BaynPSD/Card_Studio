@@ -7141,3 +7141,12 @@ Shine & Glare Effects
 .card.studio.preview-holo .card__glare2 {
   opacity: 0.5 !important;
 }
+
+/* ---------- studio : carte TOUJOURS plate (pas de rotation 3D, pas de zoom hover) ---------- */
+.card.studio {
+  --rotate-x: 0deg !important;
+  --rotate-y: 0deg !important;
+  --card-scale: 1 !important;
+  --translate-x: 0px !important;
+  --translate-y: 0px !important;
+}
