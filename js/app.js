@@ -372,9 +372,8 @@ function randomizeSeeds() {
 /* ---------- taille adaptative : la carte adopte le ratio de l'image ---------- */
 
 function adaptCardAspect() {
-  if (img.naturalWidth && img.naturalHeight) {
-    card.style.setProperty("--card-aspect", String(img.naturalWidth / img.naturalHeight));
-  }
+  // le format de la carte est FIXE (747x1038 = 0.7197) — un upload ne doit jamais le changer
+  card.style.setProperty("--card-aspect", "0.7197");
   fitCard();
 }
 
