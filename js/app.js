@@ -1491,10 +1491,32 @@ function buildLayers() {
     });
 
     row.append(eye, name, up, down);
-    row.addEventListener("click", () => {
+    /* clic = sélection ; clic maintenu + glisser = DÉPLACER la zone sur la carte (position X/Y live) */
+    row.addEventListener("pointerdown", (e) => {
+      if (e.target.closest("button")) return; /* boutons œil / ▲▼ gérés à part */
+      e.preventDefault();
       if (!card.classList.contains("edit")) setEdit(true);
       selectZone(el);
       buildLayers();
+      pushUndo(); /* snapshot avant le déplacement */
+      normalizeZone(el);
+      const c = card.getBoundingClientRect();
+      const start = { x: e.clientX, y: e.clientY };
+      const r0 = zoneRect(el);
+      const move = (ev) => {
+        const dx = ((ev.clientX - start.x) / c.width) * 100;
+        const dy = ((ev.clientY - start.y) / c.height) * 100;
+        el.style.left = r0.x + dx + "%";
+        el.style.top = r0.y + dy + "%";
+        if (el === selectedZone && typeof refreshInspector === "function") refreshInspector();
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        if (typeof syncLayersPanel === "function") syncLayersPanel();
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
     });
     layersList.appendChild(row);
   }

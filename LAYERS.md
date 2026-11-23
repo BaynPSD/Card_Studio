@@ -140,3 +140,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - L'art remplit TOUTE la carte ; `.st` (overflow:hidden + border-radius 4%/2.9%) clippe l'art aux coins arrondis → contour continu
 - Par-dessus : `.st-frame` (cadre, z3) et `.st-body` attaques (z4) ; header (brand/name/hp/logo z4) lisible par-dessus l'art
 - Vérifié en headless : rect(.st-art) == rect(.st) == rect(#card), computed inset 0 / border 0 / cover ; pixels juste à l'intérieur du cadre = couleurs de l'illu, pas le fond
+
+## Glisser depuis le panneau Calques
+- pointerdown sur une ligne de calque (hors boutons 👁▲▼) = sélection + drag : déplacer la souris déplace la zone sur la carte en live (left/top en % du déplacement souris / taille carte), inspecteur sync, pushUndo au début, syncLayersPanel au relâchement ; Ctrl+Z annule
+- CSS : .layer-row cursor grab/grabbing, user-select none, touch-action none
