@@ -134,3 +134,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## UX simplifiée façon Photoshop/Figma
 - Panneau Studio réorganisé en <details> repliables : 🎯 Sélection (ouvert), 📝 Textes (ouvert), 🔤 Tailles & couleurs par texte, 🎨 Couleurs/fond/images ; en haut : mode studio, ✏️ édition, taille texte, ➕ zone, ↩️↪️ undo/redo
 - Panneau 🧅 CALQUES à droite (#layersPanel, visible onglet Studio uniquement) : liste des zones triées par z-index, 👁 show/hide, clic = sélection (sync inspecteur), ▲▼ = ordre de pile ; sync sur onglet/édition/ajout/suppression/undo-redo (buildLayers/syncLayersPanel)
+
+## Illustration pleine carte (zone rouge du mock)
+- `.st-art { inset: 0; border: none; border-radius: 0; background-size: cover; background-position: center }` (dernier bloc, gagne à spécificité égale)
+- L'art remplit TOUTE la carte ; `.st` (overflow:hidden + border-radius 4%/2.9%) clippe l'art aux coins arrondis → contour continu
+- Par-dessus : `.st-frame` (cadre, z3) et `.st-body` attaques (z4) ; header (brand/name/hp/logo z4) lisible par-dessus l'art
+- Vérifié en headless : rect(.st-art) == rect(.st) == rect(#card), computed inset 0 / border 0 / cover ; pixels juste à l'intérieur du cadre = couleurs de l'illu, pas le fond

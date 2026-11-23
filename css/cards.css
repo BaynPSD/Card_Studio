@@ -7037,3 +7037,14 @@ Shine & Glare Effects
   outline: 2px solid #ff9f43 !important;
   outline-offset: 0;
 }
+
+/* ---------- illustration = TOUTE la carte (zone rouge du mock), contour continu ----------
+   .st a overflow:hidden + border-radius => l'art est clippé aux coins arrondis de la carte ;
+   le panneau attaques (orange) et le cadre (jaune) passent par-dessus (z 3/4) */
+.st-art {
+  inset: 0;
+  border: none;
+  border-radius: 0;
+  background-size: cover;
+  background-position: center;
+}
