@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795399228" />
-  <link rel="stylesheet" href="css/ui.css?v=1795399228" />
+  <link rel="stylesheet" href="css/cards.css?v=1795438375" />
+  <link rel="stylesheet" href="css/ui.css?v=1795438375" />
 </head>
 <body>
   <header>
@@ -134,6 +134,17 @@
           <button type="button" id="undoBtn" class="btn" title="Ctrl+Z">↩️ Annuler</button>
           <button type="button" id="redoBtn" class="btn" title="Ctrl+Shift+Z / Ctrl+Y / Ctrl+V">↪️ Rétablir</button>
         </div>
+        <p class="hint" id="studioHint">🖱️ Mode studio : clique une zone pour la sélectionner.</p>
+        <label class="auto-row">
+          <input type="checkbox" id="holoPreview" />
+          <span>✨ Aperçu effet holo par-dessus le template</span>
+        </label>
+        <div class="btn-row">
+          <button type="button" id="saveProjBtn" class="btn" title="Ctrl+S — télécharge le projet (.json)">💾 Projet</button>
+          <button type="button" id="openProjBtn" class="btn" title="Ouvrir un fichier projet .json">📂 Ouvrir…</button>
+          <input type="file" id="openProjFile" accept=".json,application/json" hidden />
+        </div>
+        <p class="hint" id="sessionHint" hidden>↩️ Une session studio est enregistrée localement — <button type="button" id="resumeBtn" class="btn small">Reprendre</button> <button type="button" id="discardSessionBtn" class="btn small">Ignorer</button></p>
         <details class="grp"><summary>🔤 Tailles &amp; couleurs par texte</summary>
         <div class="fields" id="textStyles"></div>
         </details>
@@ -148,6 +159,15 @@
             <label class="slider"><span>Hauteur <b id="inspHv">0%</b></span><input type="range" id="inspH" min="2" max="130" step="0.1" /></label>
             <label class="slider" id="inspSizeRow" hidden><span>Taille texte <b id="inspSizeV">100%</b></span><input type="range" id="inspSize" min="50" max="200" /></label>
             <label class="slider color-row" id="inspColorRow" hidden><span>Couleur</span><input type="color" id="inspColor" /></label>
+            <div class="align-row" id="inspAlign">
+              <button type="button" data-align="left" title="Aligner à gauche (carte)">⇤</button>
+              <button type="button" data-align="centerX" title="Centrer horizontalement">↔</button>
+              <button type="button" data-align="right" title="Aligner à droite (carte)">⇥</button>
+              <button type="button" data-align="top" title="Aligner en haut (carte)">⤒</button>
+              <button type="button" data-align="middleY" title="Centrer verticalement">↕</button>
+              <button type="button" data-align="bottom" title="Aligner en bas (carte)">⤓</button>
+              <button type="button" id="inspReset" title="Réinitialiser position/taille de la zone">↺</button>
+            </div>
             <button type="button" id="inspDel" class="btn" hidden>🗑 Supprimer la zone</button>
           </div>
         </div>
@@ -257,6 +277,9 @@
           <span>Démo auto (la carte tourne toute seule)</span>
         </label>
         <button id="resetBtn" class="btn secondary">⟲ Réinitialiser</button>
+        <label class="field"><span>Qualité export</span>
+          <select id="exportScale"><option value="1">1× (rapide)</option><option value="2" selected>2×</option><option value="3">3× (qualité max)</option></select>
+        </label>
         <button id="exportBtn" class="btn secondary">💾 Télécharger le rendu (PNG)</button>
         <p class="hint">L'export fige une pose et capture la carte (approximatif : les modes de fusion avancés ne sont pas toujours reproduits). Sans internet, fais une capture d'écran.</p>
       </section>
@@ -315,11 +338,11 @@
     <aside class="layers" id="layersPanel" hidden>
       <h3>🧅 Calques</h3>
       <div class="layers-list" id="layersList"></div>
-      <p class="hint">👁 show/hide · clic = sélectionner · ▲▼ = ordre</p>
+      <p class="hint">👁 show/hide · clic = sélectionner · tirer la ligne = réordonner · déposer une image sur une ligne = l’assigner (Fond→fond, Art→illustration, Logo→logo)</p>
     </aside>
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795399228"></script>
+  <script src="js/app.js?v=1795438375"></script>
 </body>
 </html>

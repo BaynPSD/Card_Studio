@@ -537,7 +537,13 @@ document.querySelectorAll(".slot").forEach((el) => {
 );
 stage.addEventListener("drop", (e) => {
   const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-  setSlotFile("card", file);
+  if (!file) return;
+  if (card.classList.contains("studio")) {
+    setSlotFile("fg", file); /* en studio : l'image déposée = illustration */
+    if (typeof loadArtNatural === "function") setTimeout(loadArtNatural, 60);
+  } else {
+    setSlotFile("card", file);
+  }
 });
 
 let defaultMaskUrl = null;
@@ -1070,15 +1076,19 @@ document.getElementById("exportBtn").addEventListener("click", async () => {
     );
     await new Promise((res) => setTimeout(res, 900));
     const html2canvas = await loadHtml2Canvas();
+    const scaleSel = document.getElementById("exportScale");
+    const scale = Math.max(1, Math.min(3, parseInt(scaleSel && scaleSel.value, 10) || 2));
     const canvas = await html2canvas(card, {
-      scale: 2,
+      scale,
       backgroundColor: null,
       logging: false,
     });
     const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "carte-holo.png";
+    const nameIn = document.getElementById("stNameIn");
+    const base = ((nameIn && nameIn.value) || "carte").trim().replace(/[^\w\-]+/g, "_").slice(0, 40) || "carte";
+    a.download = base + "-holo.png";
     a.click();
     URL.revokeObjectURL(a.href);
   } catch (err) {
@@ -1123,9 +1133,10 @@ function makeDraggable(el) {
   handle.title = "Redimensionner";
   el.appendChild(handle);
 
-  if (!el.classList.contains("st-zone-new")) {
+  {
     el.addEventListener("pointerdown", (e) => {
       if (!card.classList.contains("edit") || e.target === handle) return;
+      if (el.classList.contains("st-zone-new") && el.contentEditable === "true" && document.activeElement === el) return; /* édition texte en cours */
       e.stopPropagation();
       e.preventDefault();
       normalizeZone(el);
@@ -1135,13 +1146,16 @@ function makeDraggable(el) {
       const move = (ev) => {
         const dx = ((ev.clientX - start.x) / c.width) * 100;
         const dy = ((ev.clientY - start.y) / c.height) * 100;
-        el.style.left = r0.x + dx + "%";
-        el.style.top = r0.y + dy + "%";
+        const snapped = snapZoneToGuides(el, r0.x + dx, r0.y + dy, r0.w, r0.h);
+        el.style.left = snapped.x + "%";
+        el.style.top = snapped.y + "%";
+        showGuides(snapped.guides);
         if (typeof selectedZone !== "undefined" && el === selectedZone && typeof refreshInspector === "function") refreshInspector();
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", up);
+        clearGuides();
       };
       window.addEventListener("pointermove", move);
       window.addEventListener("pointerup", up);
@@ -1200,14 +1214,14 @@ addZoneBtn.addEventListener("click", () => {
   const st = document.querySelector(".st");
   const z = document.createElement("div");
   z.className = "st-zone-new";
-  z.contentEditable = "true";
+  z.contentEditable = "false"; /* double-clic = éditer le texte (style Figma) */
   z.spellcheck = false;
   z.textContent = "Nouveau texte";
   z.style.left = "25%";
   z.style.top = "30%";
   z.style.width = "45%";
   z.style.height = "8%";
-  z.title = "Glisser la poignée orange pour déplacer/redimensionner · double-clic pour supprimer";
+  z.title = "Glisser = déplacer · poignée orange = redimensionner · double-clic = éditer le texte · Suppr = supprimer";
   st.appendChild(z);
   makeDraggable(z);
   if (typeof syncLayersPanel === "function") syncLayersPanel();
@@ -1351,8 +1365,11 @@ setTimeout(syncLayersPanel, 900);
 document.querySelector(".st").addEventListener("dblclick", (e) => {
   const z = e.target.closest && e.target.closest(".st-zone-new");
   if (z) {
-    z.remove();
-    if (typeof syncLayersPanel === "function") syncLayersPanel();
+    /* double-clic = éditer le texte (Figma) ; Suppr / bouton 🗑 / menu clic droit = supprimer */
+    z.contentEditable = "true";
+    z.focus();
+    const sel = window.getSelection();
+    sel.selectAllChildren(z);
   }
 });
 
@@ -1609,3 +1626,280 @@ setEdit = function (on) {
   _setEdit(on);
   setTimeout(syncLayersPanel, 50);
 };
+
+/* =====================================================================
+   AUDIT UX — améliorations façon Photoshop/Figma
+   ===================================================================== */
+
+/* ---------- guides d'alignement + snap pendant le drag (Figma) ---------- */
+const GUIDE_TOL = 1.1; /* % de tolérance */
+let guideEls = [];
+function clearGuides() {
+  guideEls.forEach((g) => g.remove());
+  guideEls = [];
+}
+function showGuides(guides) {
+  clearGuides();
+  const st = document.querySelector(".st");
+  if (!st || !card.classList.contains("edit")) return;
+  for (const g of guides) {
+    const d = document.createElement("div");
+    d.className = g.axis === "x" ? "st-guide st-guide-v" : "st-guide st-guide-h";
+    if (g.axis === "x") { d.style.left = g.pos + "%"; d.style.top = "0"; d.style.width = "0"; d.style.height = "100%"; }
+    else { d.style.top = g.pos + "%"; d.style.left = "0"; d.style.height = "0"; d.style.width = "100%"; }
+    st.appendChild(d);
+    guideEls.push(d);
+  }
+}
+function snapZoneToGuides(el, x, y, w, h) {
+  const guides = [];
+  const anchors = [0, 50, 100];
+  const ptsX = [x, x + w / 2, x + w];
+  const ptsY = [y, y + h / 2, y + h];
+  let nx = x, ny = y;
+  for (const a of anchors) {
+    for (const p of ptsX) {
+      if (Math.abs(p - a) < GUIDE_TOL) { nx = a - (p - x); guides.push({ axis: "x", pos: a }); break; }
+    }
+    for (const p of ptsY) {
+      if (Math.abs(p - a) < GUIDE_TOL) { ny = a - (p - y); guides.push({ axis: "y", pos: a }); break; }
+    }
+  }
+  return { x: nx, y: ny, guides };
+}
+
+/* ---------- barre d'astuce contextuelle ---------- */
+const studioHint = document.getElementById("studioHint");
+function updateStudioHint() {
+  if (!studioHint) return;
+  if (!card.classList.contains("edit")) {
+    studioHint.textContent = "🖱️ Mode studio : clique une zone pour la sélectionner. Coche ✏️ édition pour déplacer les zones.";
+  } else if (selectedZone) {
+    const isNew = selectedZone.classList.contains("st-zone-new");
+    studioHint.textContent = "✏️ Zone sélectionnée : flèches = déplacer (Shift = ×10) · " +
+      (isNew ? "Ctrl+D = dupliquer · Suppr = supprimer · " : "") +
+      "clic droit = menu · Ctrl+Z = annuler.";
+  } else {
+    studioHint.textContent = "✏️ Mode édition : clique/drag une zone sur la carte · poignée orange = redimensionner · ⌨️ voir astuces ci-dessus.";
+  }
+}
+
+/* ---------- alignement de la zone sélectionnée (style Figma) ---------- */
+function alignSelected(dir) {
+  if (!selectedZone) return;
+  pushUndo();
+  normalizeZone(selectedZone);
+  const r = zoneRect(selectedZone);
+  let x = r.x, y = r.y;
+  if (dir === "left") x = 0;
+  else if (dir === "centerX") x = (100 - r.w) / 2;
+  else if (dir === "right") x = 100 - r.w;
+  else if (dir === "top") y = 0;
+  else if (dir === "middleY") y = (100 - r.h) / 2;
+  else if (dir === "bottom") y = 100 - r.h;
+  selectedZone.style.left = x + "%";
+  selectedZone.style.top = y + "%";
+  refreshInspector();
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
+}
+document.querySelectorAll("#inspAlign [data-align]").forEach((b) =>
+  b.addEventListener("click", () => alignSelected(b.dataset.align))
+);
+document.getElementById("inspReset").addEventListener("click", () => {
+  if (!selectedZone || selectedZone.classList.contains("st-zone-new")) return;
+  pushUndo();
+  for (const p of ["left", "top", "width", "height", "right", "bottom", "inset", "zIndex", "visibility"]) {
+    selectedZone.style.removeProperty(p);
+  }
+  refreshInspector();
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
+});
+
+/* ---------- raccourcis clavier éditeur (Figma/Photoshop) ---------- */
+function duplicateSelectedZone() {
+  if (!selectedZone || !selectedZone.classList.contains("st-zone-new")) return;
+  pushUndo();
+  const clone = selectedZone.cloneNode(true);
+  clone.querySelectorAll(".st-handle").forEach((h) => h.remove());
+  const r = zoneRect(selectedZone);
+  normalizeZone(clone);
+  clone.style.left = Math.min(90, r.x + 2) + "%";
+  clone.style.top = Math.min(90, r.y + 2) + "%";
+  document.querySelector(".st").appendChild(clone);
+  makeDraggable(clone);
+  selectZone(clone);
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
+}
+function deleteSelectedZone() {
+  if (!selectedZone || !selectedZone.classList.contains("st-zone-new")) return;
+  pushUndo();
+  selectedZone.remove();
+  selectZone(null);
+  if (typeof syncLayersPanel === "function") syncLayersPanel();
+}
+document.addEventListener("keydown", (e) => {
+  const tag = (e.target.tagName || "").toLowerCase();
+  const typing = tag === "input" || tag === "textarea" || e.target.isContentEditable;
+  const mod = e.ctrlKey || e.metaKey;
+  const k = e.key.toLowerCase();
+  if (mod && k === "s") { e.preventDefault(); saveProject(true); return; }
+  if (mod && k === "d") {
+    if (card.classList.contains("edit")) { e.preventDefault(); duplicateSelectedZone(); }
+    return;
+  }
+  if (typing || !card.classList.contains("edit") || !selectedZone) return;
+  if (k === "delete" || k === "backspace") { e.preventDefault(); deleteSelectedZone(); return; }
+  if (k.startsWith("arrow")) {
+    e.preventDefault();
+    const step = e.shiftKey ? 10 : 1;
+    const r = zoneRect(selectedZone);
+    normalizeZone(selectedZone);
+    let x = r.x, y = r.y;
+    if (k === "arrowleft") x -= step;
+    if (k === "arrowright") x += step;
+    if (k === "arrowup") y -= step;
+    if (k === "arrowdown") y += step;
+    selectedZone.style.left = x + "%";
+    selectedZone.style.top = y + "%";
+    refreshInspector();
+  }
+});
+
+/* ---------- menu contextuel (clic droit) sur une zone en édition ---------- */
+let ctxMenu = null;
+function closeCtxMenu() { if (ctxMenu) { ctxMenu.remove(); ctxMenu = null; } }
+document.addEventListener("pointerdown", (e) => { if (ctxMenu && !ctxMenu.contains(e.target)) closeCtxMenu(); });
+document.addEventListener("contextmenu", (e) => {
+  if (!card.classList.contains("edit")) return;
+  const z = e.target.closest && e.target.closest(EDIT_SEL);
+  if (!z) return;
+  e.preventDefault();
+  closeCtxMenu();
+  selectZone(z);
+  const isNew = z.classList.contains("st-zone-new");
+  ctxMenu = document.createElement("div");
+  ctxMenu.className = "ctx-menu";
+  const mk = (label, fn, disabled) => {
+    const b = document.createElement("button");
+    b.textContent = label;
+    if (disabled) b.disabled = true;
+    else b.addEventListener("click", () => { closeCtxMenu(); fn(); });
+    ctxMenu.appendChild(b);
+  };
+  mk("⬆ Monter (devant)", () => { pushUndo(); z.style.zIndex = String((parseInt(getComputedStyle(z).zIndex) || 0) + 1); syncLayersPanel(); });
+  mk("⬇ Descendre (derrière)", () => { pushUndo(); z.style.zIndex = String(Math.max(0, (parseInt(getComputedStyle(z).zIndex) || 0) - 1)); syncLayersPanel(); });
+  mk("↺ Reset position", () => { if (!isNew) { pushUndo(); for (const p of ["left","top","width","height","right","bottom","inset","zIndex","visibility"]) z.style.removeProperty(p); refreshInspector(); syncLayersPanel(); } }, !isNew && false);
+  if (isNew) {
+    mk("⧉ Dupliquer (Ctrl+D)", duplicateSelectedZone);
+    mk("🗑 Supprimer (Suppr)", deleteSelectedZone);
+  }
+  ctxMenu.style.left = Math.min(window.innerWidth - 180, e.clientX) + "px";
+  ctxMenu.style.top = Math.min(window.innerHeight - 160, e.clientY) + "px";
+  document.body.appendChild(ctxMenu);
+});
+
+/* ---------- aperçu effet holo par-dessus le template studio ---------- */
+const holoPreviewBox = document.getElementById("holoPreview");
+holoPreviewBox.addEventListener("change", () => {
+  card.classList.toggle("preview-holo", holoPreviewBox.checked);
+  if (holoPreviewBox.checked) {
+    card.style.setProperty("--pointer-x", "50%");
+    card.style.setProperty("--pointer-y", "38%");
+    card.style.setProperty("--pointer-from-center", "0.2");
+  }
+});
+
+/* ---------- projet : sauvegarde JSON + autosave localStorage + reprendre ---------- */
+const LS_KEY = "card_studio_session_v1";
+function projectJSON() {
+  return JSON.stringify({
+    app: "Card_Studio",
+    v: 1,
+    savedAt: new Date().toISOString(),
+    state: JSON.parse(snapshotStudio()),
+  }, null, 1);
+}
+function saveProject(download) {
+  const json = projectJSON();
+  try { localStorage.setItem(LS_KEY, json); } catch (e) { /* quota */ }
+  if (download) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+    const nameIn = document.getElementById("stNameIn");
+    a.download = (((nameIn && nameIn.value) || "carte").trim().replace(/[^\w\-]+/g, "_").slice(0, 40) || "carte") + ".card.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+}
+function loadProjectJSON(json) {
+  const data = JSON.parse(json);
+  const st = data.state || data;
+  pushUndo();
+  restoreStudio(JSON.stringify(st));
+  try { localStorage.setItem(LS_KEY, json); } catch (e) {}
+}
+document.getElementById("saveProjBtn").addEventListener("click", () => saveProject(true));
+document.getElementById("openProjBtn").addEventListener("click", () => document.getElementById("openProjFile").click());
+document.getElementById("openProjFile").addEventListener("change", async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  loadProjectJSON(await f.text());
+  e.target.value = "";
+});
+/* autosave toutes les 4 s + proposition de reprise au chargement */
+let lastAuto = "";
+setInterval(() => {
+  if (!card.classList.contains("studio")) return;
+  const j = projectJSON();
+  if (j !== lastAuto) { lastAuto = j; try { localStorage.setItem(LS_KEY, j); } catch (e) {} }
+}, 4000);
+setTimeout(() => {
+  let saved = null;
+  try { saved = localStorage.getItem(LS_KEY); } catch (e) {}
+  const hint = document.getElementById("sessionHint");
+  if (saved && hint) {
+    hint.hidden = false;
+    document.getElementById("resumeBtn").addEventListener("click", () => {
+      try { loadProjectJSON(saved); } catch (e) { console.warn(e); }
+      hint.hidden = true;
+    });
+    document.getElementById("discardSessionBtn").addEventListener("click", () => {
+      try { localStorage.removeItem(LS_KEY); } catch (e) {}
+      hint.hidden = true;
+    });
+  }
+}, 1200);
+
+/* ---------- drop d'image directement sur une ligne de calque ---------- */
+function fileToSlotForZone(zoneClass, file) {
+  if (!file || !file.type.startsWith("image/")) return;
+  if (zoneClass.includes("st-bg")) { setSlotFile("card", file); }
+  else if (zoneClass.includes("st-art")) { setSlotFile("fg", file); if (typeof loadArtNatural === "function") setTimeout(loadArtNatural, 60); }
+  else if (zoneClass.includes("st-logo")) {
+    card.style.setProperty("--st-logo", `url("${URL.createObjectURL(file)}")`);
+    card.style.setProperty("--st-logo-filter", "none");
+  }
+}
+function bindRowDrop(row) {
+  row.addEventListener("dragover", (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; row.classList.add("droppable"); });
+  row.addEventListener("dragleave", () => row.classList.remove("droppable"));
+  row.addEventListener("drop", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    row.classList.remove("droppable");
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f && row._zone) fileToSlotForZone(row._zone.className, f);
+  });
+}
+const _buildLayers = buildLayers;
+buildLayers = function () {
+  _buildLayers();
+  document.querySelectorAll(".layer-row").forEach(bindRowDrop);
+};
+
+/* ---------- hook hint sur sélection / mode édition ---------- */
+const _selectZone = selectZone;
+selectZone = function (el) { _selectZone(el); updateStudioHint(); };
+const _setEdit2 = setEdit;
+setEdit = function (on) { _setEdit2(on); updateStudioHint(); };
+updateStudioHint();

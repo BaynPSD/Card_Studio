@@ -175,3 +175,15 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Contrôles panneau Studio (groupe images) : #stArtFit (cover "Remplir" / contain "Tout voir"), #stArtZoom 50-300%, #stArtPosX/Y 0-100%
 - applyArtCrop() calcule background-size en px (cover ou contain × zoom) + background-position X% Y% sur .st-art ; recalculé au resize (fitCard + ResizeObserver), après upload illustration (loadArtNatural via --layer-fg) et après undo/redo
 - Testé headless : image 1200x600 -> cover 875x438 (rempli, rogné) / contain 446x223 (entière, bandes) / zoom 150 -> 1408x704
+
+## Audit UX (raccourcis & workflow façon Photoshop/Figma)
+- Nudge au clavier : flèches = ±1% sur la zone sélectionnée, Shift = ±10% ; Suppr = supprimer zone perso ; Ctrl+D = dupliquer zone perso ; Ctrl+S = sauvegarder projet .json ; Ctrl+Z/Y déjà en place
+- Alignement Figma : boutons ⇤↔⇥⤒↕⤓ dans l'inspecteur (aligné sur la carte) + ↺ reset position de la zone
+- Snap + guides magenta pendant le drag (ancres 0/50/100%, tolérance 1.1%) — .st-guide-v/h dans .st, nettoyés au pointerup
+- Clic droit sur une zone (mode édition) = menu contextuel (monter/descendre/reset/dupliquer/supprimer)
+- Zone perso : drag = déplacer (maintenant draggables comme les autres), double-clic = éditer le texte (contentEditable), Suppr = supprimer
+- Drop contextuel : image sur la stage en studio = illustration ; sur une ligne de calque = assignée (Fond→fond, Art→illu, Logo→logo)
+- Projet : 💾 Projet / 📂 Ouvrir (.card.json = cardStyle + stHTML + tous les champs) + autosave localStorage toutes les 4 s + bannière « Reprendre » au chargement
+- Export : qualité 1×/2×/3× + nom de fichier depuis le nom de la carte
+- ✨ Aperçu effet holo : toggle .preview-holo qui réactive shine/glare à 0.5 par-dessus le template studio
+- Barre d'astuce contextuelle #studioHint selon sélection/mode

@@ -7123,3 +7123,21 @@ Shine & Glare Effects
   background-color: rgba(0, 0, 0, 0.18);
   box-sizing: border-box;
 }
+
+/* ---------- guides d'alignement (snap) en mode édition ---------- */
+.st-guide {
+  position: absolute;
+  z-index: 99;
+  pointer-events: none;
+  background: #ff4fd8;
+}
+.st-guide-v { border-left: 1px solid #ff4fd8; }
+.st-guide-h { border-top: 1px solid #ff4fd8; }
+
+/* ---------- aperçu effet holo par-dessus le template studio (toggle) ---------- */
+.card.studio.preview-holo .card__shine,
+.card.studio.preview-holo .card__glare,
+.card.studio.preview-holo .card__glitter,
+.card.studio.preview-holo .card__glare2 {
+  opacity: 0.5 !important;
+}
