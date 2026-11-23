@@ -319,7 +319,7 @@ function boxStyle(el, l) {
 const HANDLES = { nw: [0, 0], n: [0.5, 0], ne: [1, 0], e: [1, 0.5], se: [1, 1], s: [0.5, 1], sw: [0, 1], w: [0, 0.5] };
 const CURSORS = { nw: "nwse-resize", se: "nwse-resize", ne: "nesw-resize", sw: "nesw-resize", n: "ns-resize", s: "ns-resize", e: "ew-resize", w: "ew-resize" };
 function drawOverlay() {
-  overlay.querySelectorAll(".selbox,.grid-ov").forEach((e) => e.remove());
+  overlay.querySelectorAll(".selbox,.grid-ov,.minibar").forEach((e) => e.remove());
   if (project.showGrid) {
     const g = document.createElement("div");
     g.className = "grid-ov";
@@ -353,6 +353,33 @@ function drawOverlay() {
       b.append(stem, rot);
     }
     overlay.appendChild(b);
+  }
+  if (ls.length) {
+    /* mini-barre flottante : verrouiller / dupliquer / ordre / supprimer */
+    const bb = bbox(ls);
+    const allLocked = ls.every((x) => x.locked);
+    const mb = document.createElement("div");
+    mb.className = "minibar";
+    mb.innerHTML =
+      `<button data-a="lock" class="${allLocked ? "on" : ""}" title="${allLocked ? "Déverrouiller" : "Verrouiller"} (Ctrl+L)">${allLocked ? "🔒 Verrouillé" : "🔓 Verrouiller"}</button>` +
+      `<button data-a="back" title="Descendre (Ctrl+[)">⤓</button><button data-a="front" title="Monter (Ctrl+])">⤒</button>` +
+      `<button data-a="dup" title="Dupliquer (Ctrl+D)">⧉</button><button data-a="del" title="Supprimer (Suppr)">🗑</button>`;
+    const top = bb.y * zoom - (ls.length === 1 && !allLocked ? 66 : 38);
+    mb.style.left = (bb.x + bb.w / 2) * zoom + "px";
+    mb.style.top = (top < 4 ? (bb.y + bb.h) * zoom + 10 : top) + "px";
+    mb.addEventListener("pointerdown", (ev) => ev.stopPropagation());
+    mb.addEventListener("click", (ev) => {
+      const k = ev.target.closest("button")?.dataset.a;
+      if (k === "lock") toggleLock();
+      if (k === "back") arrange(-1);
+      if (k === "front") arrange(1);
+      if (k === "dup") duplicate();
+      if (k === "del") {
+        if (selLayers().every((x) => x.locked)) toast("Calque verrouillé — déverrouille-le d'abord");
+        removeSel();
+      }
+    });
+    overlay.appendChild(mb);
   }
 }
 function clearGuides() { overlay.querySelectorAll(".guide").forEach((g) => g.remove()); }
@@ -435,10 +462,36 @@ function startDrag(e, onMove, onUp) {
   window.addEventListener("pointerup", up);
 }
 
+/* tous les calques sous le point (du plus haut au plus bas), verrouillés compris */
+function layersAt(p) {
+  return [...project.layers].reverse().filter((l) => {
+    if (l.hidden) return false;
+    const cx = l.x + l.w / 2, cy = l.y + l.h / 2, a = (-(l.rot || 0) * Math.PI) / 180;
+    const dx = p.x - cx, dy = p.y - cy;
+    const lx = dx * Math.cos(a) - dy * Math.sin(a), ly = dx * Math.sin(a) + dy * Math.cos(a);
+    return Math.abs(lx) <= l.w / 2 + 2 && Math.abs(ly) <= l.h / 2 + 2;
+  });
+}
 svgEl.addEventListener("pointerdown", (e) => {
   if (e.button !== 0 || editing) return;
-  const l = layerFromEvent(e);
-  if (!l) { select([]); return; }
+  const p = cardPt(e);
+  let l = layerFromEvent(e);
+  /* Alt + clic = sélectionner le calque juste en dessous (traverser les couches) */
+  if (e.altKey) {
+    const stack = layersAt(p);
+    const cur = sel.length === 1 ? stack.findIndex((x) => x.id === sel[0]) : -1;
+    l = stack[(cur + 1) % Math.max(stack.length, 1)] || null;
+    if (l) { e.preventDefault(); select([l.id]); }
+    return;
+  }
+  /* rien de déverrouillé ici : on sélectionne quand même le calque verrouillé le plus haut (pour le déverrouiller) */
+  if (!l) {
+    l = layersAt(p)[0] || null;
+    if (!l) { select([]); return; }
+    e.preventDefault();
+    select([l.id]);
+    return;
+  }
   e.preventDefault();
   if (e.shiftKey) { select([l.id], true); return; }
   if (!sel.includes(l.id)) select([l.id]);
@@ -744,7 +797,7 @@ function renderInspector() {
   if (l.locked) {
     b.appendChild(h(`<p class="hint">Calque verrouillé : déverrouille-le pour le modifier.</p>`));
     const btn = h(`<button class="bigbtn">🔓 Déverrouiller</button>`);
-    btn.onclick = () => { l.locked = false; render(); commit(); };
+    btn.onclick = () => toggleLock();
     b.appendChild(btn);
     if (l.type !== "image") return;
   }
@@ -907,7 +960,7 @@ function actionsRow() {
     if (k === "back") arrange(-1);
     if (k === "front") arrange(1);
     if (k === "dup") duplicate();
-    if (k === "lock") { selLayers().forEach((l) => (l.locked = !l.locked)); render(); commit(); }
+    if (k === "lock") toggleLock();
     if (k === "del") removeSel();
   };
   return a;
@@ -1093,6 +1146,15 @@ $("#svgFile").addEventListener("change", async (e) => {
 });
 
 /* ================= actions ================= */
+function toggleLock() {
+  const ls = selLayers();
+  if (!ls.length) return;
+  const lock = !ls.every((l) => l.locked);
+  ls.forEach((l) => (l.locked = lock));
+  render();
+  commit();
+  toast(lock ? "🔒 Verrouillé — il ne bougera plus (clic = le resélectionner)" : "🔓 Déverrouillé — tu peux le déplacer");
+}
 function removeSel() {
   const ls = selLayers().filter((l) => !l.locked);
   if (!ls.length) return;
@@ -1420,6 +1482,7 @@ document.addEventListener("keydown", (e) => {
   if (mod && k.toLowerCase() === "y") { e.preventDefault(); redo(); return; }
   if (mod && k.toLowerCase() === "s") { e.preventDefault(); saveProject(); return; }
   if (mod && k.toLowerCase() === "d") { e.preventDefault(); duplicate(); return; }
+  if (mod && k.toLowerCase() === "l") { e.preventDefault(); toggleLock(); return; }
   if (mod && k.toLowerCase() === "c") { clipboard = JSON.stringify(selLayers()); return; }
   if (mod && k.toLowerCase() === "v" && clipboard) {
     const ls = JSON.parse(clipboard).map((l) => Object.assign(l, { id: uid(), x: l.x + 14, y: l.y + 14 }));

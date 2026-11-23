@@ -233,3 +233,4 @@ L'ancien Studio (onglet de `index.html`) reste intact ; `index.html` a un lien v
 - Raccourcis : Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y, Ctrl+C / V / D, Ctrl+A, Ctrl+[ / ], Suppr, flèches (Shift ×10), Entrée = éditer le texte, Échap, + / − / 0, Ctrl+S.
 - « Voir en holo » : rendu 2× webp → `localStorage["cardstudio.holo"]` → `index.html#from-editor` charge la carte dans la visionneuse 3D.
 - Export ne marche qu'en http(s) (GitHub Pages) : en `file://` le navigateur bloque fetch/canvas → message explicite.
+- Clic = sélectionner + déplacer. Un calque verrouillé reste cliquable (cadre pointillé, pas de poignées, ne bouge plus). Mini-barre flottante au-dessus de la sélection : 🔓 Verrouiller / 🔒 Verrouillé, ⤓ ⤒, ⧉, 🗑. Ctrl+L = verrouiller/déverrouiller. Alt+clic = sélectionner le calque du dessous (cycle dans la pile, verrouillés compris).

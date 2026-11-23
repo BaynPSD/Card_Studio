@@ -259,3 +259,22 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   .workspace { grid-template-columns: 250px 1fr 290px; gap: 10px; padding: 10px; }
   .save-state { display: none; }
 }
+
+/* mini-barre au-dessus de la sélection */
+.minibar {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: #1d1f2bf2;
+  border: 1px solid var(--line2);
+  border-radius: 9px;
+  box-shadow: 0 6px 18px #0008;
+  pointer-events: auto;
+  white-space: nowrap;
+  z-index: 6;
+}
+.minibar button { background: transparent; border: 0; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: var(--text); }
+.minibar button:hover { background: var(--panel2); }
+.minibar button.on { background: #3a2a14; color: var(--orange); }
