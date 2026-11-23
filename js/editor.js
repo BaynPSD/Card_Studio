@@ -99,10 +99,13 @@ function autoSize(l) {
     l.h = l.size * (1 + (lines.length - 1) * (l.lh || 1.15)) + l.size * 0.12;
     l._lines = lines;
   } else if (l.type === "hp") {
-    const nw = textW(l.label || "", l.font, l.size * 0.4, 800, true) + l.size * 0.12 + textW(l.value || "", l.font, l.size, 800, true, -1) + 4;
+    /* bloc HP = [HP][valeur] + rond icône à droite ; le bord droit reste fixe */
+    const ic = hpIcon(l);
+    const tw = textW(l.label || "", l.font, l.size * 0.4, 800, true) + l.size * 0.12 + textW(l.value || "", l.font, l.size, 800, true, -1) + 4;
+    const nw = tw + (ic ? ic.d + ic.gap : 0);
     l.x += l.w - nw;
     l.w = nw;
-    l.h = l.size;
+    l.h = ic ? Math.max(ic.d, l.size) : l.size;
   } else if (l.type === "badge") {
     const lw = l.laurels ? l.h * 0.5 + 2 : 0;
     const inner = Math.max(l.size * 2.82, textW(l.text || "", l.font, l.size, 900, true) + l.size * 0.9);
@@ -110,6 +113,21 @@ function autoSize(l) {
     l.x += (l.w - nw) / 2;
     l.w = nw;
   }
+}
+
+/* rond d'icône du bloc HP (∞ intégré, logo du projet, image importée, ou aucun) */
+function hpIcon(l) {
+  if (!l.icon || l.icon === "none") return null;
+  return { d: l.size * 1.17, gap: l.size * 0.33 };
+}
+function hpIconMarkup(l, x, y, d, idp) {
+  const ring = `<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="${esc(l.iconRing || "#e8eef8")}" stroke-width="6"/>`;
+  let inner = "";
+  if (l.icon === "inf") inner = `<path d="M24 50C24 33 42 33 50 50C58 67 76 67 76 50C76 33 58 33 50 50C42 67 24 67 24 50Z" fill="${esc(l.iconColor || "#45e3c6")}"/>`;
+  else if (l.icon === "logo") inner = logoImg(20, 20, 60, idp, false);
+  else if (l.icon === "custom" && l.iconSrc) inner = `<clipPath id="${idp}-hpc-${l.id}"><circle cx="50" cy="50" r="40"/></clipPath><image href="${esc(l.iconSrc)}" x="10" y="10" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#${idp}-hpc-${l.id})"/>`;
+  else if (GLYPHS[l.icon]) inner = `<g transform="translate(50 50) scale(.62) translate(-50 -50)" color="${esc(l.iconColor || "#45e3c6")}">${GLYPHS[l.icon].svg}</g>`;
+  return `<svg x="${r2(x)}" y="${r2(y)}" width="${r2(d)}" height="${r2(d)}" viewBox="0 0 100 100" overflow="visible">${ring}${inner}</svg>`;
 }
 
 /* ================= rendu SVG ================= */
@@ -186,9 +204,14 @@ function renderLayer(l, idp, defs) {
       body = hit + `<text text-anchor="${anchor}" ${textAttrs(l.font, l.size, l.weight, l.italic, l.ls, l.color)}${l.shadow ? ` filter="url(#${idp}-sh)"` : ""} xml:space="preserve">${tsp}</text>`;
       break;
     }
-    case "hp":
-      body = hit + `<text x="${r2(x + w)}" y="${r2(y + l.size * 0.8)}" text-anchor="end" ${textAttrs(l.font, l.size, 800, true, 0, l.color)}><tspan font-size="${r2(l.size * 0.4)}">${esc(l.label)}</tspan><tspan dx="${r2(l.size * 0.12)}" letter-spacing="-1">${esc(l.value)}</tspan></text>`;
+    case "hp": {
+      const ic = hpIcon(l);
+      const tEnd = x + w - (ic ? ic.d + ic.gap : 0);
+      const base = ic ? y + h / 2 + l.size * 0.3 : y + l.size * 0.8;
+      body = hit + `<text x="${r2(tEnd)}" y="${r2(base)}" text-anchor="end" ${textAttrs(l.font, l.size, 800, true, 0, l.color)}><tspan font-size="${r2(l.size * 0.4)}">${esc(l.label)}</tspan><tspan dx="${r2(l.size * 0.12)}" letter-spacing="-1">${esc(l.value)}</tspan></text>` +
+        (ic ? hpIconMarkup(l, x + w - ic.d, y + (h - ic.d) / 2, ic.d, idp) : "");
       break;
+    }
     case "badge": {
       const lw = l.laurels ? h * 0.5 : 0, g = l.laurels ? 2 : 0;
       const bx = x + lw + g, bw = w - 2 * (lw + g), by = y + h * 0.07, bh = h * 0.86, rx = bh * 0.2;
@@ -617,10 +640,11 @@ function startInlineEdit(l, field) {
     else { bx = l.x + l.nameX - 4; bw = l.w - l.nameX - 70; }
   }
   if (l.type === "badge") weight = 900;
+  if (l.type === "hp" && hpIcon(l)) { const ic = hpIcon(l); bw = l.w - ic.d - ic.gap; by = l.y + (l.h - l.size * 1.2) / 2; bh = l.size * 1.2; }
   Object.assign(ta.style, {
     left: bx * zoom + "px", top: by * zoom + "px", width: Math.max(bw, 60) * zoom + "px", height: Math.max(bh, size * 1.3) * zoom + "px",
     font: `${italic ? "italic " : ""}${weight} ${size * zoom}px/${(l.lh || 1.15)} "${l.font}"`,
-    letterSpacing: (l.ls || 0) * zoom + "px", color: l.color || "#fff", textAlign: field === "dmg" ? "right" : l.align || "left",
+    letterSpacing: (l.ls || 0) * zoom + "px", color: l.color || "#fff", textAlign: field === "dmg" || l.type === "hp" ? "right" : l.align || "left",
   });
   overlay.appendChild(ta);
   editing = { l, field, ta, before: ta.value };
@@ -866,7 +890,30 @@ function renderInspector() {
       fText(r, "Valeur", () => l.value, (v) => (l.value = v));
       fontField(b, l);
       fNum(row(b), "Aa", () => l.size, (v) => (l.size = Math.max(6, v)), 0.5);
-      fColor(b, "Couleur", () => l.color, (v) => (l.color = v));
+      fColor(b, "Couleur du texte", () => l.color, (v) => (l.color = v));
+      b.appendChild(h(`<span class="lab">Icône ronde à côté (même bloc)</span>`));
+      const gr = h(`<div class="glyphs"></div>`);
+      const opts = [["inf", "∞"], ["logo", "logo"], ["bolt", "⚡"], ["heart", "♥"], ["star", "★"], ["diamond", "◆"], ["custom", "🖼"], ["none", "∅"]];
+      for (const [k, t] of opts) {
+        const gb = h(`<button class="${(l.icon || "none") === k ? "on" : ""}" title="${k === "custom" ? "Importer une image" : k === "none" ? "Sans icône" : k === "logo" ? "Logo du projet" : t}">${k === "logo" ? `<img src="${esc(logoUrl())}" alt="logo">` : t}</button>`);
+        gb.onclick = () => {
+          if (k === "custom") {
+            pickFile("image/*", async (f) => { l.iconSrc = await fileToDataURL(f, 400); l.icon = "custom"; render(); commit(); });
+            return;
+          }
+          l.icon = k;
+          render();
+          commit();
+        };
+        gr.appendChild(gb);
+      }
+      b.appendChild(gr);
+      if (l.icon && l.icon !== "none") {
+        const r = row(b);
+        if (l.icon !== "logo" && l.icon !== "custom") fColor(r, "Symbole", () => l.iconColor || "#45e3c6", (v) => (l.iconColor = v));
+        fColor(r, "Anneau", () => l.iconRing || "#e8eef8", (v) => (l.iconRing = v));
+      }
+      b.appendChild(h(`<p class="hint">Le logo = celui du projet (Image Lab → « Logo : importer »). 🖼 = n'importe quelle image, recadrée en rond.</p>`));
       break;
     }
     case "badge": {
@@ -1208,7 +1255,7 @@ function mgPreview(m) {
     autoSize(l);
     return `<svg viewBox="${l.x - 4} -4 ${l.w + 8} 60">${renderLayer(l, "c", [])}</svg>`;
   }
-  if (m.kind === "hp") return `<svg viewBox="0 0 200 60"><text x="196" y="46" text-anchor="end" font-family="Poppins" font-weight="800" font-style="italic" font-size="46" fill="#fff"><tspan font-size="18">HP</tspan><tspan dx="6">150</tspan></text></svg>`;
+  if (m.kind === "hp") return `<svg viewBox="0 0 200 60"><text x="196" y="46" text-anchor="end" font-family="Poppins" font-weight="800" font-style="italic" font-size="46" fill="#fff"><tspan font-size="18">HP</tspan><tspan dx="6">150</tspan></text></svg>`.replace('x="196"', 'x="138"').replace("</svg>", '<circle cx="170" cy="30" r="24" fill="#0b1630" stroke="#e8eef8" stroke-width="3"/><path d="M152 30C152 20 163 20 170 30C177 40 188 40 188 30C188 20 177 20 170 30C163 40 152 40 152 30Z" fill="#45e3c6"/></svg>');
   if (m.kind === "rule") return `<svg viewBox="0 0 200 60"><rect x="6" y="28" width="188" height="4" rx="2" fill="#e1ebff"/></svg>`;
   if (m.kind === "flavor") return `<svg viewBox="0 0 200 60"><text x="8" y="38" font-family="Poppins" font-style="italic" font-size="17" fill="#dde5f5">A calculated bet…</text></svg>`;
   if (m.kind === "text") return `<svg viewBox="0 0 100 100"><text x="50" y="60" text-anchor="middle" font-family="${esc(m.props.font || "Poppins")}" font-weight="${m.props.weight || 600}" font-size="${Math.min(30, 160 / Math.max(3, m.props.text.length))}" fill="currentColor">${esc(m.props.text)}</text></svg>`;
@@ -1251,7 +1298,7 @@ function addMicro(m) {
   }
   if (m.kind === "rule") return addLayer({ type: "rule", name: "Filet", x: 76.6, y: nextAttackY() - 12, w: 580, h: 3, color: "#e1ebff" }, false);
   if (m.kind === "badge") return addLayer({ type: "badge", name: "Rareté " + m.props.text, x: 566, y: 946, w: 149, h: 52, text: m.props.text, font: "Poppins", size: 33, color: "#ffffff", laurels: m.props.laurels !== false, laurelColor: "#efe3c8" }, false);
-  if (m.kind === "hp") return addLayer({ type: "hp", name: "HP", x: 497, y: 36.5, w: 140, h: 50.4, label: "HP", value: "150", font: "Poppins", size: 50.4, color: "#ffffff" }, false);
+  if (m.kind === "hp") return addLayer({ type: "hp", name: "HP + icône", x: 497, y: 30.2, w: 214.5, h: 59, label: "HP", value: "150", font: "Poppins", size: 50.4, color: "#ffffff", icon: "inf", iconColor: "#45e3c6" }, false);
   if (m.kind === "flavor") return addLayer({ type: "text", name: "Description", x: 84, y: 868.4, text: "A calculated bet, a decisive move.", font: "Poppins", size: 19.2, weight: 400, italic: true, color: "#dde5f5" }, false);
   if (m.kind === "text") return addLayer(Object.assign({ type: "text", name: m.name, font: "Poppins", color: "#ffffff" }, m.props));
 }
@@ -1322,8 +1369,8 @@ $("#shuffleBtn").addEventListener("click", () => {
   const [a, b] = PALETTES[Math.floor(Math.random() * PALETTES.length)];
   const bg = roleLayer("bg");
   if (bg) { bg.fill = a; bg.fill2 = b; }
-  const hpIco = project.layers.find((l) => l.mg === "hp-inf");
-  if (hpIco) hpIco.color = ["#45e3c6", "#ffcf5a", "#ff7ab8", "#8fd3ff", "#b6ff7a"][Math.floor(Math.random() * 5)];
+  const hpIco = project.layers.find((l) => l.type === "hp" && l.icon && l.icon !== "logo" && l.icon !== "custom");
+  if (hpIco) hpIco.iconColor = ["#45e3c6", "#ffcf5a", "#ff7ab8", "#8fd3ff", "#b6ff7a"][Math.floor(Math.random() * 5)];
   render();
   commit();
 });
@@ -1357,6 +1404,7 @@ $("#projFile").addEventListener("change", async (e) => {
     if (!data.layers) throw new Error("format");
     project = Object.assign({ finish: { grain: 0 }, uploads: [] }, data);
     project.layers = project.layers.map(withDefaults);
+    migrate(project);
     sel = [];
     render();
     commit();
@@ -1536,6 +1584,22 @@ stage.addEventListener("drop", async (e) => {
   if (art) setArt(art, src);
 });
 
+/* anciens projets : rond ∞ séparé → fusionné dans le bloc HP */
+function migrate(p) {
+  const hp = p.layers.find((l) => l.type === "hp");
+  const ico = p.layers.find((l) => l.type === "svg" && (l.mg === "hp-inf" || l.mg === "hp-logo"));
+  if (hp && !hp.icon && ico && Math.abs(ico.y + ico.h / 2 - (hp.y + hp.h / 2)) < 40) {
+    hp.icon = ico.mg === "hp-logo" ? "logo" : "inf";
+    hp.iconColor = ico.color;
+    hp.name = "HP + icône";
+    hp.w = ico.x + ico.w - hp.x;
+    hp.y = ico.y;
+    hp.h = ico.h;
+    p.layers = p.layers.filter((l) => l !== ico);
+  }
+  return p;
+}
+
 /* ================= démarrage ================= */
 (function init() {
   let saved = null;
@@ -1543,6 +1607,7 @@ stage.addEventListener("drop", async (e) => {
   if (saved && saved.layers) {
     project = Object.assign({ finish: { grain: 0 }, uploads: [] }, saved);
     project.layers = project.layers.map(withDefaults);
+    migrate(project);
   } else {
     project = null;
     project = projectFromTemplate(TEMPLATES[0]);
