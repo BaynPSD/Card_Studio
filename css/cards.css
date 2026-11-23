@@ -7561,3 +7561,52 @@ Shine & Glare Effects
 /* le HP s'arrête avant le rond (même place qu'avant) */
 .card.studio.tpl-outcome .st-hp { right: 15%; gap: 0; }
 .card.studio.tpl-outcome .st-hp .st-hp-ico { display: none; }
+
+/* ---------- jetons d'attaque : logo en couleurs / image perso ---------- */
+.card.studio .st-atk.glyph-logoc .st-cost i::before,
+.card.studio .st-atk.glyph-img .st-cost i::before {
+  content: "";
+  width: 86%;
+  height: 86%;
+  -webkit-mask: none;
+  mask: none;
+  filter: none;
+  border-radius: 50%;
+}
+.card.studio .st-atk.glyph-logoc .st-cost i::before { background: var(--st-logo, url("../img/studio/logo.webp")) center / 72% no-repeat; }
+.card.studio .st-atk.glyph-img .st-cost i::before { background: var(--st-glyph-img, none) center / cover no-repeat; }
+
+/* ---------- ⚔ 1 / 2 / 3 attaques (gabarit Outcome) ----------
+   panneau attaques = 60 → 90 % de la hauteur ; chaque ligne porte son filet en dessous */
+.card.studio.tpl-outcome .st-body { top: 60%; height: 30%; }
+.card.studio.tpl-outcome .st-body::before,
+.card.studio.tpl-outcome .st-body::after { display: none; }
+.card.studio.tpl-outcome .st-atk::after {
+  content: "";
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: calc(50% + 2.05em);
+  height: calc(var(--st-fs, 3.6px) * 0.32);
+  border-radius: 9px;
+  background: linear-gradient(90deg, rgba(200, 215, 245, 0.3), rgba(225, 235, 255, 0.85) 15%, rgba(225, 235, 255, 0.85) 85%, rgba(200, 215, 245, 0.2));
+  pointer-events: none;
+}
+.card.studio.tpl-outcome .st-atk { overflow: visible; }
+.card.studio #stAtkRow3 { display: none; }
+.card.studio.atk-n3 #stAtkRow3 { display: block; }
+.card.studio.atk-n1 #stAtkRow2 { display: none; }
+/* 2 attaques (ref ALI) */
+.card.studio.tpl-outcome #stAtkRow1 { top: 35.3%; }
+.card.studio.tpl-outcome #stAtkRow2 { top: 58.3%; }
+.card.studio.tpl-outcome .st-desc { top: 81.7%; }
+/* 3 attaques */
+.card.studio.tpl-outcome.atk-n3 #stAtkRow1 { top: 24.3%; }
+.card.studio.tpl-outcome.atk-n3 #stAtkRow2 { top: 47.3%; }
+.card.studio.tpl-outcome.atk-n3 #stAtkRow3 { top: 70.3%; }
+.card.studio.tpl-outcome.atk-n3 .st-desc { top: 92%; }
+/* 1 attaque */
+.card.studio.tpl-outcome.atk-n1 #stAtkRow1 { top: 40%; }
+.card.studio.tpl-outcome.atk-n1 .st-desc { top: 65%; }
+/* sans gabarit : la 3e ligne suit simplement les autres */
+.card.studio:not(.tpl-outcome).atk-n3 #stAtkRow3 { position: relative; }

@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,400;1,700;1,800;1,900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795550000" />
-  <link rel="stylesheet" href="css/ui.css?v=1795550000" />
+  <link rel="stylesheet" href="css/cards.css?v=1795560000" />
+  <link rel="stylesheet" href="css/ui.css?v=1795560000" />
 </head>
 <body>
   <header>
@@ -129,6 +129,13 @@
           </select>
           <input type="file" id="stHpIcoFile" accept="image/*" hidden />
         </label>
+        <div id="stHpIcoCrop" class="auto-row" style="flex-wrap:wrap;gap:6px 10px" hidden>
+          <span style="width:100%">✂ Recadrer l'image du rond (ou molette sur le rond / glisser avec Alt)</span>
+          <label>Zoom <input type="range" id="stHpIcoZ" min="0.4" max="4" step="0.01" value="1" /></label>
+          <label>↔ <input type="range" id="stHpIcoX" min="-60" max="60" step="0.5" value="0" /></label>
+          <label>↕ <input type="range" id="stHpIcoY" min="-60" max="60" step="0.5" value="0" /></label>
+          <button type="button" class="btn" id="stHpIcoReset">Recentrer</button>
+        </div>
         <label class="auto-row">
           <input type="checkbox" id="showZones" />
           <span>🗺️ Contours des zones (voir chaque couche)</span>
@@ -189,14 +196,20 @@
           <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="ALI" /></label>
           <label class="field"><span>Marque (haut gauche)</span><input type="text" id="stBrandIn" value="Outcome" /></label>
           <label class="field"><span>HP</span><input type="text" id="stHpIn" value="150" /></label>
+          <label class="field wide"><span>⚔ Nombre d'attaques</span><select id="stAtkCountIn"><option value="1">1 attaque</option><option value="2" selected>2 attaques</option><option value="3">3 attaques</option></select></label>
           <label class="field"><span>Attaque 1</span><input type="text" id="stAtk1In" value="Prediction" /></label>
           <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" value="40" /></label>
           <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" value="Outcome" /></label>
           <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
           <label class="field"><span>Coût énergie 1</span><input type="number" id="stCost1In" value="1" min="0" max="5" /></label>
           <label class="field"><span>Coût énergie 2</span><input type="number" id="stCost2In" value="2" min="0" max="5" /></label>
-          <label class="field"><span>Icône attaque 1</span><select id="stIcon1In"><option value="logo">Logo Outcome</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
-          <label class="field"><span>Icône attaque 2</span><select id="stIcon2In"><option value="logo">Logo Outcome</option><option>∞</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>●</option></select></label>
+          <label class="field"><span>Icône attaque 1</span><select id="stIcon1In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
+          <label class="field"><span>Icône attaque 2</span><select id="stIcon2In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
+          <label class="field atk3-f"><span>Attaque 3</span><input type="text" id="stAtk3In" value="Amplify" /></label>
+          <label class="field atk3-f"><span>Dégâts 3</span><input type="text" id="stDmg3In" value="150" /></label>
+          <label class="field atk3-f"><span>Coût énergie 3</span><input type="number" id="stCost3In" value="3" min="0" max="5" /></label>
+          <label class="field atk3-f"><span>Icône attaque 3</span><select id="stIcon3In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
+          <input type="file" id="stGlyphFile" accept="image/*" hidden />
           <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
           <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
           <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
@@ -330,6 +343,7 @@
                 <div class="st-body">
                   <div class="st-atk" id="stAtkRow1"><div class="st-cost" id="stCost1"></div><span class="st-atk-name" id="stAtk1"></span><span class="st-atk-dmg" id="stDmg1"></span></div>
                   <div class="st-atk" id="stAtkRow2"><div class="st-cost" id="stCost2"></div><span class="st-atk-name" id="stAtk2"></span><span class="st-atk-dmg" id="stDmg2"></span></div>
+                  <div class="st-atk" id="stAtkRow3"><div class="st-cost" id="stCost3"></div><span class="st-atk-name" id="stAtk3"></span><span class="st-atk-dmg" id="stDmg3"></span></div>
                   <p class="st-desc" id="stDesc"></p>
                 </div>
                 <div class="st-typebar"><span id="stWeak"></span><span id="stRes"></span><span id="stRet"></span></div>
@@ -356,6 +370,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795550000"></script>
+  <script src="js/app.js?v=1795560000"></script>
 </body>
 </html>

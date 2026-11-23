@@ -688,12 +688,18 @@ function bindCost(inputId, costId, rowId, iconId) {
     const n = Math.max(0, Math.min(5, parseInt(input.value || "0", 10) || 0));
     const glyph = icon.value || "\u26a1";
     cost.innerHTML = "<i></i>".repeat(n);
-    row.style.setProperty("--st-glyph", JSON.stringify(glyph === "logo" ? "" : glyph));
+    const special = glyph === "logo" || glyph === "logoc" || glyph === "img";
+    row.style.setProperty("--st-glyph", JSON.stringify(special ? "" : glyph));
     row.classList.toggle("glyph-logo", glyph === "logo");
+    row.classList.toggle("glyph-logoc", glyph === "logoc");
+    row.classList.toggle("glyph-img", glyph === "img");
     row.style.setProperty("--cost", String(n));
   };
   input.addEventListener("input", apply);
-  icon.addEventListener("input", apply);
+  icon.addEventListener("input", () => {
+    apply();
+    if (icon.value === "img" && typeof pickGlyphImage === "function") pickGlyphImage(rowId);
+  });
   apply();
 }
 bindCost("stCost1In", "stCost1", "stAtkRow1", "stIcon1In");
@@ -1324,6 +1330,7 @@ function restoreStudio(s) {
   }
   if (typeof syncTplOutcome === "function") syncTplOutcome();
   if (typeof ensureHpIco === "function") ensureHpIco();
+  if (typeof syncAtkCount === "function") syncAtkCount();
   if (typeof syncLayersPanel === "function") syncLayersPanel();
   if (typeof applyArtCrop === "function") applyArtCrop();
   if (selectedZone && !selectedZone.isConnected) selectZone(null);
@@ -2123,6 +2130,27 @@ card.addEventListener("dblclick", (e) => {
   }, 300);
 })();
 
+/* réduit une image importée (les grosses dataURL cassent les variables CSS et alourdissent le projet) */
+function shrinkImage(file, max) {
+  return new Promise((res) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      const im = new Image();
+      im.onload = () => {
+        const sc = Math.min(1, max / Math.max(im.width, im.height));
+        const c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(im.width * sc));
+        c.height = Math.max(1, Math.round(im.height * sc));
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/webp", 0.92));
+      };
+      im.onerror = () => res(fr.result);
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
 /* ---------- ◉ Rond d'icône à côté du HP : calque INDÉPENDANT (.st-hpico), icône SVG nette ---------- */
 const HPICO_GLYPHS = {
   inf: '<path d="M24 50C24 33 42 33 50 50C58 67 76 67 76 50C76 33 58 33 50 50C42 67 24 67 24 50Z" fill="#45e3c6"/>',
@@ -2135,7 +2163,11 @@ function hpIcoMarkup(kind, src) {
   const ring = '<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="#e8eef8" stroke-width="6"/>';
   let inner = HPICO_GLYPHS[kind] ?? HPICO_GLYPHS.inf;
   if (kind === "logo") inner = ""; /* logo = ::after CSS (suit le logo uploadé via --st-logo) */
-  if (kind === "custom" && src) inner = '<clipPath id="hpicoClip"><circle cx="50" cy="50" r="40"/></clipPath><image href="' + src + '" x="10" y="10" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#hpicoClip)"/>';
+  if (kind === "custom" && src) {
+    const c = hpIcoCrop();
+    const sz = 80 * c.z, x = 50 - sz / 2 + c.x, y = 50 - sz / 2 + c.y;
+    inner = '<clipPath id="hpicoClip"><circle cx="50" cy="50" r="40"/></clipPath><g clip-path="url(#hpicoClip)"><image class="st-hpico-img" href="' + src + '" x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + sz.toFixed(2) + '" height="' + sz.toFixed(2) + '" preserveAspectRatio="xMidYMid slice"/></g>';
+  }
   return '<svg class="st-hpico-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">' + ring + inner + "</svg>";
 }
 function setHpIco(kind, src) {
@@ -2144,7 +2176,10 @@ function setHpIco(kind, src) {
   [...el.childNodes].forEach((n) => { if (!(n.classList && n.classList.contains("st-rh"))) n.remove(); });
   el.insertAdjacentHTML("afterbegin", hpIcoMarkup(kind, src));
   el.dataset.icon = kind;
+  if (src) el.dataset.src = src;
   el.classList.toggle("ico-logo", kind === "logo");
+  const crop = document.getElementById("stHpIcoCrop");
+  if (crop) crop.hidden = kind !== "custom";
 }
 /* crée le calque s'il manque (anciens projets : l'icône était DANS la zone HP) */
 function ensureHpIco() {
@@ -2173,10 +2208,115 @@ if (stHpIcoIn) {
   stHpIcoFile.addEventListener("change", () => {
     const f = stHpIcoFile.files[0];
     if (!f) return;
-    const fr = new FileReader();
-    fr.onload = () => { if (typeof pushUndo === "function") pushUndo(); setHpIco("custom", fr.result); };
-    fr.readAsDataURL(f);
+    shrinkImage(f, 600).then((d) => { if (typeof pushUndo === "function") pushUndo(); setHpIco("custom", d); });
     stHpIcoFile.value = "";
   });
 }
 ensureHpIco();
+
+/* ---------- ✂ recadrage de l'image du rond (zoom + décalage, stockés sur le calque → projet/undo) ---------- */
+function hpIcoCrop() {
+  const el = document.querySelector(".st-hpico");
+  const d = (el && el.dataset) || {};
+  return { z: parseFloat(d.z || "1"), x: parseFloat(d.x || "0"), y: parseFloat(d.y || "0") };
+}
+function applyHpIcoCrop(z, x, y) {
+  const el = document.querySelector(".st-hpico");
+  if (!el || el.dataset.icon !== "custom") return;
+  el.dataset.z = z; el.dataset.x = x; el.dataset.y = y;
+  setHpIco("custom", el.dataset.src);
+  const zi = document.getElementById("stHpIcoZ"), xi = document.getElementById("stHpIcoX"), yi = document.getElementById("stHpIcoY");
+  if (zi) { zi.value = z; xi.value = x; yi.value = y; }
+}
+["stHpIcoZ", "stHpIcoX", "stHpIcoY"].forEach((id) => {
+  const i = document.getElementById(id);
+  if (i) i.addEventListener("input", () => applyHpIcoCrop(+document.getElementById("stHpIcoZ").value, +document.getElementById("stHpIcoX").value, +document.getElementById("stHpIcoY").value));
+  if (i) i.addEventListener("change", () => typeof pushUndo === "function" && pushUndo());
+});
+const hpIcoReset = document.getElementById("stHpIcoReset");
+if (hpIcoReset) hpIcoReset.addEventListener("click", () => { if (typeof pushUndo === "function") pushUndo(); applyHpIcoCrop(1, 0, 0); });
+/* molette sur le rond = zoom ; Alt + glisser = déplacer l'image dans le rond */
+document.addEventListener("wheel", (e) => {
+  const el = e.target.closest && e.target.closest(".st-hpico");
+  if (!el || el.dataset.icon !== "custom") return;
+  e.preventDefault();
+  const c = hpIcoCrop();
+  applyHpIcoCrop(Math.max(0.4, Math.min(4, +(c.z * (e.deltaY < 0 ? 1.06 : 1 / 1.06)).toFixed(3))), c.x, c.y);
+}, { passive: false });
+document.addEventListener("pointerdown", (e) => {
+  const el = e.target.closest && e.target.closest(".st-hpico");
+  if (!el || !e.altKey || el.dataset.icon !== "custom") return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  if (typeof pushUndo === "function") pushUndo();
+  const r = el.getBoundingClientRect(), c0 = hpIcoCrop(), x0 = e.clientX, y0 = e.clientY;
+  const mv = (ev) => applyHpIcoCrop(c0.z, +(c0.x + ((ev.clientX - x0) / r.width) * 100).toFixed(1), +(c0.y + ((ev.clientY - y0) / r.height) * 100).toFixed(1));
+  const up = () => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up); };
+  window.addEventListener("pointermove", mv);
+  window.addEventListener("pointerup", up);
+}, true);
+/* nouvelle image importée = recadrage remis à zéro */
+if (stHpIcoFile) stHpIcoFile.addEventListener("change", () => { const el = document.querySelector(".st-hpico"); if (el) { el.dataset.z = 1; el.dataset.x = 0; el.dataset.y = 0; } }, true);
+(function () { const el = document.querySelector(".st-hpico"); const crop = document.getElementById("stHpIcoCrop"); if (crop && el) crop.hidden = el.dataset.icon !== "custom"; })();
+
+/* ---------- ⚔ nombre d'attaques (1 / 2 / 3) + 3e attaque ---------- */
+function ensureAtkRow3() {
+  const body = document.querySelector(".st-body");
+  if (!body || document.getElementById("stAtkRow3")) return;
+  const r2 = document.getElementById("stAtkRow2");
+  const row = document.createElement("div");
+  row.className = "st-atk";
+  row.id = "stAtkRow3";
+  row.innerHTML = '<div class="st-cost" id="stCost3"></div><span class="st-atk-name" id="stAtk3"></span><span class="st-atk-dmg" id="stDmg3"></span>';
+  r2 ? r2.after(row) : body.appendChild(row);
+}
+function paintAtk3() {
+  ensureAtkRow3();
+  const v = (id) => (document.getElementById(id) || {}).value || "";
+  const n3 = document.getElementById("stAtk3"), d3 = document.getElementById("stDmg3"), c3 = document.getElementById("stCost3"), row = document.getElementById("stAtkRow3");
+  if (!row) return;
+  n3.textContent = v("stAtk3In");
+  d3.textContent = v("stDmg3In");
+  const n = Math.max(0, Math.min(5, parseInt(v("stCost3In") || "0", 10) || 0));
+  const glyph = v("stIcon3In") || "logo";
+  c3.innerHTML = "<i></i>".repeat(n);
+  const special = glyph === "logo" || glyph === "logoc" || glyph === "img";
+  row.style.setProperty("--st-glyph", JSON.stringify(special ? "" : glyph));
+  row.classList.toggle("glyph-logo", glyph === "logo");
+  row.classList.toggle("glyph-logoc", glyph === "logoc");
+  row.classList.toggle("glyph-img", glyph === "img");
+  row.style.setProperty("--cost", String(n));
+}
+function syncAtkCount() {
+  const sel = document.getElementById("stAtkCountIn");
+  const n = sel ? +sel.value : 2;
+  card.classList.remove("atk-n1", "atk-n2", "atk-n3");
+  card.classList.add("atk-n" + n);
+  document.querySelectorAll(".atk3-f").forEach((f) => (f.hidden = n < 3));
+  ["stAtk2In", "stDmg2In", "stCost2In", "stIcon2In"].forEach((id) => { const f = document.getElementById(id); if (f) f.closest(".field").hidden = n < 2; });
+  paintAtk3();
+}
+["stAtk3In", "stDmg3In", "stCost3In"].forEach((id) => { const i = document.getElementById(id); if (i) i.addEventListener("input", paintAtk3); });
+const stIcon3In = document.getElementById("stIcon3In");
+if (stIcon3In) stIcon3In.addEventListener("input", () => { paintAtk3(); if (stIcon3In.value === "img") pickGlyphImage("stAtkRow3"); });
+const stAtkCountIn = document.getElementById("stAtkCountIn");
+if (stAtkCountIn) stAtkCountIn.addEventListener("input", () => { if (typeof pushUndo === "function") pushUndo(); syncAtkCount(); });
+syncAtkCount();
+
+/* ---------- 🖼 image perso dans les jetons d'une attaque ---------- */
+let glyphRowTarget = null;
+function pickGlyphImage(rowId) {
+  glyphRowTarget = rowId;
+  document.getElementById("stGlyphFile").click();
+}
+const stGlyphFile = document.getElementById("stGlyphFile");
+if (stGlyphFile) stGlyphFile.addEventListener("change", () => {
+  const f = stGlyphFile.files[0];
+  const row = glyphRowTarget && document.getElementById(glyphRowTarget);
+  if (!f || !row) return;
+  shrinkImage(f, 256).then((d) => {
+    if (typeof pushUndo === "function") pushUndo();
+    row.style.setProperty("--st-glyph-img", `url("${d}")`);
+  });
+  stGlyphFile.value = "";
+});
