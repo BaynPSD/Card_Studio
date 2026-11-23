@@ -1111,7 +1111,7 @@ document.getElementById("exportBtn").addEventListener("click", async () => {
 
 /* ---------- mode édition directe : drag + resize des zones, échelle texte, zones perso ---------- */
 const editModeBox = document.getElementById("editMode");
-const EDIT_SEL = ".st-bg,.st-art,.st-fond,.st-pill,.st-frame,.st-brand,.st-name,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
+const EDIT_SEL = ".st-bg,.st-art,.st-fond,.st-pill,.st-frame,.st-brand,.st-name,.st-hp,.st-hpico,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
 
 function zoneRect(el) {
   const c = card.getBoundingClientRect();
@@ -1323,6 +1323,7 @@ function restoreStudio(s) {
     else el.value = v;
   }
   if (typeof syncTplOutcome === "function") syncTplOutcome();
+  if (typeof ensureHpIco === "function") ensureHpIco();
   if (typeof syncLayersPanel === "function") syncLayersPanel();
   if (typeof applyArtCrop === "function") applyArtCrop();
   if (selectedZone && !selectedZone.isConnected) selectZone(null);
@@ -1400,6 +1401,7 @@ const ZONE_META = {
   "st-brand": { label: "Marque « Outcome »", sizeVar: "--st-k-brand", colorVar: "--st-c-brand", textId: "stBrandIn" },
   "st-name": { label: "Nom de la carte", sizeVar: "--st-k-name", colorVar: "--st-c-name", textId: "stNameIn" },
   "st-hp": { label: "HP", sizeVar: "--st-k-hp", colorVar: "--st-c-hp", textId: "stHpIn" },
+  "st-hpico": { label: "Rond d'icône (∞)" },
   "st-logo": { label: "Logo" },
   "st-body": { label: "Panneau attaques", sizeVar: "--st-k-atk", colorVar: "--st-c-atk" },
   "st-typebar": { label: "Barre de type", sizeVar: "--st-k-type", colorVar: "--st-c-type" },
@@ -2120,3 +2122,61 @@ card.addEventListener("dblclick", (e) => {
     } catch (e) { console.warn("import éditeur", e); }
   }, 300);
 })();
+
+/* ---------- ◉ Rond d'icône à côté du HP : calque INDÉPENDANT (.st-hpico), icône SVG nette ---------- */
+const HPICO_GLYPHS = {
+  inf: '<path d="M24 50C24 33 42 33 50 50C58 67 76 67 76 50C76 33 58 33 50 50C42 67 24 67 24 50Z" fill="#45e3c6"/>',
+  bolt: '<g transform="translate(50 50) scale(.62) translate(-50 -50)"><polygon points="57,14 30,55 47,55 40,86 70,42 53,42" fill="#ffd34d"/></g>',
+  heart: '<g transform="translate(50 50) scale(.62) translate(-50 -50)"><path d="M50 80L25 55C14 44 21 27 36 27C43 27 48 32 50 36C52 32 57 27 64 27C79 27 86 44 75 55Z" fill="#ff6b9a"/></g>',
+  star: '<g transform="translate(50 50) scale(.62) translate(-50 -50)"><polygon points="50,20 59,40 81,42 64,56 69,78 50,66 31,78 36,56 19,42 41,40" fill="#ffd34d"/></g>',
+  none: "",
+};
+function hpIcoMarkup(kind, src) {
+  const ring = '<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="#e8eef8" stroke-width="6"/>';
+  let inner = HPICO_GLYPHS[kind] ?? HPICO_GLYPHS.inf;
+  if (kind === "logo") inner = ""; /* logo = ::after CSS (suit le logo uploadé via --st-logo) */
+  if (kind === "custom" && src) inner = '<clipPath id="hpicoClip"><circle cx="50" cy="50" r="40"/></clipPath><image href="' + src + '" x="10" y="10" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#hpicoClip)"/>';
+  return '<svg class="st-hpico-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">' + ring + inner + "</svg>";
+}
+function setHpIco(kind, src) {
+  const el = document.querySelector(".st-hpico");
+  if (!el) return;
+  [...el.childNodes].forEach((n) => { if (!(n.classList && n.classList.contains("st-rh"))) n.remove(); });
+  el.insertAdjacentHTML("afterbegin", hpIcoMarkup(kind, src));
+  el.dataset.icon = kind;
+  el.classList.toggle("ico-logo", kind === "logo");
+}
+/* crée le calque s'il manque (anciens projets : l'icône était DANS la zone HP) */
+function ensureHpIco() {
+  document.querySelectorAll(".st-hp .st-hp-ico").forEach((n) => n.remove());
+  const st = document.querySelector(".st");
+  if (!st) return;
+  let el = st.querySelector(".st-hpico");
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "st-hpico";
+    el.setAttribute("aria-hidden", "true");
+    const hp = st.querySelector(".st-hp");
+    hp ? hp.after(el) : st.appendChild(el);
+  }
+  if (!el.querySelector(".st-hpico-svg")) setHpIco((document.getElementById("stHpIcoIn") || {}).value || "inf");
+  if (typeof makeDraggable === "function" && !el.dataset.dragBound) makeDraggable(el);
+}
+const stHpIcoIn = document.getElementById("stHpIcoIn");
+const stHpIcoFile = document.getElementById("stHpIcoFile");
+if (stHpIcoIn) {
+  stHpIcoIn.addEventListener("change", () => {
+    if (stHpIcoIn.value === "custom") { stHpIcoFile.click(); return; }
+    if (typeof pushUndo === "function") pushUndo();
+    setHpIco(stHpIcoIn.value);
+  });
+  stHpIcoFile.addEventListener("change", () => {
+    const f = stHpIcoFile.files[0];
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => { if (typeof pushUndo === "function") pushUndo(); setHpIco("custom", fr.result); };
+    fr.readAsDataURL(f);
+    stHpIcoFile.value = "";
+  });
+}
+ensureHpIco();

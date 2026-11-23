@@ -7538,3 +7538,26 @@ Shine & Glare Effects
   overflow: visible;
   text-overflow: clip;
 }
+
+/* ---------- ◉ rond d'icône = calque séparé (.st-hpico) ; le HP ne contient plus que « HP 150 » ---------- */
+.card.studio .st-hpico {
+  position: absolute;
+  left: 82%;
+  top: 2.9%;
+  width: 7.9%;
+  height: 5.7%;
+  z-index: 4;
+  pointer-events: auto;
+}
+.card.studio.tpl-outcome .st-hpico { left: 87.35%; top: 2.9%; width: 7.9%; height: 5.7%; }
+.card.studio .st-hpico-svg { width: 100%; height: 100%; display: block; overflow: visible; filter: drop-shadow(0 0 0.35em rgba(90, 240, 210, 0.3)); }
+.card.studio .st-hpico.ico-logo::after {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  background: var(--st-logo, url("../img/studio/logo.webp")) center / contain no-repeat;
+  pointer-events: none;
+}
+/* le HP s'arrête avant le rond (même place qu'avant) */
+.card.studio.tpl-outcome .st-hp { right: 15%; gap: 0; }
+.card.studio.tpl-outcome .st-hp .st-hp-ico { display: none; }

@@ -235,3 +235,8 @@ L'ancien Studio (onglet de `index.html`) reste intact ; `index.html` a un lien v
 - Export ne marche qu'en http(s) (GitHub Pages) : en `file://` le navigateur bloque fetch/canvas → message explicite.
 - Clic = sélectionner + déplacer. Un calque verrouillé reste cliquable (cadre pointillé, pas de poignées, ne bouge plus). Mini-barre flottante au-dessus de la sélection : 🔓 Verrouiller / 🔒 Verrouillé, ⤓ ⤒, ⧉, 🗑. Ctrl+L = verrouiller/déverrouiller. Alt+clic = sélectionner le calque du dessous (cycle dans la pile, verrouillés compris).
 - **HP** (type `hp`) = « HP » + valeur en 1 bloc de texte. Le **rond d'icône** est un calque séparé (type `token`) : `icon` (`inf` | `logo` = logo du projet | `bolt`/`heart`/`star`/`diamond` | `custom` + `iconSrc` image recadrée en rond | `none`), `iconColor`, `iconRing` ; reste rond au redimensionnement ; double-clic = importer une image. `migrate()` sépare l'ancien bloc fusionné et convertit les anciens micrographics « Rond ∞ / Rond logo » en `token`.
+
+## Studio (index.html) — rond d'icône séparé du HP
+- `.st-hp` = « HP 150 » seulement. Le rond est un calque indépendant `.st-hpico` (dans `EDIT_SEL` + `ZONE_META` « Rond d'icône (∞) ») : déplaçable / redimensionnable / masquable / réordonnable seul.
+- Icône en SVG net (plus le caractère ∞ Arial Black) : sélecteur « ◉ Rond d'icône » = ∞ turquoise, Logo (suit le logo uploadé via `--st-logo`, en `::after`), ⚡, ♥, ★, 🖼 image importée (recadrée en rond, embarquée dans le projet), rond vide.
+- `ensureHpIco()` (au chargement + après restore/undo) retire l'ancien `<i class="st-hp-ico">` des projets existants et crée le calque s'il manque.
