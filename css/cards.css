@@ -7490,3 +7490,51 @@ Shine & Glare Effects
 .card.studio.tpl-outcome .st-logo { left: 3.9%; top: 1%; width: 9.4%; height: 6.8%; }
 .card.studio.tpl-outcome .st-brand { font-size: calc(1.15em * var(--st-k-brand, 1)); }
 .card.studio.tpl-outcome .st-hp-ico::before { font-size: 2.9em; -webkit-text-stroke: 0.06em var(--st-c-hpico, #45e3c6); }
+
+/* ---------- coins : la carte est découpée EXACTEMENT sur le contour du cadre PNG (fond-overlay) ----------
+   coins mesurés sur l'alpha du PNG 1062x1482 : haut ≈ 7.3% x 5.5%, bas ≈ 6.3% x 4.3% */
+.card.studio.tpl-outcome .st {
+  border-radius: 7.4% 7.4% 6.4% 6.4% / 5.6% 5.6% 4.4% 4.4%;
+}
+.card.studio.tpl-outcome .card__front {
+  clip-path: inset(0 round 7.4% 7.4% 6.4% 6.4% / 5.6% 5.6% 4.4% 4.4%);
+}
+
+/* ---------- poignées de redimensionnement : 4 coins, DANS la zone, seulement sur la sélection ---------- */
+.card .st .st-handle { display: none !important; }
+.st-rh {
+  display: none;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  background: #ff9f43;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  pointer-events: auto !important;
+  font-style: normal;
+}
+.st-rh-nw { left: 1px; top: 1px; cursor: nwse-resize; }
+.st-rh-ne { right: 1px; top: 1px; cursor: nesw-resize; }
+.st-rh-sw { left: 1px; bottom: 1px; cursor: nesw-resize; }
+.st-rh-se { right: 1px; bottom: 1px; cursor: nwse-resize; }
+.card.studio .st .selected > .st-rh { display: block; }
+.card.studio .st .selected { outline: 2px solid #ff9f43; outline-offset: -2px; }
+
+/* ---------- double-clic = éditer le texte directement sur la carte ---------- */
+.card.studio .st :is(#stBrand, #stName, #stHp, #stAtk1, #stDmg1, #stAtk2, #stDmg2, #stDesc, #stNum, #stRar, #stWeak, #stRes, #stRet) {
+  pointer-events: auto;
+  cursor: text;
+}
+.card.studio .st .st-editing {
+  outline: 2px dashed #5af0d2;
+  outline-offset: 2px;
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  caret-color: #ff9f43;
+  overflow: visible;
+  text-overflow: clip;
+}

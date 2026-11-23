@@ -1129,8 +1129,11 @@ function normalizeZone(el) {
   el.style.inset = "auto";
   el.style.right = "auto";
   el.style.bottom = "auto";
+  el.style.transform = "none";
   el.style.left = r.x + "%";
   el.style.top = r.y + "%";
+  /* textes auto-dimensionnés (marque, nom, HP) : la boîte suit le texte, on ne fige pas L/H */
+  if (el.matches(".st-brand,.st-name,.st-hp")) return;
   el.style.width = r.w + "%";
   el.style.height = r.h + "%";
 }
@@ -1146,6 +1149,8 @@ function makeDraggable(el) {
   {
     el.addEventListener("pointerdown", (e) => {
       if (!card.classList.contains("edit") || e.target === handle) return;
+      if (e.target.classList && e.target.classList.contains("st-rh")) return;
+      if (e.target.isContentEditable) return; /* édition texte en cours */
       if (el.classList.contains("st-zone-new") && el.contentEditable === "true" && document.activeElement === el) return; /* édition texte en cours */
       e.stopPropagation();
       e.preventDefault();
@@ -1290,7 +1295,8 @@ const redoStack = [];
 function snapshotStudio() {
   const st = document.querySelector(".st");
   const clone = st ? st.cloneNode(true) : null;
-  if (clone) clone.querySelectorAll(".st-handle").forEach((h) => h.remove());
+  if (clone) clone.querySelectorAll(".st-handle,.st-rh").forEach((h) => h.remove());
+  if (clone) clone.querySelectorAll("[contenteditable]").forEach((h) => h.removeAttribute("contenteditable"));
   const inputs = {};
   document.querySelectorAll("#pane-studio input, #pane-studio select").forEach((el) => {
     inputs[el.id] = el.type === "checkbox" ? el.checked : el.value;
@@ -1731,7 +1737,9 @@ function duplicateSelectedZone() {
   if (!selectedZone || !selectedZone.classList.contains("st-zone-new")) return;
   pushUndo();
   const clone = selectedZone.cloneNode(true);
-  clone.querySelectorAll(".st-handle").forEach((h) => h.remove());
+  clone.querySelectorAll(".st-handle,.st-rh").forEach((h) => h.remove());
+  delete clone.dataset.dragBound;
+  delete clone.dataset.rhBound;
   const r = zoneRect(selectedZone);
   normalizeZone(clone);
   clone.style.left = Math.min(90, r.x + 2) + "%";
@@ -1975,3 +1983,124 @@ function applyTplNameColor() {
 if (stTplOutcome) stTplOutcome.addEventListener("input", () => { pushUndo(); syncTplOutcome(); applyTplNameColor(); });
 syncTplOutcome();
 applyTplNameColor();
+
+/* ==========================================================================================
+   ✋ Redimensionner le calque sélectionné : 4 poignées d'angle DANS la carte (jamais coupées),
+   visibles seulement sur la sélection. Zones texte (marque, nom, HP) : la poignée agrandit le TEXTE.
+   Images / blocs : la poignée agrandit la boîte. Shift = garder les proportions.
+   ========================================================================================== */
+const RH_TEXT_SCALE = { "st-brand": "--st-k-brand", "st-name": "--st-k-name", "st-hp": "--st-k-hp" };
+function zoneKey(el) { return [...el.classList].find((c) => c.startsWith("st-") && c !== "st-selected") || ""; }
+function addResizeHandles(el) {
+  if (!el || el.dataset.rhBound) return;
+  el.dataset.rhBound = "1";
+  for (const corner of ["nw", "ne", "sw", "se"]) {
+    const h = document.createElement("i");
+    h.className = "st-rh st-rh-" + corner;
+    h.dataset.c = corner;
+    h.title = "Agrandir / réduire (Shift = proportions)";
+    el.appendChild(h);
+    h.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (typeof pushUndo === "function") pushUndo();
+      if (!card.classList.contains("edit")) setEdit(true);
+      const c = card.getBoundingClientRect();
+      const start = { x: e.clientX, y: e.clientY };
+      const scaleVar = RH_TEXT_SCALE[zoneKey(el)];
+      const sx = corner.includes("e") ? 1 : -1;
+      const sy = corner.includes("s") ? 1 : -1;
+      let r0, k0;
+      if (scaleVar) {
+        k0 = parseFloat(card.style.getPropertyValue(scaleVar)) || 1;
+        r0 = zoneRect(el);
+      } else {
+        normalizeZone(el);
+        r0 = zoneRect(el);
+      }
+      const move = (ev) => {
+        let dx = ((ev.clientX - start.x) / c.width) * 100 * sx;
+        let dy = ((ev.clientY - start.y) / c.height) * 100 * sy;
+        if (scaleVar) {
+          /* texte : agrandissement proportionnel selon la diagonale tirée */
+          const f = Math.max(0.3, Math.min(4, 1 + (dx / Math.max(r0.w, 1) + dy / Math.max(r0.h, 1)) / 2));
+          const k = Math.round(Math.max(0.3, Math.min(4, k0 * f)) * 100) / 100;
+          card.style.setProperty(scaleVar, String(k));
+        } else {
+          if (ev.shiftKey && r0.w && r0.h) {
+            const f = Math.max((r0.w + dx) / r0.w, (r0.h + dy) / r0.h);
+            dx = r0.w * f - r0.w;
+            dy = r0.h * f - r0.h;
+          }
+          const w = Math.max(3, r0.w + dx), hh = Math.max(2, r0.h + dy);
+          el.style.width = w + "%";
+          el.style.height = hh + "%";
+          if (sx < 0) el.style.left = r0.x + r0.w - w + "%";
+          if (sy < 0) el.style.top = r0.y + r0.h - hh + "%";
+          if (el.classList.contains("st-art") && typeof applyArtCrop === "function") applyArtCrop();
+        }
+        if (typeof refreshInspector === "function" && el === selectedZone) refreshInspector();
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        if (typeof syncLayersPanel === "function") syncLayersPanel();
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    });
+  }
+}
+/* poignées posées à chaque sélection (clic carte, calque, undo/redo...) */
+const _selectZoneRH = selectZone;
+selectZone = function (el) { if (el) addResizeHandles(el); _selectZoneRH(el); };
+
+/* ==========================================================================================
+   ✏️ Double-clic sur un texte de la carte = l'éditer directement (Entrée = valider, Échap = annuler)
+   Le champ du panneau est synchronisé ; marche en mode normal et en mode édition.
+   ========================================================================================== */
+const DBL_TEXT = {
+  stBrand: "stBrandIn", stName: "stNameIn", stHp: "stHpIn", stAtk1: "stAtk1In", stDmg1: "stDmg1In",
+  stAtk2: "stAtk2In", stDmg2: "stDmg2In", stDesc: "stDescIn", stNum: "stNumIn", stRar: "stRarIn",
+  stWeak: "stWeakIn", stRes: "stResIn", stRet: "stRetIn",
+};
+function startTextEdit(el) {
+  const input = document.getElementById(DBL_TEXT[el.id]);
+  if (!input || el.isContentEditable) return;
+  if (typeof pushUndo === "function") pushUndo();
+  const before = input.value;
+  el.textContent = input.value; /* HP : on édite juste le nombre */
+  el.contentEditable = "true";
+  el.spellcheck = false;
+  el.classList.add("st-editing");
+  el.focus();
+  window.getSelection().selectAllChildren(el);
+  let cancelled = false;
+  const onInput = () => { input.value = el.textContent.replace(/\n/g, " "); };
+  const onKey = (ev) => {
+    ev.stopPropagation(); /* pas de nudge / Suppr / Ctrl+Z de l'éditeur pendant la frappe */
+    if (ev.key === "Enter") { ev.preventDefault(); el.blur(); }
+    if (ev.key === "Escape") { cancelled = true; input.value = before; el.blur(); }
+  };
+  const finish = () => {
+    el.removeEventListener("input", onInput);
+    el.removeEventListener("keydown", onKey);
+    el.removeEventListener("blur", finish);
+    el.removeAttribute("contenteditable");
+    el.classList.remove("st-editing");
+    if (cancelled) input.value = before;
+    input.dispatchEvent(new Event("input", { bubbles: true })); /* repeint (préfixe HP, etc.) */
+    if (typeof refreshInspector === "function") refreshInspector();
+  };
+  el.addEventListener("input", onInput);
+  el.addEventListener("keydown", onKey);
+  el.addEventListener("blur", finish);
+}
+card.addEventListener("dblclick", (e) => {
+  if (!card.classList.contains("studio")) return;
+  const el = e.target.closest && e.target.closest(Object.keys(DBL_TEXT).map((k) => "#" + k).join(","));
+  if (!el) return;
+  e.preventDefault();
+  e.stopPropagation();
+  startTextEdit(el);
+});

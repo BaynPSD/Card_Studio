@@ -206,3 +206,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Sans illustration uploadée : `art-default.webp` calé en haut + fondu navy (il contient du texte incrusté de la ref) ; avec upload : classe `st-has-art`, léger assombrissement bas pour la lisibilité.
 - Validé en headless : ref ALI passée en illustration → les textes du gabarit tombent sur les textes incrustés (écart < 1 %).
 - Corrigé : doublon `applyDefaultMask()` appelé avant `DEFAULT_FILES` (ReferenceError TDZ en console).
+
+## Coins, poignées 4 coins, double-clic texte (gabarit Outcome)
+- Coins : `.card.studio.tpl-outcome .card__front { clip-path: inset(0 round 7.4% 7.4% 6.4% 6.4% / 5.6% 5.6% 4.4% 4.4%) }` + même radius sur `.st` = contour EXACT du cadre PNG (mesuré sur son alpha) → plus d'illu qui dépasse dans les angles.
+- Redimensionner : 4 poignées orange `.st-rh` (nw/ne/sw/se) posées DANS la zone, visibles seulement sur le calque sélectionné (clic carte ou panneau Calques) → marchent aussi pour les calques pleine carte (illu, cadre). Shift = proportions. Marque / Nom / HP : la poignée agrandit le TEXTE (`--st-k-brand/name/hp`). Ancienne `.st-handle` masquée. Ctrl+Z annule.
+- `normalizeZone` met `transform:none` (plus de saut au 1er drag des zones centrées en translateY(-50%)) et ne fige pas L/H des textes auto (marque, nom, HP).
+- Double-clic sur n'importe quel texte de la carte (nom, marque, HP, attaques, dégâts, description, numéro, rareté…) = édition directe, Entrée = valider, Échap = annuler ; le champ du panneau suit. Marche avec ou sans mode édition.
