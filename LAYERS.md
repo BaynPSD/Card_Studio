@@ -153,3 +153,10 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - `.card .st-art { z-index: 0 }` (< `.st-bg` z1, dernier bloc) : l'illu pleine carte est la couche du dessous, le fond de carte (teinte + motif overlay) recouvre toute la carte par-dessus
 - La teinte du fond est translucide (alpha 0.65 dans setStudioBg) pour laisser voir l'art à travers ; le color picker change la teinte, le slider d'opacité du motif règle le pattern
 - Ordre dans le panneau Calques : Fenêtre d'art en bas, puis Fond de carte, puis le reste
+
+## Fond séparé en 2 calques + plus de voiles holo en studio
+- `.st-bg` (z0) = couleur/gradient de fond OPAQUE, SOUS l'illustration -> la couleur ne touche que le fond
+- `.st-art` (z1) = illu pleine carte par-dessus la couleur
+- `.st-fond` (z2, nouveau calque "Motif de fond") = pattern par-dessus l'art sur toute la carte (opacité --st-fond-opacity, teinte --st-fond-filter) ; l'ancien `.st-bg::after` est désactivé (content:none)
+- `.card.studio` : shine/glare/glitter/glare2 en opacity 0 !important et texture display none -> plus de reflet blanc par-dessus la carte en studio (le glare radial suivait la souris, c'était le « voile blanc » même à opacité motif = 2)
+- Ordre panneau Calques : Fond de carte / Fenêtre d'art / Motif de fond / Pill / Cadre / textes...

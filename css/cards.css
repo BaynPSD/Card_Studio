@@ -7061,3 +7061,45 @@ Shine & Glare Effects
 .card .st-art {
   z-index: 0;
 }
+
+/* ---------- studio : fond couleur SOUS l'art, motif PAR-DESSUS l'art, plus de voiles holo ----------
+   1) .st-bg (couleur/gradient + image de fond uploadée) repasse SOUS l'illustration (z 0)
+   2) .st-art z 1 : illu pleine carte par-dessus la couleur de fond
+   3) .st-fond z 2 : NOUVEAU calque "Motif de fond" (pattern) au-dessus de l'art, sur toute la carte
+      (opacité --st-fond-opacity, teinte --st-fond-filter) — l'ancien ::after de .st-bg est désactivé
+   4) en mode studio, les voiles holo (shine/glare/glitter/glare2/texture) sont coupés :
+      on voit les VRAIES couleurs, plus de reflet blanc par-dessus tout */
+.card .st-bg { z-index: 0; }
+.card .st-art { z-index: 1; }
+
+.card.studio .st-bg::after {
+  content: none;
+}
+
+.card.studio .st-fond {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
+  background-size: cover;
+  background-position: center;
+  opacity: var(--st-fond-opacity, 0.25);
+  filter: var(--st-fond-filter, none);
+}
+
+.card.show-zones .st-fond {
+  outline: calc(var(--st-fs, 3.6px) * 0.7) dashed #b967ff;
+  outline-offset: -2px;
+}
+
+.card.studio .card__shine,
+.card.studio .card__glare,
+.card.studio .card__glitter,
+.card.studio .card__glare2 {
+  opacity: 0 !important;
+}
+
+.card.studio .card__texture {
+  display: none !important;
+}

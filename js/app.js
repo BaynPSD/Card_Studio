@@ -693,15 +693,9 @@ function shade(hex, amt) {
   return "#" + [f(r), f(g), f(b)].map((v) => v.toString(16).padStart(2, "0")).join("");
 }
 function setStudioBg(hex) {
-  /* teinte TRANSLUCIDE (alpha 0.65) : le fond de carte passe PAR-DESSUS l'illustration pleine carte
-     (z art < z bg) -> l'art reste visible à travers la teinte, comme le motif ribi-holo sur toute la carte */
-  const A = 0.65;
-  const [r, g, b] = hexToRgb(hex);
-  const stop = (amt) => {
-    const s = hexToRgb(shade(hex, amt));
-    return `rgba(${s[0]},${s[1]},${s[2]},${A})`;
-  };
-  const grad = `linear-gradient(160deg, ${stop(55)} 0%, rgba(${r},${g},${b},${A}) 45%, ${stop(-45)} 100%)`;
+  /* couleur de fond OPAQUE, SOUS l'illustration (z bg 0 < art 1) : la couleur ne s'applique
+     qu'au fond de carte, jamais par-dessus l'art ; le motif (calque .st-fond) reste au-dessus */
+  const grad = `linear-gradient(160deg, ${shade(hex, 55)} 0%, ${hex} 45%, ${shade(hex, -45)} 100%)`;
   card.style.setProperty("--st-bg-grad", grad);
   if (!slots.card.custom) card.style.setProperty("--layer-bg", "none");
   const inp = document.getElementById("stBgColor");
@@ -1046,7 +1040,7 @@ document.getElementById("exportBtn").addEventListener("click", async () => {
 
 /* ---------- mode édition directe : drag + resize des zones, échelle texte, zones perso ---------- */
 const editModeBox = document.getElementById("editMode");
-const EDIT_SEL = ".st-bg,.st-pill,.st-art,.st-frame,.st-brand,.st-name,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
+const EDIT_SEL = ".st-bg,.st-art,.st-fond,.st-pill,.st-frame,.st-brand,.st-name,.st-hp,.st-logo,.st-body,.st-typebar,.st-foot,.st-zone-new";
 
 function zoneRect(el) {
   const c = card.getBoundingClientRect();
@@ -1313,6 +1307,7 @@ document.querySelector(".st").addEventListener("dblclick", (e) => {
 /* ---------- inspecteur façon Figma : clic sur une zone (mode édition) -> panneau de propriétés ---------- */
 const ZONE_META = {
   "st-bg": { label: "Fond de carte" },
+  "st-fond": { label: "Motif de fond" },
   "st-pill": { label: "Pill header" },
   "st-art": { label: "Fenêtre d'art" },
   "st-frame": { label: "Cadre" },
