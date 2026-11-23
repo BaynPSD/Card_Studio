@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795398864" />
-  <link rel="stylesheet" href="css/ui.css?v=1795398864" />
+  <link rel="stylesheet" href="css/cards.css?v=1795399228" />
+  <link rel="stylesheet" href="css/ui.css?v=1795399228" />
 </head>
 <body>
   <header>
@@ -226,6 +226,25 @@
         <label class="field wide">
           <span>🎨 Illustration (PNG, fenêtre d'art)</span>
           <input type="file" id="stArtFile" accept="image/*" />
+        <label class="field wide">
+          <span>🖼 Cadrage de l'illustration</span>
+          <select id="stArtFit">
+            <option value="cover" selected>Remplir la fenêtre (rogner les bords)</option>
+            <option value="contain">Tout voir (image entière)</option>
+          </select>
+        </label>
+        <label class="slider">
+          <span>Zoom illustration : <b id="stArtZoomVal">100%</b></span>
+          <input type="range" id="stArtZoom" min="50" max="300" value="100" />
+        </label>
+        <label class="slider">
+          <span>Position X : <b id="stArtPosXVal">50%</b></span>
+          <input type="range" id="stArtPosX" min="0" max="100" value="50" />
+        </label>
+        <label class="slider">
+          <span>Position Y : <b id="stArtPosYVal">50%</b></span>
+          <input type="range" id="stArtPosY" min="0" max="100" value="50" />
+        </label>
         </label>
         <p class="hint">Fond = PNG pleine carte (remplace la carte de base) · Illustration = PNG affiché dans la fenêtre d'art (coins arrondis auto) · les effets holo s'appliquent par-dessus le template.</p>
         </details>
@@ -301,6 +320,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795398864"></script>
+  <script src="js/app.js?v=1795399228"></script>
 </body>
 </html>

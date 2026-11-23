@@ -170,3 +170,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - `.st-art { inset: 13% 5.5% 24% 5.5%; border: 0.5fs rgba(255,255,255,.85); border-radius: 1.2fs; background-size: cover; background-color: rgba(0,0,0,.18) }` (dernier bloc, annule le pleine carte)
 - z inchangé : fond 0 < art 1 < motif 2 < cadre 3 < textes 4 -> le fond de carte reste visible autour de la fenêtre d'art
 - Fenêtre mesurée en headless : x 6.9%, y 12.3%, L 90.2%, H 65.7% de la carte
+
+## Cadrage de l'illustration (zoom + position + fit)
+- Contrôles panneau Studio (groupe images) : #stArtFit (cover "Remplir" / contain "Tout voir"), #stArtZoom 50-300%, #stArtPosX/Y 0-100%
+- applyArtCrop() calcule background-size en px (cover ou contain × zoom) + background-position X% Y% sur .st-art ; recalculé au resize (fitCard + ResizeObserver), après upload illustration (loadArtNatural via --layer-fg) et après undo/redo
+- Testé headless : image 1200x600 -> cover 875x438 (rempli, rogné) / contain 446x223 (entière, bandes) / zoom 150 -> 1408x704

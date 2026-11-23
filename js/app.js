@@ -387,6 +387,7 @@ function fitCard() {
   card.style.setProperty("--st-fs", w / 100 + "px");
   const sizeOut = document.getElementById("sizeOut");
   if (sizeOut) sizeOut.textContent = w + "px";
+  if (typeof applyArtCrop === "function") applyArtCrop();
 }
 
 window.addEventListener("resize", fitCard);
@@ -451,6 +452,7 @@ async function setSlotFile(name, file) {
   paintSlots();
   applyImages();
   fileName.textContent = "🖼 " + file.name;
+  if (name === "fg" && typeof loadArtNatural === "function") setTimeout(loadArtNatural, 60);
   if (name === "card") autoDeriveFromCard();
 }
 
@@ -707,6 +709,55 @@ document.querySelectorAll("#bgSwatches button").forEach((b) =>
   b.addEventListener("click", () => setStudioBg(b.dataset.c))
 );
 setStudioBg(stBgColor.value || "#2f6fd0");
+
+/* ---------- cadrage de l'illustration (fit cover/contain + zoom + position X/Y) ---------- */
+const stArtFit = document.getElementById("stArtFit");
+const stArtZoom = document.getElementById("stArtZoom");
+const stArtPosX = document.getElementById("stArtPosX");
+const stArtPosY = document.getElementById("stArtPosY");
+let artNatural = { w: 0, h: 0 };
+function artZoneEl() { return document.querySelector(".st-art"); }
+function currentArtUrl() {
+  const v = card.style.getPropertyValue("--layer-fg") || "";
+  const m = v.match(/url\("?([^")]+)"?\)/);
+  return (m && m[1]) || "img/studio/art-default.webp";
+}
+function applyArtCrop() {
+  const el = artZoneEl();
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  if (!r.width || !r.height || !artNatural.w) {
+    el.style.backgroundSize = "";
+    return;
+  }
+  const fit = stArtFit ? stArtFit.value : "cover";
+  const z = (parseInt(stArtZoom && stArtZoom.value, 10) || 100) / 100;
+  const iw = artNatural.w, ih = artNatural.h;
+  const s0 = fit === "contain" ? Math.min(r.width / iw, r.height / ih) : Math.max(r.width / iw, r.height / ih);
+  const sc = s0 * z;
+  el.style.backgroundSize = Math.round(iw * sc) + "px " + Math.round(ih * sc) + "px";
+  const px = stArtPosX ? +stArtPosX.value : 50;
+  const py = stArtPosY ? +stArtPosY.value : 50;
+  el.style.backgroundPosition = px + "% " + py + "%";
+}
+function loadArtNatural() {
+  const img = new Image();
+  img.onload = () => {
+    artNatural = { w: img.naturalWidth, h: img.naturalHeight };
+    applyArtCrop();
+  };
+  img.src = currentArtUrl();
+}
+for (const el of [stArtFit, stArtZoom, stArtPosX, stArtPosY]) {
+  if (el) el.addEventListener("input", () => {
+    if (stArtZoom && document.getElementById("stArtZoomVal")) document.getElementById("stArtZoomVal").textContent = stArtZoom.value + "%";
+    if (stArtPosX && document.getElementById("stArtPosXVal")) document.getElementById("stArtPosXVal").textContent = stArtPosX.value + "%";
+    if (stArtPosY && document.getElementById("stArtPosYVal")) document.getElementById("stArtPosYVal").textContent = stArtPosY.value + "%";
+    applyArtCrop();
+  });
+}
+loadArtNatural();
+if (window.ResizeObserver && artZoneEl()) new ResizeObserver(() => applyArtCrop()).observe(artZoneEl());
 
 /* ---------- motif de fond overlay : opacité + filtre de teinte ---------- */
 const stFondOp = document.getElementById("stFondOp");
@@ -1242,6 +1293,7 @@ function restoreStudio(s) {
     else el.value = v;
   }
   if (typeof syncLayersPanel === "function") syncLayersPanel();
+  if (typeof applyArtCrop === "function") applyArtCrop();
   if (selectedZone && !selectedZone.isConnected) selectZone(null);
 }
 
