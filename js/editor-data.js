@@ -69,9 +69,10 @@ const MICRO = [
   { id: "set-dia", name: "Symbole d'extension ◆", cat: "Rareté", kind: "svg", w: 22, h: 22, svg: '<polygon points="50,8 88,50 50,92 12,50" fill="none" stroke="currentColor" stroke-width="9"/><polygon points="50,30 70,50 50,70 30,50" fill="currentColor"/>' },
   { id: "holo-spark", name: "Étincelles holo", cat: "Rareté", kind: "svg", svg: '<path d="M50 8L56 44L92 50L56 56L50 92L44 56L8 50L44 44Z" fill="currentColor"/><path d="M80 14L82 22L90 24L82 26L80 34L78 26L70 24L78 22Z" fill="currentColor"/><path d="M20 70L22 77L29 79L22 81L20 88L18 81L11 79L18 77Z" fill="currentColor"/>' },
   /* --- HP & stats --- */
-  { id: "hp", name: "HP 150 + rond ∞ (1 bloc)", cat: "HP & stats", kind: "hp", wide: true },
-  { id: "hp-inf", name: "Rond ∞ (type)", cat: "HP & stats", kind: "svg", w: 59, h: 59, color: "#45e3c6", svg: '<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="#e8eef8" stroke-width="6"/><path d="M24 50C24 33 42 33 50 50C58 67 76 67 76 50C76 33 58 33 50 50C42 67 24 67 24 50Z" fill="currentColor"/>' },
-  { id: "hp-logo", name: "Rond logo (type)", cat: "HP & stats", kind: "svg", w: 59, h: 59, color: "#e8eef8", svg: '<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="currentColor" stroke-width="6"/>{{LOGO_TEAL}}' },
+  { id: "hp", name: "HP 150", cat: "HP & stats", kind: "hp", wide: true },
+  { id: "tok-inf", name: "Rond ∞ (indépendant)", cat: "HP & stats", kind: "token", icon: "inf" },
+  { id: "tok-logo", name: "Rond logo (indépendant)", cat: "HP & stats", kind: "token", icon: "logo" },
+  { id: "tok-img", name: "Rond image (double-clic = importer)", cat: "HP & stats", kind: "token", icon: "custom" },
   { id: "weak", name: "Faiblesse ×2", cat: "HP & stats", kind: "text", props: { text: "faiblesse ×2", size: 16, weight: 600, italic: false, ls: 1 } },
   { id: "number", name: "Numéro 001/020 ◆", cat: "HP & stats", kind: "text", props: { text: "001/020  ◆", size: 19.2, weight: 600, italic: false } },
   { id: "brand", name: "Marque Outcome", cat: "HP & stats", kind: "text", props: { text: "Outcome", size: 18.4, weight: 600, italic: false } },
@@ -118,7 +119,8 @@ function baseLayers(o = {}) {
     { type: "image", name: "Logo", role: "logo", x: 35.7, y: 17, w: 57, h: 57, src: "{{LOGO}}", fit: "contain", white: true },
     { type: "text", name: "Marque", x: 90.4, y: 37.9, text: o.brand || "Outcome", font: "Poppins", size: 18.4, weight: 600, italic: false, color: "#ffffff" },
     { type: "text", name: "Nom", x: 183.8, y: 30.5, text: o.name || "ALI", font: "Poppins", size: 59.2, weight: 900, italic: true, ls: -0.6, color: NAVY },
-    { type: "hp", name: "HP + icône", x: 497, y: 30.2, w: 214.5, h: 59, label: "HP", value: o.hp || "150", font: "Poppins", size: 50.4, color: "#ffffff", icon: "inf", iconColor: "#45e3c6" },
+    { type: "hp", name: "HP", x: 497, y: 36.5, w: 140, h: 50.4, label: "HP", value: o.hp || "150", font: "Poppins", size: 50.4, color: "#ffffff", icon: "none" },
+    { type: "token", name: "Rond d'icône", x: 652.5, y: 30.2, w: 59, h: 59, icon: "inf", iconColor: "#45e3c6" },
   ];
 }
 function footLayers(o = {}) {

@@ -7,8 +7,8 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const LS_KEY = "cardstudio.editor.v1";
 const FONTS = ["Poppins", "Montserrat", "Exo 2", "Barlow Condensed", "Anton", "Bebas Neue", "Russo One", "Archivo Black", "Space Grotesk", "JetBrains Mono", "Noto Sans JP"];
-const TYPE_LABEL = { text: "TEXTE", image: "IMAGE", rect: "FORME", ellipse: "FORME", rule: "FILET", svg: "MICROGRAPHIC", attack: "ATTAQUE", badge: "RARETÉ", hp: "HP" };
-const TYPE_ICON = { text: "T", image: "🖼", rect: "□", ellipse: "○", rule: "—", svg: "✦", attack: "⚔", badge: "◈", hp: "♥" };
+const TYPE_LABEL = { text: "TEXTE", image: "IMAGE", rect: "FORME", ellipse: "FORME", rule: "FILET", svg: "MICROGRAPHIC", attack: "ATTAQUE", badge: "RARETÉ", hp: "HP", token: "ROND" };
+const TYPE_ICON = { text: "T", image: "🖼", rect: "□", ellipse: "○", rule: "—", svg: "✦", attack: "⚔", badge: "◈", hp: "♥", token: "◉" };
 const GRID = CARD_W / 24;
 
 const svgEl = $("#cardSvg");
@@ -202,6 +202,11 @@ function renderLayer(l, idp, defs) {
       const lh = l.size * (l.lh || 1.15);
       const tsp = lines.map((s, i) => `<tspan x="${r2(ax)}" y="${r2(y + l.size * 0.8 + i * lh)}">${esc(s) || " "}</tspan>`).join("");
       body = hit + `<text text-anchor="${anchor}" ${textAttrs(l.font, l.size, l.weight, l.italic, l.ls, l.color)}${l.shadow ? ` filter="url(#${idp}-sh)"` : ""} xml:space="preserve">${tsp}</text>`;
+      break;
+    }
+    case "token": {
+      const d = Math.min(w, h);
+      body = hit + hpIconMarkup(l, x + (w - d) / 2, y + (h - d) / 2, d, idp);
       break;
     }
     case "hp": {
@@ -599,6 +604,11 @@ function applyResize(l, s0, k, nx, ny, nw, nh, uniform) {
     l.x = r2(k.includes("w") ? s0.x + s0.w - l.w : nx); l.y = r2(k.includes("n") ? s0.y + s0.h - l.h : ny);
     return;
   }
+  if (l.type === "token") {
+    const d = Math.max(nw, nh);
+    l.x = r2(k.includes("w") ? s0.x + s0.w - d : nx); l.y = r2(k.includes("n") ? s0.y + s0.h - d : ny); l.w = l.h = r2(d);
+    return;
+  }
   l.x = r2(nx); l.y = r2(ny); l.w = r2(nw); l.h = r2(nh);
 }
 
@@ -618,6 +628,7 @@ svgEl.addEventListener("pointerleave", () => overlay.querySelectorAll(".hoverbox
 svgEl.addEventListener("dblclick", (e) => {
   const l = layerFromEvent(e);
   if (!l || l.locked) return;
+  if (l.type === "token") { pickFile("image/*", async (f) => { l.iconSrc = await fileToDataURL(f, 400); l.icon = "custom"; render(); commit(); }); return; }
   if (l.type === "image" || l.type === "svg") { if (l.type === "image") pickImageFor(l); return; }
   let field = "text";
   if (l.type === "hp") field = "value";
@@ -802,6 +813,31 @@ function row(parent, cls = "grid2") { const r = h(`<div class="${cls}"></div>`);
 function fontField(parent, l) {
   fSelect(parent, "", FONTS, () => l.font, (v) => { l.font = v; document.fonts.load(fontStr(v, 40, l.weight || 800, l.italic)).then(() => renderCanvas()); });
 }
+function iconChooser(b, l) {
+  b.appendChild(h(`<span class="lab">Icône</span>`));
+  const gr = h(`<div class="glyphs"></div>`);
+  const opts = [["inf", "∞"], ["logo", "logo"], ["bolt", "⚡"], ["heart", "♥"], ["star", "★"], ["diamond", "◆"], ["custom", "🖼"], ["none", "∅"]];
+  for (const [k, t] of opts) {
+    const gb = h(`<button class="${(l.icon || "none") === k ? "on" : ""}" title="${k === "custom" ? "Importer une image" : k === "none" ? "Sans icône" : k === "logo" ? "Logo du projet" : t}">${k === "logo" ? `<img src="${esc(logoUrl())}" alt="logo">` : t}</button>`);
+    gb.onclick = () => {
+      if (k === "custom") {
+        pickFile("image/*", async (f) => { l.iconSrc = await fileToDataURL(f, 400); l.icon = "custom"; render(); commit(); });
+        return;
+      }
+      l.icon = k;
+      render();
+      commit();
+    };
+    gr.appendChild(gb);
+  }
+  b.appendChild(gr);
+  if (l.icon && l.icon !== "none") {
+    const r = row(b);
+    if (l.icon !== "logo" && l.icon !== "custom") fColor(r, "Symbole", () => l.iconColor || "#45e3c6", (v) => (l.iconColor = v));
+    fColor(r, "Anneau", () => l.iconRing || "#e8eef8", (v) => (l.iconRing = v));
+  }
+  b.appendChild(h(`<p class="hint">Le logo = celui du projet (Image Lab → « Logo : importer »). 🖼 = n'importe quelle image, recadrée en rond.</p>`));
+}
 function syncGeomFields() {
   const l = selLayers()[0];
   if (!l) return;
@@ -816,7 +852,7 @@ function renderInspector() {
   if (ls.length === 0) return renderImageLab();
   if (ls.length > 1) return renderMulti(ls);
   const l = ls[0];
-  const titles = { text: "PROPRIÉTÉS TEXTE", attack: "ATTAQUE", hp: "HP", badge: "BADGE DE RARETÉ", image: "IMAGE", rect: "FORME", ellipse: "FORME", rule: "FILET", svg: "MICROGRAPHIC" };
+  const titles = { text: "PROPRIÉTÉS TEXTE", attack: "ATTAQUE", hp: "HP", badge: "BADGE DE RARETÉ", image: "IMAGE", rect: "FORME", ellipse: "FORME", rule: "FILET", svg: "MICROGRAPHIC", token: "ROND D'ICÔNE" };
   const b = box("✥ " + titles[l.type], l.locked ? "🔒 VERROUILLÉ" : TYPE_LABEL[l.type]);
   if (l.locked) {
     b.appendChild(h(`<p class="hint">Calque verrouillé : déverrouille-le pour le modifier.</p>`));
@@ -891,29 +927,12 @@ function renderInspector() {
       fontField(b, l);
       fNum(row(b), "Aa", () => l.size, (v) => (l.size = Math.max(6, v)), 0.5);
       fColor(b, "Couleur du texte", () => l.color, (v) => (l.color = v));
-      b.appendChild(h(`<span class="lab">Icône ronde à côté (même bloc)</span>`));
-      const gr = h(`<div class="glyphs"></div>`);
-      const opts = [["inf", "∞"], ["logo", "logo"], ["bolt", "⚡"], ["heart", "♥"], ["star", "★"], ["diamond", "◆"], ["custom", "🖼"], ["none", "∅"]];
-      for (const [k, t] of opts) {
-        const gb = h(`<button class="${(l.icon || "none") === k ? "on" : ""}" title="${k === "custom" ? "Importer une image" : k === "none" ? "Sans icône" : k === "logo" ? "Logo du projet" : t}">${k === "logo" ? `<img src="${esc(logoUrl())}" alt="logo">` : t}</button>`);
-        gb.onclick = () => {
-          if (k === "custom") {
-            pickFile("image/*", async (f) => { l.iconSrc = await fileToDataURL(f, 400); l.icon = "custom"; render(); commit(); });
-            return;
-          }
-          l.icon = k;
-          render();
-          commit();
-        };
-        gr.appendChild(gb);
-      }
-      b.appendChild(gr);
-      if (l.icon && l.icon !== "none") {
-        const r = row(b);
-        if (l.icon !== "logo" && l.icon !== "custom") fColor(r, "Symbole", () => l.iconColor || "#45e3c6", (v) => (l.iconColor = v));
-        fColor(r, "Anneau", () => l.iconRing || "#e8eef8", (v) => (l.iconRing = v));
-      }
-      b.appendChild(h(`<p class="hint">Le logo = celui du projet (Image Lab → « Logo : importer »). 🖼 = n'importe quelle image, recadrée en rond.</p>`));
+      b.appendChild(h(`<p class="hint">Le rond d'icône à côté est un calque séparé : clique dessus pour le changer.</p>`));
+      break;
+    }
+    case "token": {
+      iconChooser(b, l);
+      b.appendChild(h(`<p class="hint">Double-clic sur le rond = importer une image directement.</p>`));
       break;
     }
     case "badge": {
@@ -1255,7 +1274,8 @@ function mgPreview(m) {
     autoSize(l);
     return `<svg viewBox="${l.x - 4} -4 ${l.w + 8} 60">${renderLayer(l, "c", [])}</svg>`;
   }
-  if (m.kind === "hp") return `<svg viewBox="0 0 200 60"><text x="196" y="46" text-anchor="end" font-family="Poppins" font-weight="800" font-style="italic" font-size="46" fill="#fff"><tspan font-size="18">HP</tspan><tspan dx="6">150</tspan></text></svg>`.replace('x="196"', 'x="138"').replace("</svg>", '<circle cx="170" cy="30" r="24" fill="#0b1630" stroke="#e8eef8" stroke-width="3"/><path d="M152 30C152 20 163 20 170 30C177 40 188 40 188 30C188 20 177 20 170 30C163 40 152 40 152 30Z" fill="#45e3c6"/></svg>');
+  if (m.kind === "hp") return `<svg viewBox="0 0 200 60"><text x="196" y="46" text-anchor="end" font-family="Poppins" font-weight="800" font-style="italic" font-size="46" fill="#fff"><tspan font-size="18">HP</tspan><tspan dx="6">150</tspan></text></svg>`;
+  if (m.kind === "token") { const l = withDefaults({ type: "token", x: 0, y: 0, w: 100, h: 100, icon: m.icon, iconColor: "#45e3c6" }); return `<svg viewBox="-4 -4 108 108">${renderLayer(l, "c", [])}</svg>`; }
   if (m.kind === "rule") return `<svg viewBox="0 0 200 60"><rect x="6" y="28" width="188" height="4" rx="2" fill="#e1ebff"/></svg>`;
   if (m.kind === "flavor") return `<svg viewBox="0 0 200 60"><text x="8" y="38" font-family="Poppins" font-style="italic" font-size="17" fill="#dde5f5">A calculated bet…</text></svg>`;
   if (m.kind === "text") return `<svg viewBox="0 0 100 100"><text x="50" y="60" text-anchor="middle" font-family="${esc(m.props.font || "Poppins")}" font-weight="${m.props.weight || 600}" font-size="${Math.min(30, 160 / Math.max(3, m.props.text.length))}" fill="currentColor">${esc(m.props.text)}</text></svg>`;
@@ -1298,7 +1318,8 @@ function addMicro(m) {
   }
   if (m.kind === "rule") return addLayer({ type: "rule", name: "Filet", x: 76.6, y: nextAttackY() - 12, w: 580, h: 3, color: "#e1ebff" }, false);
   if (m.kind === "badge") return addLayer({ type: "badge", name: "Rareté " + m.props.text, x: 566, y: 946, w: 149, h: 52, text: m.props.text, font: "Poppins", size: 33, color: "#ffffff", laurels: m.props.laurels !== false, laurelColor: "#efe3c8" }, false);
-  if (m.kind === "hp") return addLayer({ type: "hp", name: "HP + icône", x: 497, y: 30.2, w: 214.5, h: 59, label: "HP", value: "150", font: "Poppins", size: 50.4, color: "#ffffff", icon: "inf", iconColor: "#45e3c6" }, false);
+  if (m.kind === "hp") return addLayer({ type: "hp", name: "HP", x: 497, y: 36.5, w: 140, h: 50.4, label: "HP", value: "150", font: "Poppins", size: 50.4, color: "#ffffff", icon: "none" }, false);
+  if (m.kind === "token") return addLayer({ type: "token", name: "Rond d'icône", x: 652.5, y: 30.2, w: 59, h: 59, icon: m.icon, iconColor: "#45e3c6" }, false);
   if (m.kind === "flavor") return addLayer({ type: "text", name: "Description", x: 84, y: 868.4, text: "A calculated bet, a decisive move.", font: "Poppins", size: 19.2, weight: 400, italic: true, color: "#dde5f5" }, false);
   if (m.kind === "text") return addLayer(Object.assign({ type: "text", name: m.name, font: "Poppins", color: "#ffffff" }, m.props));
 }
@@ -1369,7 +1390,7 @@ $("#shuffleBtn").addEventListener("click", () => {
   const [a, b] = PALETTES[Math.floor(Math.random() * PALETTES.length)];
   const bg = roleLayer("bg");
   if (bg) { bg.fill = a; bg.fill2 = b; }
-  const hpIco = project.layers.find((l) => l.type === "hp" && l.icon && l.icon !== "logo" && l.icon !== "custom");
+  const hpIco = project.layers.find((l) => l.type === "token" && l.icon !== "logo" && l.icon !== "custom");
   if (hpIco) hpIco.iconColor = ["#45e3c6", "#ffcf5a", "#ff7ab8", "#8fd3ff", "#b6ff7a"][Math.floor(Math.random() * 5)];
   render();
   commit();
@@ -1586,6 +1607,21 @@ stage.addEventListener("drop", async (e) => {
 
 /* anciens projets : rond ∞ séparé → fusionné dans le bloc HP */
 function migrate(p) {
+  const hpb = p.layers.find((l) => l.type === "hp" && l.icon && l.icon !== "none");
+  if (hpb) {
+    const d = hpb.size * 1.17, gap = hpb.size * 0.33;
+    const tok = withDefaults({ type: "token", name: "Rond d'icône", x: r2(hpb.x + hpb.w - d), y: r2(hpb.y + (hpb.h - d) / 2), w: r2(d), h: r2(d), icon: hpb.icon, iconColor: hpb.iconColor, iconRing: hpb.iconRing, iconSrc: hpb.iconSrc });
+    hpb.icon = "none";
+    hpb.name = "HP";
+    hpb.w = r2(hpb.w - d - gap);
+    hpb.y = r2(hpb.y + (hpb.h - hpb.size) / 2);
+    hpb.h = hpb.size;
+    p.layers.splice(p.layers.indexOf(hpb) + 1, 0, tok);
+  }
+  for (const l of p.layers) if (l.type === "svg" && (l.mg === "hp-inf" || l.mg === "hp-logo")) Object.assign(l, { type: "token", icon: l.mg === "hp-logo" ? "logo" : "inf", iconColor: l.mg === "hp-inf" ? l.color : undefined, name: "Rond d'icône", svg: undefined, mg: undefined });
+  return p;
+}
+function _oldMigrate(p) {
   const hp = p.layers.find((l) => l.type === "hp");
   const ico = p.layers.find((l) => l.type === "svg" && (l.mg === "hp-inf" || l.mg === "hp-logo"));
   if (hp && !hp.icon && ico && Math.abs(ico.y + ico.h / 2 - (hp.y + hp.h / 2)) < 40) {
