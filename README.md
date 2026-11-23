@@ -12,6 +12,10 @@ de simeydotme, embarqués via [fyk0620/ribi-holo](https://github.com/fyk0620/rib
 
 Bouge la souris (ou le doigt / le gyroscope) sur la carte pour le rendu 3D.
 
+## 🎴 Éditeur de cartes
+
+`editor.html` — éditeur façon poster studio : modèles Outcome, calques, micrographics d'attaques / énergie / rareté, export PNG / SVG, aperçu holo. En ligne : <https://baynpsd.github.io/Card_Studio/editor.html>
+
 ## Lancer
 
 - **Double-clic sur `index.html`** (fonctionne en `file://`), ou

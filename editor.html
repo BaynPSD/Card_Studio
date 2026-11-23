@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Card Studio — Éditeur de cartes</title>
+  <meta name="description" content="Éditeur de cartes Outcome façon poster studio : calques, micrographics d'attaques, export PNG/SVG, aperçu holo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link id="gfonts" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Anton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Montserrat:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Exo+2:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Russo+One&family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/editor.css?v=1795510000" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div><b>CARD STUDIO<i>.</i></b><small>TON ATELIER DE CARTES</small></div>
+    </div>
+    <div class="doc">
+      <input id="docName" class="doc-name" value="Nouvelle carte" aria-label="Nom du projet" spellcheck="false" />
+      <span id="saveState" class="save-state">✓ Enregistré sur cet appareil</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="undoBtn" title="Annuler (Ctrl+Z)" aria-label="Annuler">↶</button>
+      <button class="icon-btn" id="redoBtn" title="Rétablir (Ctrl+Shift+Z)" aria-label="Rétablir">↷</button>
+      <button class="icon-btn" id="openBtn" title="Ouvrir un projet (.card.json)" aria-label="Ouvrir">📂</button>
+      <a class="ghost-btn" href="index.html" title="Visionneuse holo 3D">🃏 Holo</a>
+      <button class="primary-btn" id="exportBtn">⤓ Export</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- ================= GAUCHE ================= -->
+    <aside class="panel left" aria-label="Bibliothèque">
+      <nav class="seg tabs" role="tablist">
+        <button role="tab" data-tab="styles" class="on">Styles</button>
+        <button role="tab" data-tab="library">▦ Bibliothèque</button>
+        <button role="tab" data-tab="layers">☰ Calques <span id="layerCount" class="pill">0</span></button>
+      </nav>
+
+      <section class="tabpane" data-pane="styles">
+        <h3 class="sec">MODÈLES DE CARTES <span class="pill" id="tplCount">0</span></h3>
+        <div class="tpl-grid" id="tplGrid"></div>
+        <p class="hint">Chaque titre, illustration, couleur et micrographic est éditable.</p>
+        <h3 class="sec">PALETTE <span class="pill">8</span></h3>
+        <div class="seg small" id="palMode"><button data-m="solid" class="on">Uni</button><button data-m="grad">Dégradé</button></div>
+        <div class="swatches" id="palette"></div>
+        <p class="mono-note" id="palTarget">S'APPLIQUE AU FOND DE CARTE</p>
+      </section>
+
+      <section class="tabpane" data-pane="library" hidden>
+        <h3 class="sec">AJOUTER SUR LA CARTE</h3>
+        <div class="add-grid">
+          <button data-add="text"><span>T</span>Texte</button>
+          <button data-add="rect"><span>□</span>Forme</button>
+          <button data-add="image"><span>🖼</span>Image</button>
+          <button data-add="svg"><span>⟨/⟩</span>SVG</button>
+        </div>
+        <h3 class="sec">MICROGRAPHICS <span class="pill" id="mgCount">0</span></h3>
+        <div class="chips" id="mgCats"></div>
+        <div class="mg-grid" id="mgGrid"></div>
+        <p class="hint">Clique pour ajouter. Les attaques, coûts et badges restent éditables.</p>
+        <input type="file" id="svgFile" accept=".svg,image/svg+xml" hidden multiple />
+        <input type="file" id="imgFile" accept="image/*" hidden />
+      </section>
+
+      <section class="tabpane" data-pane="layers" hidden>
+        <h3 class="sec">TA COMPOSITION <span class="pill" id="layerCount2">0</span></h3>
+        <ul class="layer-list" id="layerList"></ul>
+        <p class="hint">Haut de liste = devant. Glisse pour réordonner, double-clic pour renommer.</p>
+      </section>
+
+      <div class="left-foot">
+        <button class="ghost-btn" id="saveProjBtn">💾 Enregistrer</button>
+        <button class="ghost-btn" id="openBtn2">📂 Ouvrir</button>
+      </div>
+    </aside>
+
+    <!-- ================= CENTRE ================= -->
+    <section class="center">
+      <div class="center-top">
+        <div class="seg small"><button class="on" title="Ratio de carte fixe 0.7197 (747 × 1038)">Carte 63×88</button></div>
+        <button class="ghost-btn" id="holoBtn" title="Ouvrir la carte dans la visionneuse holo 3D">✨ Voir en holo</button>
+      </div>
+      <div class="stage" id="stage">
+        <div class="canvas-wrap" id="canvasWrap">
+          <svg id="cardSvg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 747 1038" width="747" height="1038"></svg>
+          <div class="overlay" id="overlay"></div>
+        </div>
+      </div>
+      <div class="center-meta"><span id="metaName">CARTE</span><span>747 × 1038 PX</span></div>
+      <div class="center-bottom">
+        <div class="zoom">
+          <button id="zoomOut" aria-label="Dézoomer">−</button>
+          <span id="zoomVal">100%</span>
+          <button id="zoomIn" aria-label="Zoomer">+</button>
+          <button id="zoomFit" title="Ajuster à l'écran" aria-label="Ajuster">⤢</button>
+        </div>
+        <button class="soft-btn" id="shuffleBtn" title="Change la palette de la carte au hasard">🔀 Palette au hasard</button>
+      </div>
+      <p class="tip">Glisse tout. Double-clic sur un texte pour l'éditer. <kbd>Shift</kbd> pour contraindre.</p>
+    </section>
+
+    <!-- ================= DROITE ================= -->
+    <aside class="panel right" aria-label="Propriétés">
+      <div id="inspector"></div>
+    </aside>
+  </main>
+
+  <!-- export -->
+  <div class="modal" id="exportModal" hidden>
+    <div class="modal-card">
+      <button class="modal-x" data-close aria-label="Fermer">×</button>
+      <h2>Prête à sortir.</h2>
+      <p class="muted">Exporte ta carte ou garde un projet éditable.</p>
+      <div class="row"><label for="expScale">Taille d'export</label>
+        <select id="expScale"><option value="1">1×</option><option value="2" selected>2×</option><option value="3">3×</option><option value="4">4×</option></select>
+        <span class="mono-note" id="expDims">1494 × 2076</span></div>
+      <button class="exp-opt" id="expPng"><b>⬇ Télécharger PNG</b><small>Haute résolution · coins transparents</small></button>
+      <button class="exp-opt" id="expSvg"><b>⟨/⟩ Télécharger SVG</b><small>Vectoriel · images et polices embarquées</small></button>
+      <button class="exp-opt" id="expProj"><b>💾 Enregistrer le projet</b><small>Tous les calques, images et SVG perso (.card.json)</small></button>
+      <button class="exp-opt" id="expHolo"><b>✨ Voir en holo 3D</b><small>Envoie le rendu dans la visionneuse holo</small></button>
+      <p class="mono-note" id="expMsg"></p>
+    </div>
+  </div>
+  <input type="file" id="projFile" accept=".json,application/json" hidden />
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/editor-data.js?v=1795510000"></script>
+  <script src="js/editor.js?v=1795510000"></script>
+</body>
+</html>

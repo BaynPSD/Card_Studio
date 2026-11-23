@@ -2104,3 +2104,19 @@ card.addEventListener("dblclick", (e) => {
   e.stopPropagation();
   startTextEdit(el);
 });
+
+/* ---------- carte envoyée depuis l'éditeur (editor.html → « Voir en holo ») ---------- */
+(function fromEditor() {
+  if (location.hash !== "#from-editor") return;
+  let d = null;
+  try { d = localStorage.getItem("cardstudio.holo"); } catch (e) {}
+  if (!d) return;
+  setTimeout(() => {
+    try {
+      const f = dataURLToFile(d, "carte-editeur.webp");
+      document.querySelector('.tab[data-tab="card"]').click();
+      setSlotFile("card", f);
+      history.replaceState(null, "", location.pathname);
+    } catch (e) { console.warn("import éditeur", e); }
+  }, 300);
+})();

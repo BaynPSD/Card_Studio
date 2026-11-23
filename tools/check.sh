@@ -5,14 +5,14 @@ set -u
 cd "$(dirname "$0")/.."
 fail=0
 
-echo "== node --check js/app.js =="
-node --check js/app.js || fail=1
+echo "== node --check js/*.js =="
+for f in js/app.js js/editor-data.js js/editor.js; do node --check "$f" || fail=1; done
 
 echo "== accolades CSS =="
 python3 - <<'PY'
 import sys
 ok = True
-for p in ("css/cards.css", "css/ui.css"):
+for p in ("css/cards.css", "css/ui.css", "css/editor.css"):
     s = open(p).read()
     d = s.count("{") - s.count("}")
     print(f"  {p}: diff={d}")
@@ -22,11 +22,11 @@ sys.exit(0 if ok else 1)
 PY
 [ $? -ne 0 ] && fail=1
 
-echo "== assets référencés dans index.html =="
+echo "== assets référencés dans index.html + editor.html =="
 python3 - <<'PY'
 import re, os, sys
-s = open("index.html").read()
-refs = re.findall(r'(?:src|href)="([^"?#]+)', s)
+s = open("index.html").read() + open("editor.html").read() + open("js/editor-data.js").read()
+refs = re.findall(r'(?:src|href)="([^"?#]+)', s) + re.findall(r'"(img/[^"]+)"', s)
 ok = True
 for r in refs:
     if r.startswith(("http", "data:")):

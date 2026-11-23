@@ -212,3 +212,24 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - Redimensionner : 4 poignées orange `.st-rh` (nw/ne/sw/se) posées DANS la zone, visibles seulement sur le calque sélectionné (clic carte ou panneau Calques) → marchent aussi pour les calques pleine carte (illu, cadre). Shift = proportions. Marque / Nom / HP : la poignée agrandit le TEXTE (`--st-k-brand/name/hp`). Ancienne `.st-handle` masquée. Ctrl+Z annule.
 - `normalizeZone` met `transform:none` (plus de saut au 1er drag des zones centrées en translateY(-50%)) et ne fige pas L/H des textes auto (marque, nom, HP).
 - Double-clic sur n'importe quel texte de la carte (nom, marque, HP, attaques, dégâts, description, numéro, rareté…) = édition directe, Entrée = valider, Échap = annuler ; le champ du panneau suit. Marche avec ou sans mode édition.
+
+# 🎴 ÉDITEUR DE CARTES (`editor.html`) — façon Pressroom « Poster Studio »
+Page séparée, 100 % statique : `editor.html` + `css/editor.css` + `js/editor-data.js` (micrographics, modèles, palettes) + `js/editor.js` (moteur).
+L'ancien Studio (onglet de `index.html`) reste intact ; `index.html` a un lien vers l'éditeur.
+
+## Modèle
+- `project = { name, logo (dataURL|null), uploads[], finish:{grain}, showGrid, snapGrid, layers[] }` — `layers[0]` = derrière.
+- Calque : `{ id, type, name, x, y, w, h, rot, opacity, hidden, locked, role? , ...props }` en px du repère carte **747 × 1038** (ratio 0.7197).
+- Types : `image` (src, fit cover/contain/stretch, alignX/Y, white, fx{gray,contrast,bright,sat}) · `text` (text, font, size, weight, italic, ls, lh, align, wrap, color, shadow ; ligne de base = y + 0.8 × size) · `rect`/`ellipse` (fill, fill2 dégradé, angle, radius, stroke) · `rule` (filet dégradé) · `svg` (markup 0..100 currentColor, vb, color) · **`attack`** (cost 0-6, glyph, text, dmg, size, iconSize, iconCx, nameX, ring) · **`badge`** (rareté + lauriers) · **`hp`** (label + value, aligné à droite).
+- Rôles : `bg` (fond), `art` (illustration), `fade` (fondu), `frame` (cadre argent `fond-overlay.webp`), `logo`. Placeholders SVG : `{{LOGO}}`, `{{LOGO_WHITE}}`, `{{LOGO_TEAL}}` = logo du projet (upload « Logo » = partout, jetons d'attaque compris).
+- Rendu : un seul `<svg viewBox="0 0 747 1038">` découpé par le contour du cadre (coins 55×58 haut / 48×46 bas). Overlay HTML = sélection, 8 poignées + rotation, guides magenta, édition en place.
+
+## UX (calquée sur Pressroom, adaptée aux cartes)
+- Haut : nom du projet, « ✓ Enregistré sur cet appareil » (autosave localStorage), ↶ ↷, 📂, 🃏 Holo, **Export** (PNG 1-4×, SVG autonome polices+images embarquées, projet `.card.json`, ✨ Voir en holo).
+- Gauche : **Styles** (5 modèles : Outcome UR ALI, UR JACK, SR 1 attaque, Full art, Carte vierge + palette uni/dégradé) · **Bibliothèque** (Texte, Forme, Image, SVG + **MICROGRAPHICS** : Attaques 1/2/3/0 coûts, filet, ambiance · Énergie (12 jetons) · Rareté (UR/SR/SAR/R, lauriers, ★★★, symbole d'extension, étincelles) · HP & stats · Déco · Technique + import de tes SVG) · **Calques** (haut = devant, glisser = réordonner, 👁, 🔒, double-clic = renommer).
+- Centre : carte, zoom − / + / ajuster (Ctrl+molette), « Palette au hasard », astuce « Glisse tout. Double-clic sur un texte pour l'éditer. Shift pour contraindre. »
+- Droite : rien de sélectionné = **Image Lab** (importer illustration, mes images, logo) + **Finition** (N&B, contraste, saturation, grain) + **Réglages carte** (cadre argent/aucun/PNG perso, fond haut/bas, grille, aimantation) ; sinon **inspecteur** du calque (champs spécifiques + X/Y/L/H/°/% avec glisser-régler sur l'étiquette, aligner sur la carte, ⤓ ⤒ ⧉ 🔒 🗑).
+- Attaque : double-clic sur le nom = éditer le nom, sur les dégâts = éditer les dégâts ; coût 0-5 et symbole des jetons dans l'inspecteur ; coin = tout agrandir, bord = élargir la ligne.
+- Raccourcis : Ctrl+Z / Ctrl+Shift+Z / Ctrl+Y, Ctrl+C / V / D, Ctrl+A, Ctrl+[ / ], Suppr, flèches (Shift ×10), Entrée = éditer le texte, Échap, + / − / 0, Ctrl+S.
+- « Voir en holo » : rendu 2× webp → `localStorage["cardstudio.holo"]` → `index.html#from-editor` charge la carte dans la visionneuse 3D.
+- Export ne marche qu'en http(s) (GitHub Pages) : en `file://` le navigateur bloque fetch/canvas → message explicite.
