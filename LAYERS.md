@@ -191,3 +191,9 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Studio : carte plate + taille de police partout
 - Studio = plus de rotation 3D : guards dans interact()/interactEnd()/startShowcase()/pointerup-zoom + CSS `.card.studio { --rotate-x/y: 0deg !important; --card-scale: 1 !important; --translate-x/y: 0 !important }` (testé : souris bougée + démo auto -> computed rotate 0deg, transform identity ; l'onglet Carte garde la rotation)
 - Inspecteur : "Panneau attaques" a maintenant sizeVar --st-k-atk / colorVar --st-c-atk -> slider taille + couleur visibles dès la sélection (toutes les zones texte ont leur taille dans l'inspecteur)
+
+## Projet 100% portable (transfert vers Claude/autre IA)
+- `.card.json` v2 = state (cardStyle + stHTML + tous les champs) + `images` embarquées en dataURL (card/fond, fg/illustration, back/dos, logo perso ; images > 6 Mo ignorées)
+- saveProject/loadProjectJSON async ; slots gardent maintenant le vrai File (`s.file`) en plus de l'URL objet (`s.blob`) ; logo idem (logoFile)
+- Ctrl+S ou 💾 Projet = téléchargement ; 📂 Ouvrir = réimport ; autosave localStorage aussi en v2
+- Testé headless : upload illu -> projectJSON (images.fg dataURL) -> reset -> loadProjectJSON -> nom + illustration restaurés

@@ -436,7 +436,8 @@ async function setSlotFile(name, file) {
   const blob = URL.createObjectURL(file);
   const s = slots[name];
   if (s.blob) URL.revokeObjectURL(s.blob);
-  s.blob = blob;
+  s.blob = blob; /* URL objet (string) */
+  s.file = file; /* vrai File, pour l'export projet */
   s.custom = true;
   if (name === "mask") {
     try {
@@ -663,11 +664,18 @@ for (const [inputId, varName] of Object.entries(ST_COLORS)) {
 }
 
 const stLogoFile = document.getElementById("stLogoFile");
-stLogoFile.addEventListener("change", () => {
-  const file = stLogoFile.files[0];
+let logoBlob = null; /* URL objet */
+let logoFile = null; /* vrai File pour l'export projet */
+function setLogoFile(file) {
   if (!file) return;
-  card.style.setProperty("--st-logo", `url("${URL.createObjectURL(file)}")`);
+  if (logoBlob) URL.revokeObjectURL(logoBlob);
+  logoBlob = URL.createObjectURL(file);
+  logoFile = file;
+  card.style.setProperty("--st-logo", `url("${logoBlob}")`);
   card.style.setProperty("--st-logo-filter", "none"); // logo perso affiché tel quel
+}
+stLogoFile.addEventListener("change", () => {
+  setLogoFile(stLogoFile.files[0]);
   stLogoFile.value = "";
 });
 
@@ -1813,17 +1821,48 @@ holoPreviewBox.addEventListener("change", () => {
 
 /* ---------- projet : sauvegarde JSON + autosave localStorage + reprendre ---------- */
 const LS_KEY = "card_studio_session_v1";
-function projectJSON() {
+const IMG_MAX_BYTES = 6 * 1024 * 1024; /* on n'embarque que les images < 6 Mo */
+function blobToDataURL(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+function dataURLToFile(dataURL, name) {
+  const [meta, b64] = dataURL.split(",");
+  const type = (meta.match(/data:([^;]+)/) || [])[1] || "image/png";
+  const bin = atob(b64);
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return new File([u8], name, { type });
+}
+async function collectImages() {
+  const imgs = {};
+  for (const name of ["card", "fg", "back"]) {
+    const sl = slots[name];
+    if (sl && sl.custom && sl.file && sl.file.size <= IMG_MAX_BYTES) {
+      try { imgs[name] = await blobToDataURL(sl.file); } catch (e) { /* ignore */ }
+    }
+  }
+  if (logoFile && logoFile.size <= IMG_MAX_BYTES) {
+    try { imgs.logo = await blobToDataURL(logoFile); } catch (e) {}
+  }
+  return imgs;
+}
+async function projectJSON() {
   return JSON.stringify({
     app: "Card_Studio",
-    v: 1,
+    v: 2, /* v2 = images embarquées (dataURL) */
     savedAt: new Date().toISOString(),
+    images: await collectImages(),
     state: JSON.parse(snapshotStudio()),
   }, null, 1);
 }
-function saveProject(download) {
-  const json = projectJSON();
-  try { localStorage.setItem(LS_KEY, json); } catch (e) { /* quota */ }
+async function saveProject(download) {
+  const json = await projectJSON();
+  try { localStorage.setItem(LS_KEY, json); } catch (e) { /* quota dépassé : le téléchargement marche quand même */ }
   if (download) {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([json], { type: "application/json" }));
@@ -1833,11 +1872,22 @@ function saveProject(download) {
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
 }
-function loadProjectJSON(json) {
+async function loadProjectJSON(json) {
   const data = JSON.parse(json);
   const st = data.state || data;
   pushUndo();
   restoreStudio(JSON.stringify(st));
+  /* réappliquer les images embarquées */
+  const imgs = data.images || {};
+  for (const name of ["card", "fg", "back"]) {
+    if (imgs[name]) {
+      try { setSlotFile(name, dataURLToFile(imgs[name], name + ".png")); } catch (e) { console.warn(e); }
+    }
+  }
+  if (imgs.logo) {
+    try { setLogoFile(dataURLToFile(imgs.logo, "logo.png")); } catch (e) { console.warn(e); }
+  }
+  if (imgs.fg && typeof loadArtNatural === "function") setTimeout(loadArtNatural, 80);
   try { localStorage.setItem(LS_KEY, json); } catch (e) {}
 }
 document.getElementById("saveProjBtn").addEventListener("click", () => saveProject(true));
@@ -1845,15 +1895,17 @@ document.getElementById("openProjBtn").addEventListener("click", () => document.
 document.getElementById("openProjFile").addEventListener("change", async (e) => {
   const f = e.target.files[0];
   if (!f) return;
-  loadProjectJSON(await f.text());
+  await loadProjectJSON(await f.text());
   e.target.value = "";
 });
 /* autosave toutes les 4 s + proposition de reprise au chargement */
 let lastAuto = "";
-setInterval(() => {
+setInterval(async () => {
   if (!card.classList.contains("studio")) return;
-  const j = projectJSON();
-  if (j !== lastAuto) { lastAuto = j; try { localStorage.setItem(LS_KEY, j); } catch (e) {} }
+  try {
+    const j = await projectJSON();
+    if (j !== lastAuto) { lastAuto = j; try { localStorage.setItem(LS_KEY, j); } catch (e) {} }
+  } catch (e) {}
 }, 4000);
 setTimeout(() => {
   let saved = null;
@@ -1861,8 +1913,8 @@ setTimeout(() => {
   const hint = document.getElementById("sessionHint");
   if (saved && hint) {
     hint.hidden = false;
-    document.getElementById("resumeBtn").addEventListener("click", () => {
-      try { loadProjectJSON(saved); } catch (e) { console.warn(e); }
+    document.getElementById("resumeBtn").addEventListener("click", async () => {
+      try { await loadProjectJSON(saved); } catch (e) { console.warn(e); }
       hint.hidden = true;
     });
     document.getElementById("discardSessionBtn").addEventListener("click", () => {
@@ -1878,8 +1930,7 @@ function fileToSlotForZone(zoneClass, file) {
   if (zoneClass.includes("st-bg")) { setSlotFile("card", file); }
   else if (zoneClass.includes("st-art")) { setSlotFile("fg", file); if (typeof loadArtNatural === "function") setTimeout(loadArtNatural, 60); }
   else if (zoneClass.includes("st-logo")) {
-    card.style.setProperty("--st-logo", `url("${URL.createObjectURL(file)}")`);
-    card.style.setProperty("--st-logo-filter", "none");
+    setLogoFile(file);
   }
 }
 function bindRowDrop(row) {
