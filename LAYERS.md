@@ -144,3 +144,7 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 ## Glisser depuis le panneau Calques
 - pointerdown sur une ligne de calque (hors boutons 👁▲▼) = sélection + drag : déplacer la souris déplace la zone sur la carte en live (left/top en % du déplacement souris / taille carte), inspecteur sync, pushUndo au début, syncLayersPanel au relâchement ; Ctrl+Z annule
 - CSS : .layer-row cursor grab/grabbing, user-select none, touch-action none
+
+## Calques : réordonner par drag + attaques sans fond
+- Glisser une ligne du panneau Calques VERTICALEMENT = monter/descendre le calque dans l'ordre (au drop, z-index réassigné selon l'ordre DOM des lignes, bas de liste = haut de pile) ; simple clic = sélection seule ; Ctrl+Z annule ; .layer-row.dragging = feedback visuel
+- `.st-body { background: transparent; border-radius: 0 }` (dernier bloc) : panneau attaques SANS fond navy — texte blanc + icônes cerclées directement sur l'illustration (ref utilisateur)

@@ -7048,3 +7048,9 @@ Shine & Glare Effects
   background-size: cover;
   background-position: center;
 }
+
+/* ---------- panneau attaques SANS fond : texte + icônes cerclées directement sur l'illustration (ref) ---------- */
+.st-body {
+  background: transparent;
+  border-radius: 0;
+}

@@ -734,3 +734,9 @@ details.grp > summary {
 details.grp > summary:hover {
   color: #ff9f43;
 }
+
+/* ligne de calque en cours de drag (réordonnancement) */
+.layer-row.dragging {
+  opacity: 0.45;
+  outline: 1px dashed #ff9f43;
+}

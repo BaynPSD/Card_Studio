@@ -1491,28 +1491,44 @@ function buildLayers() {
     });
 
     row.append(eye, name, up, down);
-    /* clic = sélection ; clic maintenu + glisser = DÉPLACER la zone sur la carte (position X/Y live) */
+    row._zone = el;
+    /* clic = sélection ; glisser VERTICALEMENT = monter/descendre le calque dans l'ordre (z-index) */
     row.addEventListener("pointerdown", (e) => {
       if (e.target.closest("button")) return; /* boutons œil / ▲▼ gérés à part */
       e.preventDefault();
       if (!card.classList.contains("edit")) setEdit(true);
+      document.querySelectorAll(".layer-row.selected").forEach((r) => r.classList.remove("selected"));
+      row.classList.add("selected");
       selectZone(el);
-      buildLayers();
-      pushUndo(); /* snapshot avant le déplacement */
-      normalizeZone(el);
-      const c = card.getBoundingClientRect();
-      const start = { x: e.clientX, y: e.clientY };
-      const r0 = zoneRect(el);
+      pushUndo(); /* snapshot avant reorder (no-op sur simple clic, dédoublonné) */
+      const startY = e.clientY;
+      let dragging = false;
       const move = (ev) => {
-        const dx = ((ev.clientX - start.x) / c.width) * 100;
-        const dy = ((ev.clientY - start.y) / c.height) * 100;
-        el.style.left = r0.x + dx + "%";
-        el.style.top = r0.y + dy + "%";
-        if (el === selectedZone && typeof refreshInspector === "function") refreshInspector();
+        if (!dragging && Math.abs(ev.clientY - startY) > 6) {
+          dragging = true;
+          row.classList.add("dragging");
+        }
+        if (!dragging) return;
+        /* insérer la ligne sous le curseur (avant la 1ère ligne dont le milieu est dépassé) */
+        const rows = [...layersList.querySelectorAll(".layer-row:not(.dragging)")];
+        let before = null;
+        for (const r of rows) {
+          const bb = r.getBoundingClientRect();
+          if (ev.clientY < bb.top + bb.height / 2) { before = r; break; }
+        }
+        if (before) layersList.insertBefore(row, before);
+        else layersList.appendChild(row);
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
         window.removeEventListener("pointerup", up);
+        row.classList.remove("dragging");
+        if (dragging) {
+          /* ordre DOM des lignes = nouvel ordre de pile -> z-index croissant (bas de liste = haut de pile) */
+          [...layersList.querySelectorAll(".layer-row")].forEach((r, i) => {
+            if (r._zone) r._zone.style.zIndex = String(i + 1);
+          });
+        }
         if (typeof syncLayersPanel === "function") syncLayersPanel();
       };
       window.addEventListener("pointermove", move);
