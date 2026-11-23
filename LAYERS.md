@@ -165,3 +165,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - buildLayers trie par z-index DÉCROISSANT : la ligne du HAUT = couche de DEVANT. Avant c'était l'inverse -> tirer "Fenêtre d'art" en haut la mettait DERNIÈRE le fond opaque => carte blanche, art invisible (le bug des captures)
 - Au drop du drag : z-index réassigné tel que haut de liste = z max (n - i) ; ▲ = z+1 (monte), ▼ = z-1 ; Ctrl+Z annule
 - Bonus : .st-atk-name tronqué proprement (nowrap + ellipsis) si le nom d'attaque est trop long
+
+## Illustration DANS son cadre (fenêtre), fond visible autour
+- `.st-art { inset: 13% 5.5% 24% 5.5%; border: 0.5fs rgba(255,255,255,.85); border-radius: 1.2fs; background-size: cover; background-color: rgba(0,0,0,.18) }` (dernier bloc, annule le pleine carte)
+- z inchangé : fond 0 < art 1 < motif 2 < cadre 3 < textes 4 -> le fond de carte reste visible autour de la fenêtre d'art
+- Fenêtre mesurée en headless : x 6.9%, y 12.3%, L 90.2%, H 65.7% de la carte
