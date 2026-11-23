@@ -6762,7 +6762,7 @@ Shine & Glare Effects
   background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
   background-size: cover;
   background-position: center;
-  opacity: var(--st-fond-opacity, 0.25);
+  opacity: var(--st-fond-opacity, 1) /* motif OPAQUE par défaut */;
   filter: var(--st-fond-filter, none);
 }
 
@@ -7084,7 +7084,7 @@ Shine & Glare Effects
   background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
   background-size: cover;
   background-position: center;
-  opacity: var(--st-fond-opacity, 0.25);
+  opacity: var(--st-fond-opacity, 1) /* motif OPAQUE par défaut */;
   filter: var(--st-fond-filter, none);
 }
 
