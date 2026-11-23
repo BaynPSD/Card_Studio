@@ -160,3 +160,8 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - `.st-fond` (z2, nouveau calque "Motif de fond") = pattern par-dessus l'art sur toute la carte (opacité --st-fond-opacity, teinte --st-fond-filter) ; l'ancien `.st-bg::after` est désactivé (content:none)
 - `.card.studio` : shine/glare/glitter/glare2 en opacity 0 !important et texture display none -> plus de reflet blanc par-dessus la carte en studio (le glare radial suivait la souris, c'était le « voile blanc » même à opacité motif = 2)
 - Ordre panneau Calques : Fond de carte / Fenêtre d'art / Motif de fond / Pill / Cadre / textes...
+
+## Panneau Calques : convention Figma/Photoshop (haut de liste = devant)
+- buildLayers trie par z-index DÉCROISSANT : la ligne du HAUT = couche de DEVANT. Avant c'était l'inverse -> tirer "Fenêtre d'art" en haut la mettait DERNIÈRE le fond opaque => carte blanche, art invisible (le bug des captures)
+- Au drop du drag : z-index réassigné tel que haut de liste = z max (n - i) ; ▲ = z+1 (monte), ▼ = z-1 ; Ctrl+Z annule
+- Bonus : .st-atk-name tronqué proprement (nowrap + ellipsis) si le nom d'attaque est trop long

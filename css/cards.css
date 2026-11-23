@@ -7103,3 +7103,11 @@ Shine & Glare Effects
 .card.studio .card__texture {
   display: none !important;
 }
+
+/* nom d'attaque trop long : tronqué proprement au lieu de déborder */
+.st-atk-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}

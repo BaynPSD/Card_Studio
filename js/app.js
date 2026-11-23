@@ -1446,11 +1446,11 @@ function layerLabel(el) {
 function buildLayers() {
   if (!layersList) return;
   const zones = [...document.querySelectorAll(EDIT_SEL)];
-  // ordre = z-index croissant (les hauts de pile en bas, comme Figma/Photoshop)
+  // ordre = z-index DÉCROISSANT : HAUT de liste = couche de DEVANT (convention Figma/Photoshop)
   zones.sort((a, b) => {
     const za = parseInt(getComputedStyle(a).zIndex) || 0;
     const zb = parseInt(getComputedStyle(b).zIndex) || 0;
-    return za - zb;
+    return zb - za;
   });
   layersList.innerHTML = "";
   for (const el of zones) {
@@ -1527,9 +1527,11 @@ function buildLayers() {
         window.removeEventListener("pointerup", up);
         row.classList.remove("dragging");
         if (dragging) {
-          /* ordre DOM des lignes = nouvel ordre de pile -> z-index croissant (bas de liste = haut de pile) */
-          [...layersList.querySelectorAll(".layer-row")].forEach((r, i) => {
-            if (r._zone) r._zone.style.zIndex = String(i + 1);
+          /* ordre DOM des lignes = nouvel ordre de pile : HAUT de liste = z le plus HAUT (devant) */
+          const rows = [...layersList.querySelectorAll(".layer-row")];
+          const n = rows.length;
+          rows.forEach((r, i) => {
+            if (r._zone) r._zone.style.zIndex = String(n - i);
           });
         }
         if (typeof syncLayersPanel === "function") syncLayersPanel();
