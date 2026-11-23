@@ -7150,3 +7150,343 @@ Shine & Glare Effects
   --translate-x: 0px !important;
   --translate-y: 0px !important;
 }
+
+/* ==========================================================================================
+   🎴 GABARIT OUTCOME (case #stTplOutcome) — reproduit les cartes ref ALI 001/020 & JACK 004/020
+   Principe "karl" : 3 couches seulement
+     1) .st-art  = illustration PLEINE CARTE (z1)          -> upload « Illustration »
+     2) .st-fond = cadre argent PNG avec trou (fond-overlay.webp, z2)
+     3) textes   = positions mesurées en % sur la ref 1062x1482 (z4)
+   1em (.st) = 2.1407 % de la largeur. Tout est scopé .tpl-outcome : décocher = ancien template.
+   ========================================================================================== */
+.card.studio.tpl-outcome .st {
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+  --tpl-navy: #0c1a36;
+}
+
+/* --- couches --- */
+.card.studio.tpl-outcome .st-bg {
+  background: linear-gradient(180deg, #16326c 0%, #0c1b3d 60%, #08122b 100%);
+}
+.card.studio.tpl-outcome .st-art {
+  inset: 0;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  z-index: 1;
+}
+/* pas d'illu uploadée : l'illu par défaut (crop de la ref, texte incrusté) est calée en haut et fondue */
+.card.studio.tpl-outcome:not(.st-has-art) .st-art {
+  background-size: 100% auto !important;
+  background-position: 50% 0 !important;
+  background-repeat: no-repeat;
+}
+.card.studio.tpl-outcome .st-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 52%, rgba(8, 18, 45, 0.45) 72%, rgba(8, 18, 45, 0.7) 100%);
+}
+.card.studio.tpl-outcome:not(.st-has-art) .st-art::after {
+  background: linear-gradient(180deg, transparent 50%, #0c1b3d 63%, #0a1734 100%);
+}
+.card.studio.tpl-outcome .st-fond {
+  inset: 0;
+  z-index: 2;
+  background-image: var(--st-fond-img, url("../img/studio/fond-overlay.webp"));
+  background-size: 100% 100%;
+}
+.card.studio.tpl-outcome .st-pill,
+.card.studio.tpl-outcome .st-frame,
+.card.studio.tpl-outcome .st-typebar { display: none; }
+
+/* --- header : [bolt][Outcome] sur bande navy, NOM navy sur l'onglet blanc, HP 150 + rond ∞ --- */
+.card.studio.tpl-outcome .st-logo {
+  left: 6.1%;
+  top: 2.7%;
+  width: 5%;
+  height: 3.4%;
+  right: auto;
+  transform: none;
+  aspect-ratio: auto;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: var(--st-logo-filter, brightness(0) invert(1));
+  z-index: 4;
+}
+.card.studio.tpl-outcome .st-brand {
+  left: 12.1%;
+  top: 4.45%;
+  transform: translateY(-50%);
+  font-size: calc(1.08em * var(--st-k-brand, 1));
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--st-c-brand, #ffffff);
+  white-space: nowrap;
+}
+.card.studio.tpl-outcome .st-name {
+  left: 24.6%;
+  right: auto;
+  max-width: 44%;
+  top: 5.5%;
+  transform: translateY(-50%);
+  font-size: calc(3.7em * var(--st-k-name, 1));
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  padding-right: 0.08em;
+  color: var(--st-c-name, var(--tpl-navy));
+}
+.card.studio.tpl-outcome .st-hp {
+  left: auto;
+  right: 4.6%;
+  top: 5.7%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: calc(var(--st-fs, 3.6px) * 2.2);
+  font-size: calc(1em * var(--st-k-hp, 1));
+  color: var(--st-c-hp, #ffffff);
+  line-height: 1;
+}
+.card.studio.tpl-outcome #stHp {
+  font-size: 3.15em;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.card.studio.tpl-outcome .st-hp-lbl {
+  font-size: 0.4em;
+  font-weight: 800;
+  margin-right: 0.25em;
+}
+.card.studio.tpl-outcome .st-hp-ico {
+  flex: none;
+  width: 3.7em;
+  height: 3.7em;
+  margin: 0;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 0.2em solid #e8eef8;
+  background: radial-gradient(circle at 50% 40%, #13254a, #08132b);
+  box-shadow: 0 0 0.4em rgba(90, 240, 210, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  color: transparent;
+  overflow: hidden;
+}
+.card.studio.tpl-outcome .st-hp-ico::before {
+  content: "∞";
+  font-family: "Arial Black", Arial, sans-serif;
+  font-style: normal;
+  font-weight: 900;
+  font-size: 2.6em;
+  line-height: 1;
+  margin-top: -0.08em;
+  color: var(--st-c-hpico, #45e3c6);
+}
+
+/* --- attaques : texte blanc direct sur l'art, icônes cerclées + logo, 2 filets --- */
+.card.studio.tpl-outcome .st-body {
+  inset: auto;
+  left: 5%;
+  top: 66.5%;
+  width: 90%;
+  height: 20%;
+  display: block;
+  padding: 0;
+  gap: 0;
+  background: transparent;
+  border-radius: 0;
+  overflow: visible;
+}
+.card.studio.tpl-outcome .st-body::before,
+.card.studio.tpl-outcome .st-body::after {
+  content: "";
+  position: absolute;
+  height: calc(var(--st-fs, 3.6px) * 0.32);
+  border-radius: 9px;
+  background: linear-gradient(90deg, rgba(200, 215, 245, 0.35), rgba(225, 235, 255, 0.85) 15%, rgba(225, 235, 255, 0.85) 85%, rgba(200, 215, 245, 0.2));
+  pointer-events: none;
+}
+.card.studio.tpl-outcome .st-body::before { top: 37%; left: 11%; right: 6.5%; }
+.card.studio.tpl-outcome .st-body::after { top: 75%; left: 5.8%; right: 7.8%; }
+.card.studio.tpl-outcome .st-atk {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  height: 3em;
+  transform: translateY(-50%);
+  display: block;
+}
+.card.studio.tpl-outcome #stAtkRow1 { top: 20.5%; }
+.card.studio.tpl-outcome #stAtkRow2 { top: 55%; }
+.card.studio.tpl-outcome .st-cost {
+  position: absolute;
+  left: 11.4%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 0.47em;
+  font-size: 1em;
+}
+.card.studio.tpl-outcome .st-cost i {
+  width: 2.57em;
+  height: 2.57em;
+  border: 0.17em solid #e6eefb;
+  background: rgba(8, 18, 45, 0.35);
+  filter: none;
+  box-shadow: 0 0 0.25em rgba(120, 200, 255, 0.4);
+}
+.card.studio.tpl-outcome .st-cost i::before {
+  font-size: 1.2em;
+  color: #fff;
+  filter: brightness(0) invert(1);
+}
+/* icône = logo Outcome (option « Logo Outcome ») */
+.card.studio .st-atk.glyph-logo .st-cost i::before {
+  content: "";
+  width: 62%;
+  height: 62%;
+  background: #ffffff;
+  -webkit-mask: var(--st-logo, url("../img/studio/logo.webp")) center / contain no-repeat;
+  mask: var(--st-logo, url("../img/studio/logo.webp")) center / contain no-repeat;
+  filter: none;
+}
+.card.studio.tpl-outcome .st-atk-name {
+  position: absolute;
+  left: 25.3%;
+  right: 22%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: calc(2.07em * var(--st-k-atk, 1));
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--st-c-atk, #ffffff);
+  text-shadow: 0 0.04em 0.12em rgba(0, 0, 20, 0.5);
+}
+.card.studio.tpl-outcome .st-atk-dmg {
+  position: absolute;
+  right: 6.1%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  font-size: calc(2.07em * var(--st-k-dmg, 1));
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.15;
+  color: var(--st-c-dmg, #ffffff);
+  text-shadow: 0 0.04em 0.12em rgba(0, 0, 20, 0.5);
+}
+.card.studio.tpl-outcome .st-desc {
+  position: absolute;
+  left: 6.9%;
+  right: 6%;
+  top: 90%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 0;
+  font-size: calc(1.2em * var(--st-k-desc, 1));
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.2;
+  text-align: left;
+  opacity: 1;
+  color: var(--st-c-desc, #dde5f5);
+}
+
+/* --- pied : numéro + ◆ à gauche, badge UR + lauriers à droite --- */
+.card.studio.tpl-outcome .st-foot {
+  inset: 0;
+  left: 0;
+  bottom: auto;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  font-size: calc(1em * var(--st-k-foot, 1));
+  color: var(--st-c-foot, #ffffff);
+}
+.card.studio.tpl-outcome .st-foot > span { pointer-events: auto; }
+.card.studio.tpl-outcome #stNum {
+  position: absolute;
+  left: 8.4%;
+  top: 95.6%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.card.studio.tpl-outcome #stNum::after {
+  content: "◆";
+  margin-left: 0.85em;
+  font-size: 0.75em;
+  vertical-align: 0.1em;
+  color: #cfd9ec;
+}
+.card.studio.tpl-outcome #stRar {
+  position: absolute;
+  left: 85.75%;
+  top: 93.65%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.07em solid #e3e9f5;
+  background: rgba(8, 18, 45, 0.55);
+  line-height: 1;
+  overflow: visible;
+  white-space: nowrap;
+}
+.card.studio.tpl-outcome #stRar {
+  font-size: 2.07em;
+  font-weight: 900;
+  font-style: italic;
+  min-width: 2.82em;
+  height: 1.33em;
+  padding: 0 0.3em;
+  border-width: 0.07em;
+  border-radius: 0.27em;
+  box-shadow: inset 0 0 0 0.06em rgba(10, 25, 60, 0.9), inset 0 0 0 0.12em rgba(210, 222, 245, 0.5);
+}
+.card.studio.tpl-outcome #stRar::before,
+.card.studio.tpl-outcome #stRar::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.8em;
+  height: 1.6em;
+  transform: translateY(-50%);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 40'><g fill='%23efe3c8'><path d='M15 39 C6 32 4 20 9 3' fill='none' stroke='%23efe3c8' stroke-width='1.6' stroke-linecap='round'/><ellipse cx='7' cy='31' rx='2.4' ry='5' transform='rotate(-55 7 31)'/><ellipse cx='5' cy='23' rx='2.3' ry='4.8' transform='rotate(-35 5 23)'/><ellipse cx='5' cy='15' rx='2.2' ry='4.5' transform='rotate(-15 5 15)'/><ellipse cx='8' cy='7' rx='2' ry='4.2' transform='rotate(10 8 7)'/><ellipse cx='13' cy='27' rx='2.2' ry='4.4' transform='rotate(35 13 27)'/><ellipse cx='12.5' cy='18' rx='2' ry='4.2' transform='rotate(45 12.5 18)'/><ellipse cx='12.5' cy='10' rx='1.8' ry='3.8' transform='rotate(55 12.5 10)'/></g></svg>") center / contain no-repeat;
+}
+.card.studio.tpl-outcome #stRar::before { right: calc(100% + 0.05em); }
+.card.studio.tpl-outcome #stRar::after { left: calc(100% + 0.05em); transform: translateY(-50%) scaleX(-1); }
+
+/* correctifs gabarit : l'em des attaques = l'em de .st (sinon icônes/titres ~1.5x trop gros) */
+.card.studio.tpl-outcome .st-body,
+.card.studio.tpl-outcome .st-atk { font-size: 1em; }
+.card.studio.tpl-outcome .st-hp { width: auto; height: auto; white-space: nowrap; }
+.card.studio.tpl-outcome #stNum,
+.card.studio.tpl-outcome #stRar { width: max-content; }
+/* les moteurs holo mettent display:grid partout -> forcer l'inline pour HP / numéro */
+.card.studio.tpl-outcome #stHp { display: inline-flex; align-items: baseline; }
+.card.studio.tpl-outcome .st-hp-lbl { display: inline; }
+.card.studio.tpl-outcome #stNum { display: flex; align-items: center; }
+.card.studio.tpl-outcome .st-logo { left: 4.75%; top: 1.65%; width: 7.7%; height: 5.5%; }
+.card.studio .st-atk.glyph-logo .st-cost i::before { width: 92%; height: 92%; }
+.card.studio.tpl-outcome .st-logo { left: 3.9%; top: 1%; width: 9.4%; height: 6.8%; }
+.card.studio.tpl-outcome .st-brand { font-size: calc(1.15em * var(--st-k-brand, 1)); }
+.card.studio.tpl-outcome .st-hp-ico::before { font-size: 2.9em; -webkit-text-stroke: 0.06em var(--st-c-hpico, #45e3c6); }

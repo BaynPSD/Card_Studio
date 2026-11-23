@@ -197,3 +197,12 @@ S&S, dis-le et je rebascule les % du template sur ces valeurs.
 - saveProject/loadProjectJSON async ; slots gardent maintenant le vrai File (`s.file`) en plus de l'URL objet (`s.blob`) ; logo idem (logoFile)
 - Ctrl+S ou 💾 Projet = téléchargement ; 📂 Ouvrir = réimport ; autosave localStorage aussi en v2
 - Testé headless : upload illu -> projectJSON (images.fg dataURL) -> reset -> loadProjectJSON -> nom + illustration restaurés
+
+## 🎴 Gabarit Outcome (case `#stTplOutcome`, cochée par défaut) — reproduit ALI 001/020 & JACK 004/020
+- 3 couches seulement : `.st-art` illustration PLEINE CARTE (z1) → `.st-fond` = cadre argent `fond-overlay.webp` (PNG à trou, z2, `background-size:100% 100%`) → textes (z4). `.st-pill`, `.st-frame`, `.st-typebar` masqués.
+- Tout est dans UN bloc CSS en fin de `cards.css`, scopé `.card.studio.tpl-outcome` ; décocher = ancien template intact.
+- Positions mesurées sur la ref 1062×1482 (en % carte) : logo bolt centre 8.6/4.4 ; « Outcome » left 12.1 / y 4.45 ; NOM navy `#0c1a36` 900 italic 3.7em left 24.6 / y 5.5 ; HP (« HP » 0.4× + nombre 3.15em) right 4.6 / y 5.7 + rond ∞ teal Ø 7.9 %L ; attaques : body 5/66.5/90/20, lignes centrées 70.6 % et 77.5 %, filets 73.9 % et 81.5 %, noms left 27.8 %, dégâts right 10.5 % ; description italique y 84.5 % ; numéro + ◆ left 8.4 / y 95.6 ; badge UR centre 85.75/93.65 + lauriers SVG.
+- Police : Poppins (Google Fonts). Icônes d'attaque : option « Logo Outcome » (`glyph-logo`, mask du logo, suit le logo uploadé).
+- Sans illustration uploadée : `art-default.webp` calé en haut + fondu navy (il contient du texte incrusté de la ref) ; avec upload : classe `st-has-art`, léger assombrissement bas pour la lisibilité.
+- Validé en headless : ref ALI passée en illustration → les textes du gabarit tombent sur les textes incrustés (écart < 1 %).
+- Corrigé : doublon `applyDefaultMask()` appelé avant `DEFAULT_FILES` (ReferenceError TDZ en console).

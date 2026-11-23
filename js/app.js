@@ -327,16 +327,7 @@ async function buildMask(src) {
   return blob ? URL.createObjectURL(blob) : canvas.toDataURL("image/png");
 }
 
-async function applyDefaultMask() {
-  try {
-    const url = await buildMask("img/card_mask.webp");
-    card.style.setProperty("--mask", `url("${url}")`);
-    card.classList.add("masked");
-  } catch (e) {
-    console.warn("masque par défaut indisponible", e);
-  }
-}
-applyDefaultMask();
+/* (ancien doublon applyDefaultMask supprimé : appelé avant DEFAULT_FILES -> erreur TDZ) */
 
 /* ---------- slots : carte / masque / foil (comme ribi-holo) ---------- */
 
@@ -407,6 +398,7 @@ function applyImages() {
   card.style.setProperty("--layer-bg", bg ? `url("${bg}")` : "none");
   if (slots.fg.url) card.style.setProperty("--layer-fg", `url("${slots.fg.url}")`);
   else card.style.removeProperty("--layer-fg");
+  card.classList.toggle("st-has-art", !!slots.fg.url);
   if (slots.foil.url) {
     card.style.setProperty("--foil", `url("${slots.foil.url}")`);
   } else {
@@ -641,11 +633,18 @@ const ST_TEXT = {
 for (const [inputId, targetId] of Object.entries(ST_TEXT)) {
   const input = document.getElementById(inputId);
   const target = document.getElementById(targetId);
-  const prefix = targetId === "stHp" ? "HP " : "";
-  target.textContent = prefix + input.value;
-  input.addEventListener("input", () => {
-    target.textContent = prefix + input.value;
-  });
+  const isHp = targetId === "stHp";
+  const paint = () => {
+    if (isHp) {
+      target.textContent = "";
+      const lbl = document.createElement("small");
+      lbl.className = "st-hp-lbl";
+      lbl.textContent = "HP";
+      target.append(lbl, document.createTextNode(input.value));
+    } else target.textContent = input.value;
+  };
+  paint();
+  input.addEventListener("input", paint);
 }
 
 const ST_COLORS = {
@@ -689,7 +688,8 @@ function bindCost(inputId, costId, rowId, iconId) {
     const n = Math.max(0, Math.min(5, parseInt(input.value || "0", 10) || 0));
     const glyph = icon.value || "\u26a1";
     cost.innerHTML = "<i></i>".repeat(n);
-    row.style.setProperty("--st-glyph", JSON.stringify(glyph));
+    row.style.setProperty("--st-glyph", JSON.stringify(glyph === "logo" ? "" : glyph));
+    row.classList.toggle("glyph-logo", glyph === "logo");
     row.style.setProperty("--cost", String(n));
   };
   input.addEventListener("input", apply);
@@ -1316,6 +1316,7 @@ function restoreStudio(s) {
     if (el.type === "checkbox") el.checked = !!v;
     else el.value = v;
   }
+  if (typeof syncTplOutcome === "function") syncTplOutcome();
   if (typeof syncLayersPanel === "function") syncLayersPanel();
   if (typeof applyArtCrop === "function") applyArtCrop();
   if (selectedZone && !selectedZone.isConnected) selectZone(null);
@@ -1956,3 +1957,21 @@ selectZone = function (el) { _selectZone(el); updateStudioHint(); };
 const _setEdit2 = setEdit;
 setEdit = function (on) { _setEdit2(on); updateStudioHint(); };
 updateStudioHint();
+
+/* ---------- 🎴 Gabarit Outcome (carte ref ALI/JACK) : art pleine carte + cadre PNG + textes mesurés ---------- */
+const stTplOutcome = document.getElementById("stTplOutcome");
+function syncTplOutcome() {
+  card.classList.toggle("tpl-outcome", !!(stTplOutcome && stTplOutcome.checked));
+  if (typeof applyArtCrop === "function") setTimeout(applyArtCrop, 30);
+}
+/* couleur du nom : navy sur l'onglet blanc du gabarit, blanc sinon (appliqué au chargement et quand on coche/décoche) */
+function applyTplNameColor() {
+  const on = !!(stTplOutcome && stTplOutcome.checked);
+  const col = on ? "#0c1a36" : "#ffffff";
+  card.style.setProperty("--st-c-name", col);
+  const picker = document.querySelector('input[aria-label="Couleur Nom de la carte"]');
+  if (picker) picker.value = col;
+}
+if (stTplOutcome) stTplOutcome.addEventListener("input", () => { pushUndo(); syncTplOutcome(); applyTplNameColor(); });
+syncTplOutcome();
+applyTplNameColor();

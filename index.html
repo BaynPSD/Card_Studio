@@ -7,9 +7,9 @@
   <meta name="description" content="Card_Studio : crée des cartes holo personnalisées (upload PNG, 30+ effets, tilt 3D, studio card maker) — 100% client, GitHub Pages." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795444352" />
-  <link rel="stylesheet" href="css/ui.css?v=1795444352" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,400;1,700;1,800;1,900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/cards.css?v=1795500000" />
+  <link rel="stylesheet" href="css/ui.css?v=1795500000" />
 </head>
 <body>
   <header>
@@ -118,6 +118,10 @@
           <span>Mode studio — template éditable</span>
         </label>
         <label class="auto-row">
+          <input type="checkbox" id="stTplOutcome" checked />
+          <span>🎴 Gabarit Outcome (comme ALI / JACK) — il suffit d'uploader l'illustration</span>
+        </label>
+        <label class="auto-row">
           <input type="checkbox" id="showZones" />
           <span>🗺️ Contours des zones (voir chaque couche)</span>
         </label>
@@ -183,8 +187,8 @@
           <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
           <label class="field"><span>Coût énergie 1</span><input type="number" id="stCost1In" value="1" min="0" max="5" /></label>
           <label class="field"><span>Coût énergie 2</span><input type="number" id="stCost2In" value="2" min="0" max="5" /></label>
-          <label class="field"><span>Icône attaque 1</span><select id="stIcon1In"><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
-          <label class="field"><span>Icône attaque 2</span><select id="stIcon2In"><option>∞</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>●</option></select></label>
+          <label class="field"><span>Icône attaque 1</span><select id="stIcon1In"><option value="logo">Logo Outcome</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
+          <label class="field"><span>Icône attaque 2</span><select id="stIcon2In"><option value="logo">Logo Outcome</option><option>∞</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>●</option></select></label>
           <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
           <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
           <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
@@ -343,6 +347,6 @@
   </main>
 
   <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795444352"></script>
+  <script src="js/app.js?v=1795500000"></script>
 </body>
 </html>
