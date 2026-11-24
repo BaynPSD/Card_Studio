@@ -2137,6 +2137,7 @@ function shrinkImage(file, max) {
     fr.onload = () => {
       const im = new Image();
       im.onload = () => {
+        if (!im.width || file.type === "image/svg+xml") return res(fr.result); /* SVG : gardé tel quel */
         const sc = Math.min(1, max / Math.max(im.width, im.height));
         const c = document.createElement("canvas");
         c.width = Math.max(1, Math.round(im.width * sc));
@@ -2161,13 +2162,9 @@ const HPICO_GLYPHS = {
 };
 function hpIcoMarkup(kind, src) {
   const ring = '<circle cx="50" cy="50" r="45" fill="#0b1630" stroke="#e8eef8" stroke-width="6"/>';
-  let inner = HPICO_GLYPHS[kind] ?? HPICO_GLYPHS.inf;
+  let inner = kind === "custom" ? "" : HPICO_GLYPHS[kind] ?? HPICO_GLYPHS.inf;
   if (kind === "logo") inner = ""; /* logo = ::after CSS (suit le logo uploadé via --st-logo) */
-  if (kind === "custom" && src) {
-    const c = hpIcoCrop();
-    const sz = 80 * c.z, x = 50 - sz / 2 + c.x, y = 50 - sz / 2 + c.y;
-    inner = '<clipPath id="hpicoClip"><circle cx="50" cy="50" r="40"/></clipPath><g clip-path="url(#hpicoClip)"><image class="st-hpico-img" href="' + src + '" x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + sz.toFixed(2) + '" height="' + sz.toFixed(2) + '" preserveAspectRatio="xMidYMid slice"/></g>';
-  }
+  /* image perso : rendue en HTML (cercle CSS) au-dessus du rond — plus de clipPath SVG (id en double = image invisible) */
   return '<svg class="st-hpico-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">' + ring + inner + "</svg>";
 }
 function setHpIco(kind, src) {
@@ -2175,6 +2172,21 @@ function setHpIco(kind, src) {
   if (!el) return;
   [...el.childNodes].forEach((n) => { if (!(n.classList && n.classList.contains("st-rh"))) n.remove(); });
   el.insertAdjacentHTML("afterbegin", hpIcoMarkup(kind, src));
+  if (kind === "custom" && src) {
+    const c = hpIcoCrop();
+    const wrap = document.createElement("div");
+    wrap.className = "st-hpico-imgwrap";
+    const im = document.createElement("img");
+    im.className = "st-hpico-img";
+    im.alt = "";
+    im.draggable = false;
+    im.src = src;
+    im.style.width = im.style.height = c.z * 100 + "%";
+    im.style.left = 50 + c.x * 1.25 + "%";
+    im.style.top = 50 + c.y * 1.25 + "%";
+    wrap.appendChild(im);
+    el.querySelector(".st-hpico-svg").after(wrap);
+  }
   el.dataset.icon = kind;
   if (src) el.dataset.src = src;
   el.classList.toggle("ico-logo", kind === "logo");
@@ -2388,12 +2400,24 @@ card.addEventListener("drop", (e) => {
   putImageInZone(z, f);
 }, true);
 /* sélecteur de fichier partagé */
+const zoneFileInput = document.createElement("input");
+zoneFileInput.type = "file";
+zoneFileInput.accept = "image/*";
+zoneFileInput.hidden = true;
+document.body.appendChild(zoneFileInput); /* input attaché au DOM : certains navigateurs ignorent .click() sur un input détaché */
+let zoneFileTarget = null;
+zoneFileInput.addEventListener("change", () => {
+  const f = zoneFileInput.files[0];
+  if (f && zoneFileTarget) putImageInZone(zoneFileTarget, f);
+  zoneFileInput.value = "";
+});
+let zonePickAt = 0;
 function pickImageForZone(zone) {
-  const i = document.createElement("input");
-  i.type = "file";
-  i.accept = "image/*";
-  i.onchange = () => i.files[0] && putImageInZone(zone, i.files[0]);
-  i.click();
+  zoneFileTarget = zone;
+  const now = Date.now();
+  if (now - zonePickAt < 600) return; /* un seul sélecteur (un 2e .click() l'annule) */
+  zonePickAt = now;
+  zoneFileInput.click();
 }
 /* double-clic sur le rond / le logo = choisir une image */
 card.addEventListener("dblclick", (e) => {

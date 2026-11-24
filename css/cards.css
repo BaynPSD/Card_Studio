@@ -7615,3 +7615,21 @@ Shine & Glare Effects
 .card.studio .st .drop-target { outline: 3px dashed #5af0d2 !important; outline-offset: 2px; }
 /* petites zones (rond, logo) : poignées plus fines pour voir le contenu */
 .card.studio .st :is(.st-hpico, .st-logo).selected > .st-rh { width: 8px; height: 8px; border-width: 1px; }
+
+/* image perso du rond : cercle CSS centré dans l'anneau (rayon 40/50) */
+.card.studio .st-hpico .st-hpico-imgwrap {
+  position: absolute;
+  inset: 10%;
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+.card.studio .st-hpico .st-hpico-img {
+  position: absolute;
+  display: block;
+  max-width: none;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  pointer-events: none;
+}
