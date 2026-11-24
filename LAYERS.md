@@ -245,3 +245,10 @@ L'ancien Studio (onglet de `index.html`) reste intact ; `index.html` a un lien v
 - Rond d'icône image : recadrage zoom / ↔ / ↕ (`data-z/x/y` sur `.st-hpico`, sauvés avec le projet), molette sur le rond = zoom, Alt+glisser = déplacer l'image, « Recentrer ». Images importées réduites (`shrinkImage`) : les dataURL énormes cassaient les variables CSS.
 - 🖼 **Image dans une zone** : glisser un fichier DIRECTEMENT sur la zone visée (`zoneAtPoint` : rond `.st-hpico` → image recadrable, ligne d'attaque → image des jetons, logo → logo, ailleurs → illustration ; contour turquoise pointillé = zone qui recevra l'image), double-clic sur le rond ou le logo = sélecteur de fichier, bouton « 🖼 Insérer / remplacer l'image… » dans le panneau Sélection (zones image). Poignées plus fines sur le rond et le logo.
 - Image du rond : rendue en HTML (`.st-hpico-imgwrap` cercle CSS inset 10 % + `<img class="st-hpico-img">` centré, taille = zoom, décalage en %) au lieu d'un `clipPath` SVG (un id en double dans la page rendait l'image invisible). Plus de ∞ dessiné sous l'image. SVG importés gardés tels quels. Sélecteur de fichier = input attaché au DOM (`zoneFileInput`), anti double ouverture.
+
+# 🧭 STRUCTURE DU SITE (depuis le 24/11)
+- `index.html` = **🎴 Card maker** (l'éditeur façon poster studio) → page d'accueil, 1er onglet. Nav `.site-nav` dans la barre du haut.
+- `holo.html` = **🃏 Carte holo** (visionneuse 3D, 2e onglet). `body.no-studio` : l'ancien Studio est retiré de l'interface (onglet, panneau et calque `.st` masqués, mode studio forcé à OFF au chargement). Son code reste dans `app.js` pour l'instant mais n'est plus accessible.
+- `editor.html` = simple redirection vers `index.html` (anciens liens).
+- « ✨ Voir en holo » du Card maker → `holo.html#from-editor`.
+- Corrigé : effets Écarlate & Violet (pokemon-cards-151) qui affichaient le calque Studio par-dessus la carte ; `DEFAULT_FILES` en URL absolues (une `url()` relative dans une variable CSS était résolue depuis `css/` → 404 sur card.webp / card_foil.webp) ; vignette « Couche avant » vide masquée.

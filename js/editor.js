@@ -1535,7 +1535,7 @@ async function sendToHolo() {
   try {
     const { canvas } = await renderPNG(2);
     localStorage.setItem("cardstudio.holo", canvas.toDataURL("image/webp", 0.92));
-    location.href = "index.html#from-editor";
+    location.href = "holo.html#from-editor";
   } catch (e) { exportErr(e); toast("⚠ Aperçu holo impossible ici (ouvre le site en ligne)"); }
 }
 $("#expHolo").onclick = sendToHolo;

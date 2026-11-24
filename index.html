@@ -1,376 +1,135 @@
-<!DOCTYPE html>
-<html lang="fr" data-scheme="dark">
+<!doctype html>
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Holo Card Studio — effets 3D façon Pokémon</title>
-  <meta name="description" content="Card_Studio : crée des cartes holo personnalisées (upload PNG, 30+ effets, tilt 3D, studio card maker) — 100% client, GitHub Pages." />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Card maker — Card Studio</title>
+  <meta name="description" content="Éditeur de cartes Outcome façon poster studio : calques, micrographics d'attaques, export PNG/SVG, aperçu holo." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,400;1,700;1,800;1,900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/cards.css?v=1795580000" />
-  <link rel="stylesheet" href="css/ui.css?v=1795580000" />
+  <link id="gfonts" href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Anton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Montserrat:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Exo+2:ital,wght@0,500;0,700;0,800;0,900;1,700;1,800;1,900&family=Russo+One&family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/editor.css?v=1795590000" />
 </head>
 <body>
-  <header>
-    <h1>🎴 Holo Card Studio</h1>
-    <p class="subtitle">
-      Upload ton PNG, choisis un effet holo (2 moteurs : SWSH + Écarlate/Violet) et bouge la souris sur la carte ✨
-      <br /><small>Moteurs de <a href="https://github.com/simeydotme/pokemon-cards-css">pokemon-cards-css</a> &amp; <a href="https://github.com/simeydotme/pokemon-cards-151">pokemon-cards-151</a>, embarqués via <a href="https://github.com/fyk0620/ribi-holo">ribi-holo</a></small>
-    </p>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div><b>CARD STUDIO<i>.</i></b><small>TON ATELIER DE CARTES</small></div>
+      <nav class="site-nav" aria-label="Pages">
+        <a class="on" href="index.html">🎴 Card maker</a>
+        <a href="holo.html">🃏 Carte holo</a>
+      </nav>
+    </div>
+    <div class="doc">
+      <input id="docName" class="doc-name" value="Nouvelle carte" aria-label="Nom du projet" spellcheck="false" />
+      <span id="saveState" class="save-state">✓ Enregistré sur cet appareil</span>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="undoBtn" title="Annuler (Ctrl+Z)" aria-label="Annuler">↶</button>
+      <button class="icon-btn" id="redoBtn" title="Rétablir (Ctrl+Shift+Z)" aria-label="Rétablir">↷</button>
+      <button class="icon-btn" id="openBtn" title="Ouvrir un projet (.card.json)" aria-label="Ouvrir">📂</button>
+      <button class="primary-btn" id="exportBtn">⤓ Export</button>
+    </div>
   </header>
 
-  <main>
-    <aside class="panel">
-      <nav class="tabs">
-        <button type="button" class="tab active" data-tab="card">🃏 Carte holo</button>
-        <button type="button" class="tab" data-tab="studio">🛠️ Studio</button>
+  <main class="workspace">
+    <!-- ================= GAUCHE ================= -->
+    <aside class="panel left" aria-label="Bibliothèque">
+      <nav class="seg tabs" role="tablist">
+        <button role="tab" data-tab="styles" class="on">Styles</button>
+        <button role="tab" data-tab="library">▦ Bibliothèque</button>
+        <button role="tab" data-tab="layers">☰ Calques <span id="layerCount" class="pill">0</span></button>
       </nav>
-      <a class="btn editor-link" href="editor.html" style="display:block;text-align:center;margin:8px 0 4px;text-decoration:none">🎴 Nouvel éditeur de cartes (façon poster studio) →</a>
-      <div class="pane" id="pane-card">
-      <section class="block">
-        <h2>1 · Images</h2>
-        <div class="slots">
-          <div class="slot" data-slot="card">
-            <img alt="Carte" />
-            <div class="slot__drop">📤 Carte<br /><small>clic ou glisse un PNG</small></div>
-            <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Remettre la carte par défaut" aria-label="Remettre la carte par défaut">✕</button>
-          </div>
-          <div class="slot" data-slot="mask">
-            <img alt="Masque" />
-            <div class="slot__drop">🎭 Masque<br /><small>optionnel</small></div>
-            <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Masque par défaut (plein cadre)" aria-label="Masque par défaut (plein cadre)">✕</button>
-          </div>
-          <div class="slot" data-slot="foil">
-            <img alt="Foil" />
-            <div class="slot__drop">✨ Foil<br /><small>optionnel</small></div>
-            <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Foil par défaut" aria-label="Foil par défaut">✕</button>
-          </div>
-          <div class="slot" data-slot="back">
-            <img alt="Dos" />
-            <div class="slot__drop">🂠 Dos<br /><small>optionnel</small></div>
-            <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Dos par défaut" aria-label="Dos par défaut">✕</button>
-          </div>
-          <div class="slot" data-slot="fg">
-            <img alt="Couche avant" />
-            <div class="slot__drop">🎭 Perso<br /><small>PNG transparent</small></div>
-            <input type="file" accept="image/*" hidden />
-            <button type="button" class="slot__clear" title="Retirer la couche avant" aria-label="Retirer la couche avant">✕</button>
-          </div>
+
+      <section class="tabpane" data-pane="styles">
+        <h3 class="sec">MODÈLES DE CARTES <span class="pill" id="tplCount">0</span></h3>
+        <div class="tpl-grid" id="tplGrid"></div>
+        <p class="hint">Chaque titre, illustration, couleur et micrographic est éditable.</p>
+        <h3 class="sec">PALETTE <span class="pill">8</span></h3>
+        <div class="seg small" id="palMode"><button data-m="solid" class="on">Uni</button><button data-m="grad">Dégradé</button></div>
+        <div class="swatches" id="palette"></div>
+        <p class="mono-note" id="palTarget">S'APPLIQUE AU FOND DE CARTE</p>
+      </section>
+
+      <section class="tabpane" data-pane="library" hidden>
+        <h3 class="sec">AJOUTER SUR LA CARTE</h3>
+        <div class="add-grid">
+          <button data-add="text"><span>T</span>Texte</button>
+          <button data-add="rect"><span>□</span>Forme</button>
+          <button data-add="image"><span>🖼</span>Image</button>
+          <button data-add="svg"><span>⟨/⟩</span>SVG</button>
         </div>
-        <button id="cutBtn" class="btn secondary">✂️ Découpe IA auto (perso vs fond)</button>
-        <p class="hint">Quand tu uploads une <strong>carte</strong>, le <strong>masque</strong> et le <strong>foil</strong> sont recréés automatiquement à partir de cette image (sauf si tu uploads les leurs). Glisse aussi une image directement sur la carte.</p>
-        <p class="hint" id="fileName"></p>
+        <h3 class="sec">MICROGRAPHICS <span class="pill" id="mgCount">0</span></h3>
+        <div class="chips" id="mgCats"></div>
+        <div class="mg-grid" id="mgGrid"></div>
+        <p class="hint">Clique pour ajouter. Les attaques, coûts et badges restent éditables.</p>
+        <input type="file" id="svgFile" accept=".svg,image/svg+xml" hidden multiple />
+        <input type="file" id="imgFile" accept="image/*" hidden />
       </section>
 
-      <section class="block">
-        <h2>2 · Effet holo</h2>
-        <div class="effects" id="effects"></div>
+      <section class="tabpane" data-pane="layers" hidden>
+        <h3 class="sec">TA COMPOSITION <span class="pill" id="layerCount2">0</span></h3>
+        <ul class="layer-list" id="layerList"></ul>
+        <p class="hint">Haut de liste = devant. Glisse pour réordonner, double-clic pour renommer.</p>
       </section>
 
-      <section class="block">
-        <h2>3 · Réglages</h2>
-        <label class="slider">
-          <span>Rotation max <output id="rotOut">14°</output></span>
-          <input type="range" id="rotMax" min="0" max="30" step="0.5" value="14" />
-        </label>
-        <label class="slider">
-          <span>Intensité de l'éclat <output id="glareOut">100%</output></span>
-          <input type="range" id="glare" min="0" max="1.5" step="0.05" value="1" />
-        </label>
-        <label class="slider">
-          <span>Taille de la carte <output id="sizeOut">500px</output></span>
-          <input type="range" id="cardSize" min="240" max="720" step="10" value="500" />
-        </label>
-        <label class="slider color-row">
-          <span>Couleur de lueur</span>
-          <input type="color" id="glowColor" value="#ccfff5" />
-        </label>
-        <label class="auto-row">
-          <input type="checkbox" id="texture" />
-          <span>✨ Texture grain sur toute la carte</span>
-        </label>
-        <label class="auto-row">
-          <input type="checkbox" id="parallax" />
-          <span>🧿 Parallaxe multicouche (fond vs effets)</span>
-        </label>
-        <label class="auto-row">
-          <input type="checkbox" id="parallaxLayers" />
-          <span>🧿 Parallaxe en couches (illu seule, texte fixe)</span>
-        </label>
-        <div class="theme">
-          <span>Thème</span>
-          <button type="button" data-theme="light" aria-label="Thème clair">☀️</button>
-          <button type="button" data-theme="dark" aria-pressed="true" aria-label="Thème sombre">🌙</button>
-          <button type="button" data-theme="system" aria-label="Thème système">🖥️</button>
-        </div>
-      </section>
-
+      <div class="left-foot">
+        <button class="ghost-btn" id="saveProjBtn">💾 Enregistrer</button>
+        <button class="ghost-btn" id="openBtn2">📂 Ouvrir</button>
       </div>
-      <div class="pane" id="pane-studio" hidden>
-      <section class="block">
-        <h2>🛠️ Studio (card maker)</h2>
-        <label class="auto-row">
-          <input type="checkbox" id="studioBox" />
-          <span>Mode studio — template éditable</span>
-        </label>
-        <label class="auto-row">
-          <input type="checkbox" id="stTplOutcome" checked />
-          <span>🎴 Gabarit Outcome (comme ALI / JACK) — il suffit d'uploader l'illustration</span>
-        </label>
-        <label class="auto-row" style="gap:8px">
-          <span>◉ Rond d'icône (calque séparé)</span>
-          <select id="stHpIcoIn" aria-label="Icône du rond">
-            <option value="inf">∞ turquoise</option><option value="logo">Logo</option><option value="bolt">⚡</option><option value="heart">♥</option><option value="star">★</option><option value="custom">🖼 Mon image…</option><option value="none">Rond vide</option>
-          </select>
-          <input type="file" id="stHpIcoFile" accept="image/*" hidden />
-        </label>
-        <div id="stHpIcoCrop" class="auto-row" style="flex-wrap:wrap;gap:6px 10px" hidden>
-          <span style="width:100%">✂ Recadrer l'image du rond (ou molette sur le rond / glisser avec Alt)</span>
-          <label>Zoom <input type="range" id="stHpIcoZ" min="0.4" max="4" step="0.01" value="1" /></label>
-          <label>↔ <input type="range" id="stHpIcoX" min="-60" max="60" step="0.5" value="0" /></label>
-          <label>↕ <input type="range" id="stHpIcoY" min="-60" max="60" step="0.5" value="0" /></label>
-          <button type="button" class="btn" id="stHpIcoReset">Recentrer</button>
-        </div>
-        <label class="auto-row">
-          <input type="checkbox" id="showZones" />
-          <span>🗺️ Contours des zones (voir chaque couche)</span>
-        </label>
-        <label class="auto-row">
-          <input type="checkbox" id="editMode" />
-          <span>✏️ Mode édition — déplacer / redimensionner les zones sur la carte</span>
-        </label>
-        <label class="slider">
-          <span>Taille du texte : <b id="stScaleVal">100%</b></span>
-          <input type="range" id="stScaleIn" min="50" max="200" value="100" />
-        </label>
-        <button type="button" id="addZoneBtn" class="btn">➕ Ajouter une zone texte</button>
-        <div class="btn-row">
-          <button type="button" id="undoBtn" class="btn" title="Ctrl+Z">↩️ Annuler</button>
-          <button type="button" id="redoBtn" class="btn" title="Ctrl+Shift+Z / Ctrl+Y / Ctrl+V">↪️ Rétablir</button>
-        </div>
-        <p class="hint" id="studioHint">🖱️ Mode studio : clique une zone pour la sélectionner.</p>
-        <label class="auto-row">
-          <input type="checkbox" id="holoPreview" />
-          <span>✨ Aperçu effet holo par-dessus le template</span>
-        </label>
-        <div class="btn-row">
-          <button type="button" id="saveProjBtn" class="btn" title="Ctrl+S — télécharge le projet complet (.json avec images incluses)">💾 Projet</button>
-          <button type="button" id="openProjBtn" class="btn" title="Ouvrir un fichier projet .json">📂 Ouvrir…</button>
-          <input type="file" id="openProjFile" accept=".json,application/json" hidden />
-        </div>
-        <p class="hint" id="sessionHint" hidden>↩️ Une session studio est enregistrée localement — <button type="button" id="resumeBtn" class="btn small">Reprendre</button> <button type="button" id="discardSessionBtn" class="btn small">Ignorer</button></p>
-        <details class="grp"><summary>🔤 Tailles &amp; couleurs par texte</summary>
-        <div class="fields" id="textStyles"></div>
-        </details>
-        <details class="grp" open><summary>🎯 Sélection — clique une zone sur la carte</summary>
-        <div class="inspector" id="inspector" hidden>
-          <h3>🎯 Sélection : <span id="inspName">—</span></h3>
-          <div class="fields">
-            <label class="field" id="inspTextRow" hidden><span>Texte</span><input type="text" id="inspText" /></label>
-            <label class="slider"><span>X <b id="inspXv">0%</b></span><input type="range" id="inspX" min="-20" max="120" step="0.1" /></label>
-            <label class="slider"><span>Y <b id="inspYv">0%</b></span><input type="range" id="inspY" min="-20" max="120" step="0.1" /></label>
-            <label class="slider"><span>Largeur <b id="inspWv">0%</b></span><input type="range" id="inspW" min="2" max="130" step="0.1" /></label>
-            <label class="slider"><span>Hauteur <b id="inspHv">0%</b></span><input type="range" id="inspH" min="2" max="130" step="0.1" /></label>
-            <label class="slider" id="inspSizeRow" hidden><span>Taille texte <b id="inspSizeV">100%</b></span><input type="range" id="inspSize" min="50" max="200" /></label>
-            <label class="slider color-row" id="inspColorRow" hidden><span>Couleur</span><input type="color" id="inspColor" /></label>
-            <div class="align-row" id="inspAlign">
-              <button type="button" data-align="left" title="Aligner à gauche (carte)">⇤</button>
-              <button type="button" data-align="centerX" title="Centrer horizontalement">↔</button>
-              <button type="button" data-align="right" title="Aligner à droite (carte)">⇥</button>
-              <button type="button" data-align="top" title="Aligner en haut (carte)">⤒</button>
-              <button type="button" data-align="middleY" title="Centrer verticalement">↕</button>
-              <button type="button" data-align="bottom" title="Aligner en bas (carte)">⤓</button>
-              <button type="button" id="inspReset" title="Réinitialiser position/taille de la zone">↺</button>
-            </div>
-            <button type="button" id="inspImg" class="btn" hidden>🖼 Insérer / remplacer l'image…</button>
-            <button type="button" id="inspDel" class="btn" hidden>🗑 Supprimer la zone</button>
-          </div>
-        </div>
-        </details>
-        <details class="grp" open><summary>📝 Textes de la carte</summary>
-        <div class="fields">
-          <label class="field"><span>Nom</span><input type="text" id="stNameIn" value="ALI" /></label>
-          <label class="field"><span>Marque (haut gauche)</span><input type="text" id="stBrandIn" value="Outcome" /></label>
-          <label class="field"><span>HP</span><input type="text" id="stHpIn" value="150" /></label>
-          <label class="field wide"><span>⚔ Nombre d'attaques</span><select id="stAtkCountIn"><option value="1">1 attaque</option><option value="2" selected>2 attaques</option><option value="3">3 attaques</option></select></label>
-          <label class="field"><span>Attaque 1</span><input type="text" id="stAtk1In" value="Prediction" /></label>
-          <label class="field"><span>Dégâts 1</span><input type="text" id="stDmg1In" value="40" /></label>
-          <label class="field"><span>Attaque 2</span><input type="text" id="stAtk2In" value="Outcome" /></label>
-          <label class="field"><span>Dégâts 2</span><input type="text" id="stDmg2In" value="100" /></label>
-          <label class="field"><span>Coût énergie 1</span><input type="number" id="stCost1In" value="1" min="0" max="5" /></label>
-          <label class="field"><span>Coût énergie 2</span><input type="number" id="stCost2In" value="2" min="0" max="5" /></label>
-          <label class="field"><span>Icône attaque 1</span><select id="stIcon1In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
-          <label class="field"><span>Icône attaque 2</span><select id="stIcon2In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
-          <label class="field atk3-f"><span>Attaque 3</span><input type="text" id="stAtk3In" value="Amplify" /></label>
-          <label class="field atk3-f"><span>Dégâts 3</span><input type="text" id="stDmg3In" value="150" /></label>
-          <label class="field atk3-f"><span>Coût énergie 3</span><input type="number" id="stCost3In" value="3" min="0" max="5" /></label>
-          <label class="field atk3-f"><span>Icône attaque 3</span><select id="stIcon3In"><option value="logo">Logo (blanc)</option><option value="logoc">Logo (couleurs)</option><option value="img">🖼 Mon image…</option><option>⚡</option><option>♥</option><option>🎲</option><option>⭐</option><option>🪙</option><option>◆</option><option>∞</option><option>●</option></select></label>
-          <input type="file" id="stGlyphFile" accept="image/*" hidden />
-          <label class="field wide"><span>Description</span><input type="text" id="stDescIn" value="A calculated bet, a decisive move." /></label>
-          <label class="field"><span>Numéro</span><input type="text" id="stNumIn" value="001/020" /></label>
-          <label class="field"><span>Rareté</span><input type="text" id="stRarIn" value="UR" /></label>
-          <label class="field"><span>Faiblesse</span><input type="text" id="stWeakIn" value="×2" /></label>
-          <label class="field"><span>Résistance</span><input type="text" id="stResIn" value="−30" /></label>
-          <label class="field"><span>Retraite</span><input type="text" id="stRetIn" value="★" /></label>
-        </div>
-        </details>
-        <details class="grp"><summary>🎨 Couleurs, fond &amp; images</summary>
-        <label class="slider color-row">
-          <span>Cadre (argent)</span>
-          <input type="color" id="stFrameIn" value="#eceaf2" />
-        </label>
-        <label class="slider color-row">
-          <span>Bannière haut (optionnel)</span>
-          <input type="color" id="stHeadIn" value="#ffffff" />
-        </label>
-        <label class="slider color-row">
-          <span>Texte bannière</span>
-          <input type="color" id="stHeadTextIn" value="#ffffff" />
-        </label>
-        <label class="slider color-row">
-          <span>Texte attaques/pied</span>
-          <input type="color" id="stTextIn" value="#ffffff" />
-        </label>
-        <label class="field">
-          <span>Logo (haut droite)</span>
-          <input type="file" id="stLogoFile" accept="image/*" />
-        </label>
-        <label class="slider color-row">
-          <span>🎨 Couleur du fond (si pas d'image)</span>
-          <input type="color" id="stBgColor" value="#2f6fd0" />
-        </label>
-        <div class="swatches" id="bgSwatches">
-          <button type="button" data-c="#2f6fd0" style="background:#2f6fd0" title="Classique (bleu)" aria-label="Fond bleu classique"></button>
-          <button type="button" data-c="#78c850" style="background:#78c850" title="Plante" aria-label="Fond plante"></button>
-          <button type="button" data-c="#f08030" style="background:#f08030" title="Feu" aria-label="Fond feu"></button>
-          <button type="button" data-c="#6890f0" style="background:#6890f0" title="Eau" aria-label="Fond eau"></button>
-          <button type="button" data-c="#f8d030" style="background:#f8d030" title="Électrik" aria-label="Fond électrik"></button>
-          <button type="button" data-c="#f85888" style="background:#f85888" title="Psy" aria-label="Fond psy"></button>
-          <button type="button" data-c="#c03028" style="background:#c03028" title="Combat" aria-label="Fond combat"></button>
-          <button type="button" data-c="#705848" style="background:#705848" title="Ténèbres" aria-label="Fond ténèbres"></button>
-          <button type="button" data-c="#b8b8d0" style="background:#b8b8d0" title="Métal" aria-label="Fond métal"></button>
-          <button type="button" data-c="#7038f8" style="background:#7038f8" title="Dragon" aria-label="Fond dragon"></button>
-          <button type="button" data-c="#ee99ac" style="background:#ee99ac" title="Fée" aria-label="Fond fée"></button>
-        </div>
-        <label class="field wide">
-          <span>🖼 Fond de carte (PNG pleine carte)</span>
-          <input type="file" id="stBgFile" accept="image/*" />
-        </label>
-        <label class="slider color-row">
-          <span>🎨 Teinte du motif de fond</span>
-          <input type="color" id="stFondColor" value="#ffffff" />
-        </label>
-        <label class="slider">
-          <span>Motif de fond : <b id="stFondOpVal">100%</b></span>
-          <input type="range" id="stFondOp" min="0" max="100" value="100" />
-        </label>
-        <label class="field wide">
-          <span>🎨 Illustration (PNG, fenêtre d'art)</span>
-          <input type="file" id="stArtFile" accept="image/*" />
-        <label class="field wide">
-          <span>🖼 Cadrage de l'illustration</span>
-          <select id="stArtFit">
-            <option value="cover" selected>Remplir la fenêtre (rogner les bords)</option>
-            <option value="contain">Tout voir (image entière)</option>
-          </select>
-        </label>
-        <label class="slider">
-          <span>Zoom illustration : <b id="stArtZoomVal">100%</b></span>
-          <input type="range" id="stArtZoom" min="50" max="300" value="100" />
-        </label>
-        <label class="slider">
-          <span>Position X : <b id="stArtPosXVal">50%</b></span>
-          <input type="range" id="stArtPosX" min="0" max="100" value="50" />
-        </label>
-        <label class="slider">
-          <span>Position Y : <b id="stArtPosYVal">50%</b></span>
-          <input type="range" id="stArtPosY" min="0" max="100" value="50" />
-        </label>
-        </label>
-        <p class="hint">Fond = PNG pleine carte (remplace la carte de base) · Illustration = PNG affiché dans la fenêtre d'art (coins arrondis auto) · les effets holo s'appliquent par-dessus le template.</p>
-        </details>
-      </section>
-
-      </div>
-      <section class="block actions">
-        <label class="auto-row">
-          <input type="checkbox" id="auto" checked />
-          <span>Démo auto (la carte tourne toute seule)</span>
-        </label>
-        <button id="resetBtn" class="btn secondary">⟲ Réinitialiser</button>
-        <label class="field"><span>Qualité export</span>
-          <select id="exportScale"><option value="1">1× (rapide)</option><option value="2" selected>2×</option><option value="3">3× (qualité max)</option></select>
-        </label>
-        <button id="exportBtn" class="btn secondary">💾 Télécharger le rendu (PNG)</button>
-        <p class="hint">L'export fige une pose et capture la carte (approximatif : les modes de fusion avancés ne sont pas toujours reproduits). Sans internet, fais une capture d'écran.</p>
-      </section>
     </aside>
 
-    <section class="stage" id="stage">
-      <div class="card interactive masked" id="card"
-           data-rarity="rare holo" data-supertype="pokémon" data-subtypes="basic"
-           data-set="" data-number="" data-trainer-gallery="true">
-        <div class="card__translater">
-          <div class="card__rotator" id="rotator">
-            <div class="card__back" id="cardBack">
-              <img id="cardBackImg" src="img/card_back.webp" width="660" height="921" alt="Dos de la carte" draggable="false" />
-              <div class="card__shine"></div>
-              <div class="card__glitter"></div>
-              <div class="card__glare"></div>
-              <div class="card__glare2"></div>
-              <div class="card__texture"></div>
-            </div>
-            <div class="card__front" id="front">
-              <img id="cardImg" src="img/card.webp" width="660" height="921" alt="Carte" draggable="false" />
-              <div class="card__layer-bg"></div>
-              <div class="card__layer-fg"></div>
-              <div class="st" aria-hidden="true">
-                <div class="st-bg"></div>
-                <div class="st-art"></div>
-                <div class="st-fond"></div>
-                <div class="st-pill"></div>
-                <div class="st-frame"></div>
-                <div class="st-head"></div>
-                <span class="st-brand" id="stBrand"></span>
-                <span class="st-name" id="stName"></span>
-                <div class="st-hp"><span id="stHp"></span></div>
-                <div class="st-hpico" aria-hidden="true"></div>
-                <div class="st-logo"></div>
-                <div class="st-body">
-                  <div class="st-atk" id="stAtkRow1"><div class="st-cost" id="stCost1"></div><span class="st-atk-name" id="stAtk1"></span><span class="st-atk-dmg" id="stDmg1"></span></div>
-                  <div class="st-atk" id="stAtkRow2"><div class="st-cost" id="stCost2"></div><span class="st-atk-name" id="stAtk2"></span><span class="st-atk-dmg" id="stDmg2"></span></div>
-                  <div class="st-atk" id="stAtkRow3"><div class="st-cost" id="stCost3"></div><span class="st-atk-name" id="stAtk3"></span><span class="st-atk-dmg" id="stDmg3"></span></div>
-                  <p class="st-desc" id="stDesc"></p>
-                </div>
-                <div class="st-typebar"><span id="stWeak"></span><span id="stRes"></span><span id="stRet"></span></div>
-                <div class="st-foot"><span id="stNum"></span><span id="stRar"></span></div>
-              </div>
-              <div class="card__shine"></div>
-              <div class="card__glitter"></div>
-              <div class="card__glare"></div>
-              <div class="card__glare2"></div>
-              <div class="card__texture"></div>
-            </div>
-          </div>
+    <!-- ================= CENTRE ================= -->
+    <section class="center">
+      <div class="center-top">
+        <div class="seg small"><button class="on" title="Ratio de carte fixe 0.7197 (747 × 1038)">Carte 63×88</button></div>
+        <button class="ghost-btn" id="holoBtn" title="Ouvrir la carte dans la visionneuse holo 3D">✨ Voir en holo</button>
+      </div>
+      <div class="stage" id="stage">
+        <div class="canvas-wrap" id="canvasWrap">
+          <svg id="cardSvg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 747 1038" width="747" height="1038"></svg>
+          <div class="overlay" id="overlay"></div>
         </div>
       </div>
-      <div class="drop-overlay" id="dropOverlay">Dépose ton image ici 📥</div>
-      <p class="stage-hint">Bouge la souris (ou le doigt) sur la carte pour incliner en 3D</p>
+      <div class="center-meta"><span id="metaName">CARTE</span><span>747 × 1038 PX</span></div>
+      <div class="center-bottom">
+        <div class="zoom">
+          <button id="zoomOut" aria-label="Dézoomer">−</button>
+          <span id="zoomVal">100%</span>
+          <button id="zoomIn" aria-label="Zoomer">+</button>
+          <button id="zoomFit" title="Ajuster à l'écran" aria-label="Ajuster">⤢</button>
+        </div>
+        <button class="soft-btn" id="shuffleBtn" title="Change la palette de la carte au hasard">🔀 Palette au hasard</button>
+      </div>
+      <p class="tip">Glisse tout. Double-clic sur un texte pour l'éditer. <kbd>Shift</kbd> pour contraindre. <kbd>Alt</kbd>+clic = calque du dessous. <kbd>Ctrl</kbd>+<kbd>L</kbd> = verrouiller.</p>
     </section>
 
-    <aside class="layers" id="layersPanel" hidden>
-      <h3>🧅 Calques</h3>
-      <div class="layers-list" id="layersList"></div>
-      <p class="hint">👁 show/hide · clic = sélectionner · tirer la ligne = réordonner · déposer une image sur une ligne = l’assigner (Fond→fond, Art→illustration, Logo→logo)</p>
+    <!-- ================= DROITE ================= -->
+    <aside class="panel right" aria-label="Propriétés">
+      <div id="inspector"></div>
     </aside>
   </main>
 
-  <div class="veil" id="veil" hidden></div>
-  <script src="js/app.js?v=1795580000"></script>
+  <!-- export -->
+  <div class="modal" id="exportModal" hidden>
+    <div class="modal-card">
+      <button class="modal-x" data-close aria-label="Fermer">×</button>
+      <h2>Prête à sortir.</h2>
+      <p class="muted">Exporte ta carte ou garde un projet éditable.</p>
+      <div class="row"><label for="expScale">Taille d'export</label>
+        <select id="expScale"><option value="1">1×</option><option value="2" selected>2×</option><option value="3">3×</option><option value="4">4×</option></select>
+        <span class="mono-note" id="expDims">1494 × 2076</span></div>
+      <button class="exp-opt" id="expPng"><b>⬇ Télécharger PNG</b><small>Haute résolution · coins transparents</small></button>
+      <button class="exp-opt" id="expSvg"><b>⟨/⟩ Télécharger SVG</b><small>Vectoriel · images et polices embarquées</small></button>
+      <button class="exp-opt" id="expProj"><b>💾 Enregistrer le projet</b><small>Tous les calques, images et SVG perso (.card.json)</small></button>
+      <button class="exp-opt" id="expHolo"><b>✨ Voir en holo 3D</b><small>Envoie le rendu dans la visionneuse holo</small></button>
+      <p class="mono-note" id="expMsg"></p>
+    </div>
+  </div>
+  <input type="file" id="projFile" accept=".json,application/json" hidden />
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="js/editor-data.js?v=1795590000"></script>
+  <script src="js/editor.js?v=1795590000"></script>
 </body>
 </html>

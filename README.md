@@ -14,7 +14,9 @@ Bouge la souris (ou le doigt / le gyroscope) sur la carte pour le rendu 3D.
 
 ## 🎴 Éditeur de cartes
 
-`editor.html` — éditeur façon poster studio : modèles Outcome, calques, micrographics d'attaques / énergie / rareté, export PNG / SVG, aperçu holo. En ligne : <https://baynpsd.github.io/Card_Studio/editor.html>
+**Card maker** (page d'accueil, `index.html`) — éditeur façon poster studio : modèles Outcome, calques, micrographics d'attaques / énergie / rareté, export PNG / SVG, aperçu holo. En ligne : <https://baynpsd.github.io/Card_Studio/>
+
+**Carte holo** (`holo.html`) — visionneuse 3D : upload d'une carte, 30+ effets holo (SWSH + Écarlate & Violet).
 
 ## Lancer
 

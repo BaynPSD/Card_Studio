@@ -799,3 +799,10 @@ details.grp > summary:hover {
 
 #studioHint { color: #9fb4ff; }
 #sessionHint button { margin: 0 4px; }
+
+/* holo.html : visionneuse seule (l'ancien Studio est retiré de l'interface ; le Card maker est index.html) */
+body.no-studio .card .st,
+body.no-studio #pane-studio,
+body.no-studio .tab[data-tab="studio"] { display: none !important; }
+.site-tabs a.tab { text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; }
+.slot img:not([src]), .slot img[src=""] { visibility: hidden; }

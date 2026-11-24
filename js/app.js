@@ -334,11 +334,13 @@ async function buildMask(src) {
 const fileName = document.getElementById("fileName");
 const dropOverlay = document.getElementById("dropOverlay");
 
+/* URL absolues : une url() relative posée dans une variable CSS est résolue depuis css/ par le navigateur → 404 */
+const absUrl = (p) => new URL(p, location.href).href;
 const DEFAULT_FILES = {
-  card: "img/card.webp",
-  mask: "img/card_mask.webp",
-  foil: "img/card_foil.webp",
-  back: "img/card_back.webp",
+  card: absUrl("img/card.webp"),
+  mask: absUrl("img/card_mask.webp"),
+  foil: absUrl("img/card_foil.webp"),
+  back: absUrl("img/card_back.webp"),
   fg: null,
 };
 
@@ -2436,3 +2438,18 @@ refreshInspector = function () {
   _refreshInspImg();
   if (inspImg) inspImg.hidden = !(selectedZone && zoneTakesImage(selectedZone));
 };
+
+/* ---------- holo.html : visionneuse seule, le mode Studio n'est jamais actif ---------- */
+(function noStudio() {
+  if (!document.body.classList.contains("no-studio")) return;
+  const off = () => {
+    const sb = document.getElementById("studioBox");
+    if (sb && sb.checked) { sb.checked = false; sb.dispatchEvent(new Event("input")); }
+    card.classList.remove("studio", "edit", "tpl-outcome");
+    const tab = document.querySelector('.tab[data-tab="card"]');
+    if (tab && !tab.classList.contains("active")) tab.click();
+  };
+  off();
+  setTimeout(off, 600);
+  setTimeout(off, 1600); /* après une éventuelle restauration de session */
+})();
