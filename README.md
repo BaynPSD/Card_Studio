@@ -18,6 +18,13 @@ Bouge la souris (ou le doigt / le gyroscope) sur la carte pour le rendu 3D.
 
 **Carte holo** (`holo.html`) — visionneuse 3D : upload d'une carte, 30+ effets holo (SWSH + Écarlate & Violet).
 
+## 💻 En local (sans internet pour le site)
+
+1. Télécharge le repo (bouton vert **Code → Download ZIP**, puis dézippe) ou `git clone`.
+2. **Windows** : double-clic sur `lancer-local.bat` → le navigateur s'ouvre sur `http://localhost:8080`. Ferme la fenêtre noire pour arrêter.
+   **Mac / Linux** : double-clic sur `lancer-local.command` (ou `python3 -m http.server 8080`).
+3. Ne pas ouvrir `index.html` directement par double-clic : le navigateur bloque alors l'export PNG/SVG.
+
 ## Lancer
 
 - **Double-clic sur `index.html`** (fonctionne en `file://`), ou

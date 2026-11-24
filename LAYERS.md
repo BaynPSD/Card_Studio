@@ -252,3 +252,4 @@ L'ancien Studio (onglet de `index.html`) reste intact ; `index.html` a un lien v
 - `editor.html` = simple redirection vers `index.html` (anciens liens).
 - « ✨ Voir en holo » du Card maker → `holo.html#from-editor`.
 - Corrigé : effets Écarlate & Violet (pokemon-cards-151) qui affichaient le calque Studio par-dessus la carte ; `DEFAULT_FILES` en URL absolues (une `url()` relative dans une variable CSS était résolue depuis `css/` → 404 sur card.webp / card_foil.webp) ; vignette « Couche avant » vide masquée.
+- Local :  (Windows, serveur PowerShell , port 8080→8099, ouvre le navigateur) /  (Mac/Linux, python http.server). Pas de file:// (export bloqué).
