@@ -7610,3 +7610,8 @@ Shine & Glare Effects
 .card.studio.tpl-outcome.atk-n1 .st-desc { top: 65%; }
 /* sans gabarit : la 3e ligne suit simplement les autres */
 .card.studio:not(.tpl-outcome).atk-n3 #stAtkRow3 { position: relative; }
+
+/* zone qui va recevoir l'image glissée */
+.card.studio .st .drop-target { outline: 3px dashed #5af0d2 !important; outline-offset: 2px; }
+/* petites zones (rond, logo) : poignées plus fines pour voir le contenu */
+.card.studio .st :is(.st-hpico, .st-logo).selected > .st-rh { width: 8px; height: 8px; border-width: 1px; }

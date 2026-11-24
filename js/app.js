@@ -2320,3 +2320,95 @@ if (stGlyphFile) stGlyphFile.addEventListener("change", () => {
   });
   stGlyphFile.value = "";
 });
+
+/* ==========================================================================================
+   🖼 Mettre une image dans la zone : glisser un fichier DIRECTEMENT sur la zone (rond, logo, illustration,
+   ligne d'attaque…), double-clic sur la zone, ou bouton « Insérer / remplacer l'image » de la sélection.
+   ========================================================================================== */
+function imageZoneOf(el) {
+  if (!el || !el.closest) return null;
+  return el.closest(".st-hpico,.st-logo,.st-atk,.st-art,.st-bg,.st-fond") || null;
+}
+function zoneTakesImage(z) { return !!imageZoneOf(z); }
+async function putImageInZone(zone, file) {
+  if (!zone || !file || !file.type.startsWith("image/")) return;
+  if (typeof pushUndo === "function") pushUndo();
+  if (zone.classList.contains("st-hpico")) {
+    zone.dataset.z = 1; zone.dataset.x = 0; zone.dataset.y = 0;
+    setHpIco("custom", await shrinkImage(file, 600));
+    const sel = document.getElementById("stHpIcoIn");
+    if (sel) sel.value = "custom";
+    for (const [id, v] of [["stHpIcoZ", 1], ["stHpIcoX", 0], ["stHpIcoY", 0]]) { const i = document.getElementById(id); if (i) i.value = v; }
+  } else if (zone.classList.contains("st-atk")) {
+    zone.style.setProperty("--st-glyph-img", `url("${await shrinkImage(file, 256)}")`);
+    const n = zone.id.replace("stAtkRow", "");
+    const sel = document.getElementById("stIcon" + n + "In");
+    if (sel) { sel.value = "img"; n === "3" ? paintAtk3() : sel.dispatchEvent(new Event("input")); }
+  } else if (zone.classList.contains("st-logo")) {
+    setLogoFile(file);
+  } else if (zone.classList.contains("st-art")) {
+    setSlotFile("fg", file);
+    if (typeof loadArtNatural === "function") setTimeout(loadArtNatural, 60);
+  } else {
+    fileToSlotForZone(zone.className, file);
+  }
+  if (typeof toast === "function") toast("Image placée ✓");
+}
+function zoneAtPoint(x, y) {
+  /* zone image la plus haute sous le pointeur ; sinon la zone sélectionnée ; sinon l'illustration */
+  for (const el of document.elementsFromPoint(x, y)) {
+    const z = imageZoneOf(el);
+    if (z && card.contains(z) && !z.classList.contains("st-fond") && !z.classList.contains("st-bg")) return z;
+  }
+  if (selectedZone && zoneTakesImage(selectedZone)) return imageZoneOf(selectedZone);
+  return card.querySelector(".st-art");
+}
+let dropHL = null;
+function setDropHL(z) {
+  if (dropHL === z) return;
+  if (dropHL) dropHL.classList.remove("drop-target");
+  dropHL = z;
+  if (z) z.classList.add("drop-target");
+}
+card.addEventListener("dragover", (e) => {
+  if (!card.classList.contains("studio")) return;
+  e.preventDefault();
+  setDropHL(zoneAtPoint(e.clientX, e.clientY));
+}, true);
+card.addEventListener("dragleave", (e) => { if (!card.contains(e.relatedTarget)) setDropHL(null); }, true);
+card.addEventListener("drop", (e) => {
+  if (!card.classList.contains("studio")) return;
+  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (!f) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const z = zoneAtPoint(e.clientX, e.clientY);
+  setDropHL(null);
+  stage.classList.remove("dragging");
+  putImageInZone(z, f);
+}, true);
+/* sélecteur de fichier partagé */
+function pickImageForZone(zone) {
+  const i = document.createElement("input");
+  i.type = "file";
+  i.accept = "image/*";
+  i.onchange = () => i.files[0] && putImageInZone(zone, i.files[0]);
+  i.click();
+}
+/* double-clic sur le rond / le logo = choisir une image */
+card.addEventListener("dblclick", (e) => {
+  if (!card.classList.contains("studio")) return;
+  const z = e.target.closest && e.target.closest(".st-hpico,.st-logo");
+  if (!z) return;
+  e.preventDefault();
+  e.stopPropagation();
+  pickImageForZone(z);
+});
+/* bouton dans le panneau Sélection */
+const inspImg = document.getElementById("inspImg");
+if (inspImg) inspImg.addEventListener("click", () => selectedZone && pickImageForZone(imageZoneOf(selectedZone)));
+const _refreshInspImg = refreshInspector;
+refreshInspector = function () {
+  _refreshInspImg();
+  if (inspImg) inspImg.hidden = !(selectedZone && zoneTakesImage(selectedZone));
+};
